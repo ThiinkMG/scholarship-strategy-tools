@@ -1,0 +1,629 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scholarship Type Sorter - My College Finance</title>
+    <style>
+        :root {
+            --mcf-brand-blue: #012699;
+            --mcf-brand-green: #26e011;
+            --mcf-brand-amber: #fdc003;
+            --mcf-brand-black: #000516;
+            --mcf-background: #fafafa;
+            --mcf-foreground: #09090b;
+            --mcf-card: #ffffff;
+            --mcf-card-foreground: #09090b;
+            --mcf-primary: #336bff;
+            --mcf-primary-foreground: #f8fafc;
+            --mcf-secondary: #f1f5f9;
+            --mcf-secondary-foreground: #64748b;
+            --mcf-muted: #f1f5f9;
+            --mcf-muted-foreground: #64748b;
+            --mcf-destructive: #ef4444;
+            --mcf-border: #e2e8f0;
+            --mcf-input: #e2e8f0;
+            --mcf-radius: 0.5rem;
+            --mcf-transition: all 0.3s ease;
+            --cat-merit: #336bff;
+            --cat-need: #16a34a;
+            --cat-niche: #a855f7;
+            --cat-athletic: #f97316;
+            --cat-creative: #ec4899;
+            --cat-service: #06b6d4;
+        }
+        body.dark-mode {
+            --mcf-background: #09090b; --mcf-foreground: #f8fafc; --mcf-card: #1a1a1f; --mcf-card-foreground: #f8fafc;
+            --mcf-primary: #4c6ef5; --mcf-primary-foreground: #f8fafc; --mcf-secondary: #374151; --mcf-secondary-foreground: #f8fafc;
+            --mcf-muted: #1c1917; --mcf-muted-foreground: #94a3b8; --mcf-border: #374151; --mcf-input: #1f2937;
+            --mcf-brand-blue: #0139cc; --mcf-brand-green: #3ae826; --mcf-brand-amber: #fdc922; --mcf-brand-black: #f0f1ff;
+            --cat-merit: #4c6ef5; --cat-need: #22c55e; --cat-niche: #c084fc; --cat-athletic: #fb923c; --cat-creative: #f472b6; --cat-service: #22d3ee;
+        }
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,'Noto Sans',sans-serif;font-size:16px;line-height:1.5;background:var(--mcf-background);color:var(--mcf-foreground);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+
+        /* HEADER */
+        .mcf-header{position:sticky;top:0;z-index:100;border-bottom:2px solid var(--mcf-border);backdrop-filter:blur(12px);background:rgba(250,250,250,0.92);}
+        body.dark-mode .mcf-header{background:rgba(9,9,11,0.92);}
+        .mcf-header-inner{max-width:1280px;margin:0 auto;padding:0 1rem;display:flex;justify-content:space-between;align-items:center;height:64px;}
+        .mcf-header-brand{display:flex;align-items:center;gap:0.75rem;}
+        .mcf-logo-header{width:50px;height:50px;object-fit:contain;}
+        .mcf-brand-text{display:flex;flex-direction:column;}
+        .mcf-brand-name{font-size:1rem;font-weight:900;text-transform:uppercase;letter-spacing:0.05em;color:var(--mcf-brand-blue);line-height:1.2;}
+        .mcf-tagline{font-size:0.6rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--mcf-muted-foreground);}
+        .mcf-theme-toggle{width:40px;height:40px;padding:0;border:2px solid var(--mcf-border);background:var(--mcf-card);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--mcf-transition);color:var(--mcf-foreground);}
+        .mcf-theme-toggle:hover{border-color:var(--mcf-primary);transform:scale(1.1);}
+        .content-wrap{max-width:960px;margin:0 auto;padding:0 1rem;}
+
+        /* HERO */
+        .hero{text-align:center;padding:2.5rem 0 1.5rem;animation:fadeSlideIn 0.6s ease-out;}
+        .hero-badge{display:inline-flex;align-items:center;gap:0.4rem;background:linear-gradient(135deg,var(--mcf-brand-blue),var(--mcf-primary));color:#fff;font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.35rem 1rem;border-radius:50px;margin-bottom:1rem;}
+        .hero-title{font-size:2rem;font-weight:900;line-height:1.15;letter-spacing:-0.02em;margin-bottom:0.75rem;}
+        .hero-title span{background:linear-gradient(135deg,var(--mcf-brand-blue),var(--mcf-primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .hero-desc{font-size:1rem;color:var(--mcf-muted-foreground);max-width:620px;margin:0 auto;line-height:1.6;}
+
+        /* PROGRESS */
+        .progress-section{margin-bottom:1.25rem;animation:fadeSlideIn 0.6s ease-out 0.1s both;}
+        .progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;}
+        .progress-label{font-size:0.78rem;font-weight:600;color:var(--mcf-foreground);}
+        .progress-score{font-size:0.78rem;font-weight:700;color:var(--mcf-brand-blue);}
+        .progress-track{width:100%;height:10px;background:var(--mcf-secondary);border-radius:50px;overflow:hidden;border:1px solid var(--mcf-border);}
+        .progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--mcf-brand-blue),var(--mcf-primary));border-radius:50px;transition:width 0.5s cubic-bezier(0.22,1,0.36,1);}
+
+        /* SORT AREA */
+        .sort-workspace{animation:fadeSlideIn 0.6s ease-out 0.2s both;}
+
+        /* SCHOLARSHIP CARD TO SORT */
+        .sort-card-container{margin-bottom:1.25rem;}
+        .sort-card{background:var(--mcf-card);border:2.5px solid var(--mcf-border);border-radius:calc(var(--mcf-radius)*2);padding:1.5rem;text-align:center;transition:var(--mcf-transition);animation:cardIn 0.4s ease-out;}
+        .sort-card .sc-emoji{font-size:2.2rem;margin-bottom:0.4rem;}
+        .sort-card .sc-label{font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--mcf-muted-foreground);margin-bottom:0.35rem;}
+        .sort-card .sc-name{font-size:1.2rem;font-weight:800;color:var(--mcf-foreground);margin-bottom:0.5rem;line-height:1.3;}
+        .sort-card .sc-desc{font-size:0.88rem;color:var(--mcf-muted-foreground);line-height:1.6;max-width:540px;margin:0 auto;}
+        .sort-card .sc-hint{display:inline-block;margin-top:0.75rem;font-size:0.72rem;color:var(--mcf-muted-foreground);font-style:italic;background:var(--mcf-secondary);padding:0.25rem 0.75rem;border-radius:50px;}
+
+        /* DROP ZONES */
+        .drop-zones{display:grid;grid-template-columns:repeat(3,1fr);gap:0.65rem;margin-bottom:1.25rem;}
+        @media(max-width:768px){.drop-zones{grid-template-columns:repeat(2,1fr);}}
+        @media(max-width:500px){.drop-zones{grid-template-columns:1fr 1fr;}}
+
+        .drop-zone{border:2.5px dashed var(--mcf-border);border-radius:calc(var(--mcf-radius)*1.5);padding:1rem 0.75rem;text-align:center;cursor:pointer;transition:all 0.3s ease;min-height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.25rem;position:relative;background:var(--mcf-card);}
+        .drop-zone:hover{border-color:var(--mcf-primary);background:rgba(51,107,255,0.03);transform:translateY(-2px);}
+        .drop-zone .dz-icon{font-size:1.5rem;}
+        .drop-zone .dz-name{font-size:0.78rem;font-weight:700;color:var(--mcf-foreground);}
+        .drop-zone .dz-count{font-size:0.62rem;color:var(--mcf-muted-foreground);font-weight:600;}
+        .drop-zone.dz-highlight{border-color:var(--mcf-primary);background:rgba(51,107,255,0.06);border-style:solid;}
+        .drop-zone.dz-correct{border-color:var(--mcf-brand-green);background:rgba(38,224,17,0.06);border-style:solid;animation:correctPulse 0.5s ease-out;}
+        .drop-zone.dz-wrong{border-color:var(--mcf-destructive);background:rgba(239,68,68,0.06);border-style:solid;animation:shake 0.4s ease-out;}
+
+        .drop-zone[data-cat="merit"] .dz-icon{color:var(--cat-merit);}
+        .drop-zone[data-cat="need"] .dz-icon{color:var(--cat-need);}
+        .drop-zone[data-cat="niche"] .dz-icon{color:var(--cat-niche);}
+        .drop-zone[data-cat="athletic"] .dz-icon{color:var(--cat-athletic);}
+        .drop-zone[data-cat="creative"] .dz-icon{color:var(--cat-creative);}
+        .drop-zone[data-cat="service"] .dz-icon{color:var(--cat-service);}
+
+        /* FEEDBACK */
+        .feedback-panel{padding:1.15rem;border-radius:calc(var(--mcf-radius)*1.5);margin-bottom:1.25rem;animation:feedbackIn 0.35s ease-out;line-height:1.65;}
+        .feedback-panel.correct-fb{background:linear-gradient(135deg,rgba(38,224,17,0.06),rgba(22,163,74,0.06));border:1.5px solid rgba(38,224,17,0.35);}
+        .feedback-panel.incorrect-fb{background:linear-gradient(135deg,rgba(239,68,68,0.06),rgba(220,38,38,0.06));border:1.5px solid rgba(239,68,68,0.35);}
+        .fb-verdict{display:flex;align-items:center;gap:0.5rem;font-size:1rem;font-weight:800;margin-bottom:0.4rem;}
+        .fb-verdict.correct-v{color:#166534;}body.dark-mode .fb-verdict.correct-v{color:var(--mcf-brand-green);}
+        .fb-verdict.incorrect-v{color:#991b1b;}body.dark-mode .fb-verdict.incorrect-v{color:#f87171;}
+        .fb-explain{font-size:0.85rem;color:var(--mcf-card-foreground);margin-bottom:0.5rem;}
+        .fb-cat-badge{display:inline-flex;align-items:center;gap:0.3rem;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:0.2rem 0.65rem;border-radius:50px;color:#fff;margin-bottom:0.5rem;}
+        .next-btn-wrap{display:flex;justify-content:flex-end;margin-top:0.75rem;}
+
+        /* SUMMARY */
+        .summary-screen{display:none;animation:fadeSlideIn 0.6s ease-out;}
+        .summary-screen.visible{display:block;}
+        .summary-hero{text-align:center;padding:2rem 0 1.5rem;}
+        .summary-icon{font-size:3.5rem;margin-bottom:0.5rem;}
+        .summary-title{font-size:1.75rem;font-weight:900;margin-bottom:0.5rem;}
+        .summary-subtitle{font-size:1rem;color:var(--mcf-muted-foreground);margin-bottom:1.5rem;}
+        .score-display{display:inline-flex;align-items:baseline;gap:0.25rem;background:var(--mcf-card);border:2px solid var(--mcf-border);border-radius:calc(var(--mcf-radius)*2);padding:1rem 2rem;margin-bottom:1.5rem;}
+        .score-big{font-size:3rem;font-weight:900;color:var(--mcf-brand-blue);}
+        .score-total{font-size:1.25rem;font-weight:600;color:var(--mcf-muted-foreground);}
+        .score-label{font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--mcf-muted-foreground);display:block;margin-top:0.25rem;}
+
+        /* CATEGORY REFERENCE CARDS */
+        .ref-title{font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--mcf-foreground);margin:1.5rem 0 0.75rem;padding-bottom:0.5rem;border-bottom:2px solid var(--mcf-border);}
+        .ref-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.75rem;margin-bottom:1.5rem;}
+        .ref-card{background:var(--mcf-card);border:2px solid var(--mcf-border);border-radius:calc(var(--mcf-radius)*1.5);padding:1.15rem;transition:var(--mcf-transition);}
+        .ref-card:hover{border-color:var(--mcf-brand-blue);box-shadow:0 4px 16px rgba(0,0,0,0.06);}
+        .ref-card-header{display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;}
+        .ref-card-icon{font-size:1.4rem;}
+        .ref-card-name{font-size:0.95rem;font-weight:700;color:var(--mcf-foreground);}
+        .ref-card-badge{font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:0.15rem 0.5rem;border-radius:50px;color:#fff;}
+        .ref-card-desc{font-size:0.8rem;color:var(--mcf-muted-foreground);line-height:1.55;margin-bottom:0.5rem;}
+        .ref-card-examples{font-size:0.75rem;color:var(--mcf-card-foreground);line-height:1.5;}
+        .ref-card-examples strong{color:var(--mcf-foreground);font-size:0.68rem;text-transform:uppercase;letter-spacing:0.04em;}
+
+        /* REVIEW CARDS */
+        .review-card{background:var(--mcf-card);border:2px solid var(--mcf-border);border-radius:calc(var(--mcf-radius)*1.5);padding:1rem;margin-bottom:0.6rem;}
+        .review-card.rev-correct{border-left:5px solid var(--mcf-brand-green);}
+        .review-card.rev-incorrect{border-left:5px solid var(--mcf-destructive);}
+        .rev-header{display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem;margin-bottom:0.35rem;}
+        .rev-name{font-size:0.88rem;font-weight:700;color:var(--mcf-foreground);flex:1;}
+        .rev-result{font-size:0.68rem;font-weight:700;flex-shrink:0;}
+        .rev-result.rr-correct{color:#166534;}body.dark-mode .rev-result.rr-correct{color:var(--mcf-brand-green);}
+        .rev-result.rr-incorrect{color:#991b1b;}body.dark-mode .rev-result.rr-incorrect{color:#f87171;}
+        .rev-explain{font-size:0.78rem;color:var(--mcf-muted-foreground);line-height:1.5;}
+
+        /* BUTTONS */
+        .mcf-btn{display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;padding:0.6rem 1.25rem;font-size:0.82rem;font-weight:600;border-radius:var(--mcf-radius);transition:var(--mcf-transition);cursor:pointer;border:none;font-family:inherit;text-decoration:none;}
+        .mcf-btn-primary{background:var(--mcf-primary);color:var(--mcf-primary-foreground);}
+        .mcf-btn-primary:hover{background:var(--mcf-brand-blue);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.12);}
+        .mcf-btn-outline{background:transparent;border:2px solid var(--mcf-border);color:var(--mcf-foreground);}
+        .mcf-btn-outline:hover{border-color:var(--mcf-primary);background:rgba(51,107,255,0.05);}
+        .mcf-btn-amber{background:var(--mcf-brand-amber);color:#000516;}
+        .mcf-btn-amber:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(253,192,3,0.3);}
+        .action-bar{display:flex;flex-wrap:wrap;justify-content:center;gap:0.75rem;margin:1.5rem 0 2rem;}
+
+        /* FOOTER */
+        .mcf-footer{background:linear-gradient(to bottom,#111827,#000000);color:white;padding:2.5rem 1rem;margin-top:2rem;text-align:center;}
+        .mcf-footer-inner{max-width:700px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:1rem;}
+        .mcf-footer .mcf-logo-footer{width:60px;height:60px;object-fit:contain;}
+        .mcf-footer-title{font-size:1.1rem;font-weight:900;letter-spacing:0.05em;}
+        .mcf-footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:0.5rem;align-items:center;}
+        .mcf-footer-links a{color:rgba(255,255,255,0.7);text-decoration:none;font-size:0.8rem;transition:color 0.3s ease;}
+        .mcf-footer-links a:hover{color:var(--mcf-brand-amber);}
+        .mcf-footer-sep{color:rgba(255,255,255,0.3);font-size:0.8rem;}
+        .mcf-footer-tagline{font-size:0.8rem;letter-spacing:0.1em;color:var(--mcf-brand-amber);font-weight:600;}
+        .mcf-footer-copy{font-size:0.7rem;color:rgba(255,255,255,0.45);}
+
+        @keyframes fadeSlideIn{from{transform:translateY(18px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+        @keyframes feedbackIn{from{transform:translateY(10px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+        @keyframes cardIn{from{transform:scale(0.95) translateY(10px);opacity:0;}to{transform:scale(1) translateY(0);opacity:1;}}
+        @keyframes correctPulse{0%{transform:scale(1);}50%{transform:scale(1.03);}100%{transform:scale(1);}}
+        @keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-5px);}40%{transform:translateX(5px);}60%{transform:translateX(-3px);}80%{transform:translateX(3px);}}
+
+        @media(max-width:640px){.hero-title{font-size:1.5rem;}.mcf-brand-text{display:none;}.score-big{font-size:2.25rem;}.summary-title{font-size:1.35rem;}}
+        @media print{.mcf-header,.mcf-footer,.mcf-theme-toggle,.action-bar,.next-btn-wrap{display:none!important;}body{background:#fff!important;color:#000!important;}}
+    </style>
+</head>
+<body>
+    <header class="mcf-header"><div class="mcf-header-inner"><div class="mcf-header-brand"><img src="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" alt="My College Finance Logo" class="mcf-logo-header"><div class="mcf-brand-text"><div class="mcf-brand-name">My College Finance</div><div class="mcf-tagline">EDUCATE &bull; MOTIVATE &bull; ELEVATE</div></div></div><button id="mcf-theme-toggle" class="mcf-theme-toggle" aria-label="Toggle dark mode"><svg class="mcf-sun-icon" width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="4" fill="currentColor"/><path d="M10 0v4M10 16v4M20 10h-4M4 10H0M17.07 2.93l-2.83 2.83M5.76 14.24l-2.83 2.83M17.07 17.07l-2.83-2.83M5.76 5.76L2.93 2.93" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><svg class="mcf-moon-icon" width="18" height="18" viewBox="0 0 20 20" fill="none" style="display:none;"><path d="M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C10.3395 3 10.6734 3.02389 11 3.07039C9.27477 4.07544 8 5.8965 8 8C8 11.3137 10.6863 14 14 14C15.1035 14 16.0754 13.6238 16.9296 12.9998C16.9762 13.3266 17 13.6605 17 14Z" fill="currentColor"/></svg></button></div></header>
+
+    <div class="content-wrap">
+        <!-- QUIZ SCREEN -->
+        <div id="quizScreen">
+            <section class="hero">
+                <div class="hero-badge">Lesson 2.2 &mdash; Types of Scholarships</div>
+                <h1 class="hero-title">Scholarship Type<br><span>Sorter</span></h1>
+                <p class="hero-desc">Can you sort scholarships into the correct categories? Read each scholarship description and click the category where it belongs. Discover the wide variety of scholarships available!</p>
+            </section>
+
+            <div class="progress-section" id="progressSection">
+                <div class="progress-header">
+                    <span class="progress-label" id="progressLabel">Scholarship 1 of 15</span>
+                    <span class="progress-score" id="progressScore">Score: 0</span>
+                </div>
+                <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+            </div>
+
+            <div class="sort-workspace">
+                <div class="sort-card-container" id="sortCardContainer"></div>
+                <div class="drop-zones" id="dropZones"></div>
+                <div id="feedbackContainer"></div>
+                <div style="display:flex;justify-content:center;margin-top:1rem;">
+                    <button class="mcf-btn mcf-btn-outline" onclick="restartQuiz()" style="font-size:0.75rem;padding:0.45rem 1rem;"><span>&#128260;</span> Reset &amp; Start Over</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SUMMARY SCREEN -->
+        <div id="summaryScreen" class="summary-screen">
+            <div class="summary-hero">
+                <div class="summary-icon" id="summaryIcon"></div>
+                <h2 class="summary-title" id="summaryTitle"></h2>
+                <p class="summary-subtitle" id="summarySubtitle"></p>
+                <div class="score-display">
+                    <span class="score-big" id="finalScore"></span>
+                    <span class="score-total" id="finalTotal"></span>
+                    <span class="score-label">Correctly Sorted</span>
+                </div>
+            </div>
+
+            <div class="ref-title">Scholarship Category Reference Guide</div>
+            <div class="ref-grid" id="refGrid"></div>
+
+            <div class="ref-title">Review Your Answers</div>
+            <div id="reviewCards"></div>
+
+            <div class="action-bar">
+                <button class="mcf-btn mcf-btn-primary" onclick="downloadPDF()"><span>&#128196;</span> Save &amp; Download PDF</button>
+                <button class="mcf-btn mcf-btn-outline" onclick="downloadTemplate()"><span>&#128203;</span> Download Blank Template</button>
+                <button class="mcf-btn mcf-btn-amber" onclick="restartQuiz()"><span>&#128260;</span> Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="mcf-footer"><div class="mcf-footer-inner"><img src="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" alt="My College Finance Logo" class="mcf-logo-footer"><div class="mcf-footer-title">MY COLLEGE FINANCE</div><div class="mcf-footer-links"><a href="https://www.mycollegefinance.com/" target="_blank" rel="noopener">Main Website</a><span class="mcf-footer-sep">&bull;</span><a href="https://www.mycollegefinance.com/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a><span class="mcf-footer-sep">&bull;</span><a href="https://www.mycollegefinance.com/terms-policy" target="_blank" rel="noopener">Terms of Service</a><span class="mcf-footer-sep">&bull;</span><a href="https://linktr.ee/mycollegefinance" target="_blank" rel="noopener">Social Media</a></div><div class="mcf-footer-tagline">EDUCATE &bull; MOTIVATE &bull; ELEVATE</div><div class="mcf-footer-copy">&copy; 2025 My College Finance. All rights reserved.</div></div></footer>
+
+<script>
+/* ==========================================
+   CATEGORY DATA
+   ========================================== */
+const catData = {
+    merit: { icon: '\u{1F3C6}', name: 'Merit-Based', color: 'var(--cat-merit)', hex: '#336bff', darkHex: '#4c6ef5',
+        desc: 'Awarded based on academic achievement, test scores, GPA, class rank, or intellectual accomplishment. These reward what you have achieved in the classroom.',
+        examples: 'Presidential Scholarships, Dean\'s List Awards, National Merit Scholarships, AP Scholar Awards, Valedictorian Awards' },
+    need: { icon: '\u{1F4B0}', name: 'Need-Based', color: 'var(--cat-need)', hex: '#16a34a', darkHex: '#22c55e',
+        desc: 'Awarded based on financial need as determined by FAFSA, CSS Profile, or other income documentation. Designed to make college accessible for students who cannot afford the full cost.',
+        examples: 'Pell Grants, State Need-Based Grants, Institutional Need-Based Aid, Federal SEOG, Cal Grants' },
+    niche: { icon: '\u{1F308}', name: 'Niche / Identity', color: 'var(--cat-niche)', hex: '#a855f7', darkHex: '#c084fc',
+        desc: 'Awarded based on specific personal characteristics: heritage, ethnicity, gender, religion, disability, first-generation status, career interest, or unique life circumstances.',
+        examples: 'Hispanic Scholarship Fund, UNCF Awards, First-Gen Scholarships, LGBTQ+ Awards, Left-Handed Scholarships, Scholarships for Students with Disabilities' },
+    athletic: { icon: '\u26BD', name: 'Athletic', color: 'var(--cat-athletic)', hex: '#f97316', darkHex: '#fb923c',
+        desc: 'Awarded to student-athletes based on sports performance, recruitment, and athletic potential. Governed by NCAA, NAIA, and NJCAA regulations across divisions.',
+        examples: 'NCAA Division I Full Rides, Division II Partial Athletic Awards, NAIA Athletic Scholarships, Club Sport Scholarships, Walk-On Program Opportunities' },
+    creative: { icon: '\u{1F3A8}', name: 'Creative / Talent', color: 'var(--cat-creative)', hex: '#ec4899', darkHex: '#f472b6',
+        desc: 'Awarded based on artistic, musical, theatrical, or creative talent. Typically require a portfolio, audition, or demonstration of creative work.',
+        examples: 'Fine Arts Scholarships, Music Performance Awards, Theatre Audition Scholarships, Scholastic Art & Writing Awards, Film School Scholarships' },
+    service: { icon: '\u{1F91D}', name: 'Service / Leadership', color: 'var(--cat-service)', hex: '#06b6d4', darkHex: '#22d3ee',
+        desc: 'Awarded based on community service, volunteer work, leadership roles, civic engagement, or demonstrated commitment to making a positive impact.',
+        examples: 'Bonner Scholars, Eagle Scout Scholarships, Volunteer Service Awards, Student Government Scholarships, AmeriCorps Segal Education Awards' }
+};
+
+/* ==========================================
+   SCHOLARSHIP ITEMS TO SORT
+   ========================================== */
+const scholarships = [
+    { name: 'National Merit Scholarship', emoji: '\u{1F4DA}', desc: 'Awarded to students who score in the top 1% on the PSAT/NMSQT and demonstrate outstanding academic performance throughout high school.', category: 'merit', explain: 'This scholarship is entirely based on academic test performance (PSAT scores), making it a classic merit-based award.' },
+    { name: 'Federal Pell Grant', emoji: '\u{1F3DB}', desc: 'Federal grant program providing up to $7,395 per year to undergraduate students based on Expected Family Contribution calculated from FAFSA.', category: 'need', explain: 'Pell Grants are awarded solely based on financial need as determined by your FAFSA. There are no academic requirements to qualify.' },
+    { name: 'Hispanic Scholarship Fund Award', emoji: '\u{1F31F}', desc: 'Provides $500-$5,000 awards to students of Hispanic heritage pursuing degrees at accredited institutions in the United States.', category: 'niche', explain: 'This scholarship targets students of a specific heritage/ethnicity, making it a niche/identity-based award. While GPA may be a factor, the primary eligibility is Hispanic identity.' },
+    { name: 'NCAA Division I Full Ride', emoji: '\u{1F3C8}', desc: 'Full tuition, room, board, and books package offered to recruited student-athletes who demonstrate elite-level sports performance.', category: 'athletic', explain: 'This is a pure athletic scholarship -- awarded based on sports ability and recruitment by a college coaching staff under NCAA regulations.' },
+    { name: 'Scholastic Art & Writing Gold Key', emoji: '\u270D\uFE0F', desc: 'Awards given to students in grades 7-12 who submit exceptional visual art or creative writing portfolios judged by professional artists.', category: 'creative', explain: 'This award is judged entirely on creative talent -- the quality of art or writing portfolios -- making it a creative/talent-based scholarship.' },
+    { name: 'Bonner Scholars Program', emoji: '\u{1F30D}', desc: 'Four-year scholarship for students committed to community service, requiring 10 hours of volunteer work per week throughout college.', category: 'service', explain: 'Bonner Scholars is structured around sustained community service commitment, making it a service/leadership-based scholarship with ongoing volunteer requirements.' },
+    { name: 'Dean\'s Scholarship', emoji: '\u{1F393}', desc: 'University award given automatically to admitted students with a GPA of 3.75+ and strong standardized test scores. No separate application.', category: 'merit', explain: 'This is an automatic merit-based award triggered by academic credentials (GPA and test scores) with no consideration of financial need.' },
+    { name: 'Federal SEOG Grant', emoji: '\u{1F4B3}', desc: 'Supplemental Educational Opportunity Grant providing $100-$4,000 per year to undergraduates with exceptional financial need beyond Pell eligibility.', category: 'need', explain: 'SEOG is specifically for students with "exceptional financial need" -- it is a need-based federal grant layered on top of the Pell Grant.' },
+    { name: 'Gates Millennium Scholarship', emoji: '\u{1F680}', desc: 'Full cost-of-attendance award for outstanding minority students who are Pell-eligible and demonstrate significant leadership and community service.', category: 'niche', explain: 'While this scholarship considers multiple factors, its primary eligibility criteria is being a minority student from a low-income background, making it a niche/identity-based award.' },
+    { name: 'NAIA Athletic Scholarship', emoji: '\u{1F3BE}', desc: 'Partial scholarship offered to student-athletes at NAIA member institutions based on athletic talent and potential contribution to the team.', category: 'athletic', explain: 'NAIA scholarships are awarded by coaches based on athletic performance and recruitment, making them athletic scholarships governed by NAIA rules.' },
+    { name: 'YoungArts National Winner', emoji: '\u{1F3B5}', desc: 'National award for emerging artists ages 15-18 in visual arts, music, dance, theater, writing, and film, selected through blind adjudication.', category: 'creative', explain: 'YoungArts evaluates students purely on artistic merit through blind judging of creative work -- a textbook creative/talent-based award.' },
+    { name: 'Eagle Scout Scholarship', emoji: '\u269A\uFE0F', desc: 'Award for Boy Scouts who achieve Eagle rank, recognizing years of leadership, community service projects, and personal development.', category: 'service', explain: 'Eagle Scout scholarships reward the extensive leadership development and mandatory community service projects required to achieve Eagle rank.' },
+    { name: 'QuestBridge National College Match', emoji: '\u{1F4D6}', desc: 'Matches high-achieving, low-income students with full four-year scholarships at top colleges. Requires demonstrated financial need and academic excellence.', category: 'need', explain: 'While QuestBridge students are academically strong, the program\'s core mission is providing access for low-income students -- making financial need the primary criterion.' },
+    { name: 'First-Generation College Student Award', emoji: '\u{1F3E0}', desc: 'Scholarship for students whose parents did not complete a four-year college degree, recognizing the unique challenges of being first in the family.', category: 'niche', explain: 'This targets a specific identity/life circumstance -- being a first-generation college student -- regardless of grades, sports, or financial need.' },
+    { name: 'Student Government Leadership Scholarship', emoji: '\u{1F5F3}', desc: 'Award recognizing students who have held significant leadership positions, organized campus or community initiatives, and demonstrated civic engagement.', category: 'service', explain: 'This scholarship evaluates leadership roles and civic engagement -- the core criteria for service/leadership-based awards.' }
+];
+
+/* ==========================================
+   STATE
+   ========================================== */
+let currentIndex = 0;
+let score = 0;
+let answers = [];
+let shuffled = [];
+let waitingForNext = false;
+
+/* ==========================================
+   DARK MODE
+   ========================================== */
+function initDarkMode(){
+    const s=localStorage.getItem('mcf-theme')||'light';
+    if(s==='dark'){document.body.classList.add('dark-mode');updIcons(true);}
+    document.getElementById('mcf-theme-toggle').addEventListener('click',()=>{
+        const d=document.body.classList.toggle('dark-mode');
+        localStorage.setItem('mcf-theme',d?'dark':'light');updIcons(d);
+    });
+}
+function updIcons(d){
+    document.querySelectorAll('.mcf-sun-icon').forEach(i=>i.style.display=d?'none':'block');
+    document.querySelectorAll('.mcf-moon-icon').forEach(i=>i.style.display=d?'block':'none');
+}
+
+/* ==========================================
+   SHUFFLE
+   ========================================== */
+function shuffle(arr){
+    const a=[...arr];
+    for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+    return a;
+}
+
+/* ==========================================
+   BUILD DROP ZONES
+   ========================================== */
+function buildDropZones(){
+    const container=document.getElementById('dropZones');
+    const counts={};
+    answers.forEach(a=>{if(a.correct){if(!counts[a.correctCat])counts[a.correctCat]=0;counts[a.correctCat]++;}});
+    container.innerHTML='';
+    Object.entries(catData).forEach(([key,cat])=>{
+        const c=counts[key]||0;
+        container.innerHTML+=`
+        <div class="drop-zone" data-cat="${key}" onclick="handleDrop('${key}')">
+            <div class="dz-icon">${cat.icon}</div>
+            <div class="dz-name">${cat.name}</div>
+            <div class="dz-count">${c} sorted</div>
+        </div>`;
+    });
+}
+
+/* ==========================================
+   RENDER CARD
+   ========================================== */
+function renderCard(){
+    if(currentIndex>=shuffled.length){showSummary();return;}
+    const s=shuffled[currentIndex];
+    waitingForNext=false;
+
+    document.getElementById('progressLabel').textContent=`Scholarship ${currentIndex+1} of ${shuffled.length}`;
+    document.getElementById('progressScore').textContent=`Score: ${score}`;
+    document.getElementById('progressFill').style.width=((currentIndex)/shuffled.length*100)+'%';
+
+    document.getElementById('sortCardContainer').innerHTML=`
+        <div class="sort-card" id="activeCard">
+            <div class="sc-emoji">${s.emoji}</div>
+            <div class="sc-label">Sort This Scholarship</div>
+            <div class="sc-name">${s.name}</div>
+            <div class="sc-desc">${s.desc}</div>
+            <div class="sc-hint">Click the category below where this scholarship belongs</div>
+        </div>`;
+
+    document.getElementById('feedbackContainer').innerHTML='';
+    buildDropZones();
+
+    // Reset zone styles
+    document.querySelectorAll('.drop-zone').forEach(z=>{z.classList.remove('dz-correct','dz-wrong','dz-highlight');});
+}
+
+/* ==========================================
+   HANDLE DROP (CLICK)
+   ========================================== */
+function handleDrop(chosenCat){
+    if(waitingForNext)return;
+    waitingForNext=true;
+
+    const s=shuffled[currentIndex];
+    const correct=chosenCat===s.category;
+    if(correct)score++;
+
+    answers.push({name:s.name,emoji:s.emoji,chosenCat,correctCat:s.category,correct,explain:s.explain});
+
+    // Visual feedback on zones
+    const chosenZone=document.querySelector(`.drop-zone[data-cat="${chosenCat}"]`);
+    const correctZone=document.querySelector(`.drop-zone[data-cat="${s.category}"]`);
+
+    if(correct){
+        chosenZone.classList.add('dz-correct');
+    }else{
+        chosenZone.classList.add('dz-wrong');
+        correctZone.classList.add('dz-correct');
+    }
+
+    // Card animation
+    const card=document.getElementById('activeCard');
+    if(!correct)card.style.borderColor='var(--mcf-destructive)';
+    else card.style.borderColor='var(--mcf-brand-green)';
+
+    // Feedback panel
+    const cat=catData[s.category];
+    const fb=document.getElementById('feedbackContainer');
+    fb.innerHTML=`
+        <div class="feedback-panel ${correct?'correct-fb':'incorrect-fb'}">
+            <div class="fb-verdict ${correct?'correct-v':'incorrect-v'}">
+                <span>${correct?'\u{1F389}':'\u{1F4A1}'}</span>
+                <span>${correct?'Correct!':'Not quite!'}</span>
+            </div>
+            <span class="fb-cat-badge" style="background:${cat.color};">${cat.icon} ${cat.name}</span>
+            <div class="fb-explain">${s.explain}</div>
+            <div class="next-btn-wrap">
+                <button class="mcf-btn mcf-btn-primary" onclick="nextCard()">
+                    ${currentIndex<shuffled.length-1?'Next Scholarship \u2192':'See Results \u{1F3C6}'}
+                </button>
+            </div>
+        </div>`;
+
+    document.getElementById('progressScore').textContent=`Score: ${score}`;
+    localStorage.setItem('mcf-sorter-progress',JSON.stringify({currentIndex,score,answers,order:shuffled.map(s=>s.name)}));
+}
+
+function nextCard(){
+    currentIndex++;
+    renderCard();
+    document.getElementById('sortCardContainer').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ==========================================
+   SUMMARY
+   ========================================== */
+function showSummary(){
+    document.getElementById('quizScreen').style.display='none';
+    document.getElementById('summaryScreen').classList.add('visible');
+    document.getElementById('progressFill').style.width='100%';
+
+    const pct=Math.round((score/shuffled.length)*100);
+    document.getElementById('finalScore').textContent=score;
+    document.getElementById('finalTotal').textContent=`/ ${shuffled.length}`;
+
+    let icon,title,sub;
+    if(pct===100){icon='\u{1F3C6}';title='Perfect Sort!';sub='You know your scholarship types inside and out!';}
+    else if(pct>=80){icon='\u{1F31F}';title='Excellent Sorting!';sub='You have a strong grasp of scholarship categories.';}
+    else if(pct>=60){icon='\u{1F4AA}';title='Great Effort!';sub='You are learning to tell scholarship types apart.';}
+    else if(pct>=40){icon='\u{1F4DA}';title='Keep Practicing!';sub='Review the category guide below to strengthen your knowledge.';}
+    else{icon='\u{1F680}';title='Time to Study Up!';sub='The reference guide below will help you master scholarship types.';}
+
+    document.getElementById('summaryIcon').innerHTML=icon;
+    document.getElementById('summaryTitle').textContent=title;
+    document.getElementById('summarySubtitle').textContent=sub;
+
+    // Category reference cards
+    const refGrid=document.getElementById('refGrid');
+    refGrid.innerHTML='';
+    Object.entries(catData).forEach(([key,cat])=>{
+        const sorted=answers.filter(a=>a.correctCat===key);
+        refGrid.innerHTML+=`
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <span class="ref-card-icon">${cat.icon}</span>
+                <span class="ref-card-name">${cat.name}</span>
+                <span class="ref-card-badge" style="background:${cat.color};">${sorted.filter(a=>a.correct).length}/${sorted.length}</span>
+            </div>
+            <div class="ref-card-desc">${cat.desc}</div>
+            <div class="ref-card-examples"><strong>Examples:</strong> ${cat.examples}</div>
+        </div>`;
+    });
+
+    // Review cards
+    const rc=document.getElementById('reviewCards');
+    rc.innerHTML='';
+    answers.forEach((a,i)=>{
+        const correctCat=catData[a.correctCat];
+        const chosenCatD=catData[a.chosenCat];
+        rc.innerHTML+=`
+        <div class="review-card ${a.correct?'rev-correct':'rev-incorrect'}">
+            <div class="rev-header">
+                <span class="rev-name">${a.emoji} ${i+1}. ${a.name}</span>
+                <span class="rev-result ${a.correct?'rr-correct':'rr-incorrect'}">${a.correct?'Correct':'You chose '+chosenCatD.name+' -- Answer: '+correctCat.name}</span>
+            </div>
+            <div class="rev-explain">${a.explain}</div>
+        </div>`;
+    });
+
+    localStorage.setItem('mcf-sorter-results',JSON.stringify({score,total:shuffled.length,pct,answers}));
+    window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function restartQuiz(){
+    currentIndex=0;score=0;answers=[];
+    shuffled=shuffle(scholarships);
+    waitingForNext=false;
+    localStorage.removeItem('mcf-sorter-progress');
+    document.getElementById('summaryScreen').classList.remove('visible');
+    document.getElementById('quizScreen').style.display='block';
+    renderCard();
+    window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ==========================================
+   PDF
+   ========================================== */
+function downloadPDF(){
+    const now=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+    const pct=Math.round((score/shuffled.length)*100);
+    let html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Scholarship Types Reference Sheet - My College Finance</title>
+    <style>
+        @page{margin:0.6in;size:letter;}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#09090b;font-size:10.5px;line-height:1.5;}
+        .pdf-header{text-align:center;border-bottom:3px solid #012699;padding-bottom:10px;margin-bottom:14px;}
+        .pdf-header img{width:55px;height:55px;}.pdf-header h1{font-size:20px;color:#012699;margin:6px 0 2px;}
+        .pdf-header .tagline{font-size:10px;color:#64748b;letter-spacing:0.1em;}.pdf-header .date{font-size:9px;color:#94a3b8;margin-top:4px;}
+        .score-box{text-align:center;background:#f0f5ff;border:2px solid #dbeafe;border-radius:8px;padding:12px;margin-bottom:14px;}
+        .score-box .big{font-size:28px;font-weight:900;color:#012699;}.score-box .sub{font-size:10px;color:#64748b;}
+        .cat-block{border:1px solid #e2e8f0;border-radius:6px;padding:8px 12px;margin-bottom:8px;page-break-inside:avoid;}
+        .cat-block h3{font-size:12px;margin:0 0 2px;display:flex;align-items:center;gap:4px;}
+        .cat-block .badge{display:inline-block;font-size:7px;font-weight:700;text-transform:uppercase;padding:1px 5px;border-radius:50px;color:#fff;}
+        .cat-block p{font-size:9.5px;color:#374151;margin:2px 0 4px;}.cat-block .examples{font-size:9px;color:#64748b;font-style:italic;}
+        .item{padding:5px 0;border-bottom:1px solid #f1f5f9;font-size:10px;display:flex;justify-content:space-between;gap:8px;}
+        .item:last-child{border:none;}.item .name{font-weight:600;}.item .result{font-size:9px;font-weight:700;}
+        .item .result.c{color:#166534;}.item .result.w{color:#991b1b;}
+        .section-title{font-size:12px;font-weight:800;color:#012699;border-bottom:2px solid #e2e8f0;padding-bottom:3px;margin:14px 0 8px;}
+        .pdf-footer{text-align:center;border-top:2px solid #e2e8f0;padding-top:10px;margin-top:16px;font-size:9px;color:#94a3b8;}
+        .pdf-footer .amber{color:#d97706;font-weight:600;letter-spacing:0.1em;}
+    </style></head><body>
+    <div class="pdf-header"><img src="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" alt="MCF Logo"><h1>Scholarship Types Reference Sheet</h1><div class="tagline">EDUCATE * MOTIVATE * ELEVATE</div><div class="date">Generated ${now} | The Scholarship Strategy - Lesson 2.2</div></div>
+    <div class="score-box"><div class="big">${score} / ${shuffled.length}</div><div class="sub">${pct}% Correctly Sorted</div></div>
+    <div class="section-title">Scholarship Category Guide</div>`;
+
+    Object.entries(catData).forEach(([key,cat])=>{
+        const items=answers.filter(a=>a.correctCat===key);
+        html+=`<div class="cat-block"><h3><span class="badge" style="background:${cat.hex};">${cat.name}</span> ${cat.icon} ${cat.name}</h3><p>${cat.desc}</p><div class="examples">Examples: ${cat.examples}</div>`;
+        items.forEach(a=>{
+            html+=`<div class="item"><span class="name">${a.emoji} ${a.name}</span><span class="result ${a.correct?'c':'w'}">${a.correct?'Correct':'You chose '+catData[a.chosenCat].name}</span></div>`;
+        });
+        html+=`</div>`;
+    });
+
+    html+=`<div class="pdf-footer"><div class="amber">EDUCATE * MOTIVATE * ELEVATE</div><div>Copyright 2025 My College Finance. All rights reserved. | www.mycollegefinance.com</div></div>
+    <script src="../../nav-inject.js"></script>
+</body></html>`;
+    openPrintWindow(html,'Scholarship_Types_Reference_Sheet.html');
+}
+
+/* ==========================================
+   BLANK TEMPLATE
+   ========================================== */
+function downloadTemplate(){
+    let html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Scholarship Type Sorter Worksheet - My College Finance</title>
+    <style>
+        @page{margin:0.65in;size:letter;}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#09090b;font-size:10.5px;line-height:1.5;}
+        .header{text-align:center;border-bottom:3px solid #012699;padding-bottom:10px;margin-bottom:16px;}
+        .header img{width:50px;height:50px;}.header h1{font-size:18px;color:#012699;margin:6px 0 2px;}
+        .header .tagline{font-size:9px;color:#64748b;letter-spacing:0.1em;}.header .sub{font-size:9px;color:#94a3b8;margin-top:4px;}
+        .instructions{background:#f0f5ff;border:1px solid #dbeafe;border-radius:6px;padding:8px 12px;margin-bottom:14px;font-size:10px;color:#1e3a5f;}
+        .instructions strong{color:#012699;}
+        .section-title{font-size:12px;font-weight:800;color:#012699;border-bottom:2px solid #e2e8f0;padding-bottom:3px;margin:14px 0 8px;}
+        .cat-ref{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px;}
+        .cat-mini{border:1px solid #e2e8f0;border-radius:4px;padding:6px 8px;}
+        .cat-mini h4{font-size:10px;color:#012699;margin:0 0 2px;}.cat-mini p{font-size:8.5px;color:#64748b;margin:0;}
+        .sort-item{border:1px solid #e2e8f0;border-radius:6px;padding:8px 10px;margin-bottom:8px;page-break-inside:avoid;}
+        .sort-item h3{font-size:11px;margin:0 0 3px;}.sort-item p{font-size:9.5px;color:#374151;margin:0 0 6px;}
+        .sort-item .choices{display:flex;flex-wrap:wrap;gap:6px;}
+        .choice-box{border:2px solid #d1d5db;border-radius:4px;padding:3px 10px;font-size:9px;font-weight:700;color:#374151;}
+        .write-lines{border-bottom:1px solid #e2e8f0;height:18px;}
+        .footer{text-align:center;border-top:2px solid #e2e8f0;padding-top:10px;margin-top:16px;}
+        .footer .amber{color:#d97706;font-weight:600;letter-spacing:0.1em;font-size:10px;}.footer .copy{font-size:8px;color:#94a3b8;}
+    </style></head><body>
+    <div class="header"><img src="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" alt="MCF Logo"><h1>Scholarship Type Sorter Worksheet</h1><div class="tagline">EDUCATE * MOTIVATE * ELEVATE</div><div class="sub">The Scholarship Strategy | Lesson 2.2</div></div>
+    <div class="instructions"><strong>Instructions:</strong> Read each scholarship description. Circle or check the category where it belongs. Then write a brief explanation for your choice. Use the category reference guide below to help you.</div>
+    <p style="font-size:10px;margin-bottom:12px;"><strong>Name:</strong> _______________________________ <strong>Date:</strong> _______________</p>
+    <div class="section-title">Category Reference</div>
+    <div class="cat-ref">`;
+    Object.entries(catData).forEach(([key,cat])=>{
+        html+=`<div class="cat-mini"><h4>${cat.icon} ${cat.name}</h4><p>${cat.desc.substring(0,100)}...</p></div>`;
+    });
+    html+=`</div><div class="section-title">Sort These Scholarships</div>`;
+
+    scholarships.forEach((s,i)=>{
+        html+=`<div class="sort-item"><h3>${i+1}. ${s.emoji} ${s.name}</h3><p>${s.desc}</p>
+        <div class="choices">`;
+        Object.entries(catData).forEach(([key,cat])=>{
+            html+=`<span class="choice-box">${cat.icon} ${cat.name}</span>`;
+        });
+        html+=`</div><div style="margin-top:6px;"><span style="font-size:8px;color:#64748b;font-style:italic;">Why?</span><div class="write-lines"></div></div></div>`;
+    });
+
+    html+=`<div class="footer"><div class="amber">EDUCATE * MOTIVATE * ELEVATE</div><div class="copy">Copyright 2025 My College Finance. All rights reserved. | www.mycollegefinance.com</div></div>
+    <script src="../../nav-inject.js"></script>
+</body></html>`;
+    openPrintWindow(html,'Scholarship_Type_Sorter_Worksheet.html');
+}
+
+function openPrintWindow(html,name){
+    const blob=new Blob([html],{type:'text/html'});const url=URL.createObjectURL(blob);
+    const win=window.open(url,'_blank');
+    if(win){win.onload=()=>{setTimeout(()=>{win.print();},400);};}
+    else{const a=document.createElement('a');a.href=url;a.download=name;a.click();}
+    setTimeout(()=>URL.revokeObjectURL(url),10000);
+}
+
+/* ==========================================
+   INIT
+   ========================================== */
+document.addEventListener('DOMContentLoaded',()=>{
+    initDarkMode();
+    // Try to restore progress
+    const saved=localStorage.getItem('mcf-sorter-progress');
+    if(saved){
+        try{
+            const d=JSON.parse(saved);
+            if(d.order&&d.answers&&d.answers.length<scholarships.length){
+                shuffled=d.order.map(name=>scholarships.find(s=>s.name===name)).filter(Boolean);
+                if(shuffled.length===scholarships.length){
+                    currentIndex=d.answers.length;
+                    score=d.score;
+                    answers=d.answers;
+                    renderCard();
+                    return;
+                }
+            }
+        }catch(e){}
+    }
+    shuffled=shuffle(scholarships);
+    renderCard();
+});
+</script>
+
+    <script src="../../nav-inject.js"></script>
+</body>
+</html>

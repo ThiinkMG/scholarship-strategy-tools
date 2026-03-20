@@ -1,0 +1,704 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scholarship Scam Detector - My College Finance</title>
+    <style>
+        :root {
+            --mcf-brand-blue:#012699;--mcf-brand-green:#26e011;--mcf-brand-amber:#fdc003;--mcf-brand-black:#000516;
+            --mcf-background:#fafafa;--mcf-foreground:#09090b;--mcf-card:#ffffff;--mcf-card-foreground:#09090b;
+            --mcf-primary:#336bff;--mcf-primary-foreground:#f8fafc;--mcf-secondary:#f1f5f9;--mcf-secondary-foreground:#64748b;
+            --mcf-muted:#f1f5f9;--mcf-muted-foreground:#64748b;--mcf-destructive:#ef4444;--mcf-border:#e2e8f0;
+            --mcf-input:#e2e8f0;--mcf-radius:0.5rem;--mcf-transition:all 0.3s ease;
+        }
+        body.dark-mode {
+            --mcf-background:#09090b;--mcf-foreground:#f8fafc;--mcf-card:#1a1a1f;--mcf-card-foreground:#f8fafc;
+            --mcf-primary:#4c6ef5;--mcf-primary-foreground:#f8fafc;--mcf-secondary:#374151;--mcf-secondary-foreground:#f8fafc;
+            --mcf-muted:#1c1917;--mcf-muted-foreground:#94a3b8;--mcf-border:#374151;--mcf-input:#1f2937;
+            --mcf-brand-blue:#0139cc;--mcf-brand-green:#3ae826;--mcf-brand-amber:#fdc922;--mcf-brand-black:#f0f1ff;
+        }
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,'Noto Sans',sans-serif;font-size:16px;line-height:1.5;background:var(--mcf-background);color:var(--mcf-foreground);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+
+        .mcf-header{position:sticky;top:0;z-index:100;border-bottom:2px solid var(--mcf-border);backdrop-filter:blur(12px);background:rgba(250,250,250,0.92);}
+        body.dark-mode .mcf-header{background:rgba(9,9,11,0.92);}
+        .mcf-header-inner{max-width:1280px;margin:0 auto;padding:0 1rem;display:flex;justify-content:space-between;align-items:center;height:64px;}
+        .mcf-header-brand{display:flex;align-items:center;gap:0.75rem;}
+        .mcf-logo-header{width:50px;height:50px;object-fit:contain;}
+        .mcf-brand-text{display:flex;flex-direction:column;}
+        .mcf-brand-name{font-size:1rem;font-weight:900;text-transform:uppercase;letter-spacing:0.05em;color:var(--mcf-brand-blue);line-height:1.2;}
+        .mcf-tagline{font-size:0.6rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--mcf-muted-foreground);}
+        .mcf-theme-toggle{width:40px;height:40px;padding:0;border:2px solid var(--mcf-border);background:var(--mcf-card);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--mcf-transition);color:var(--mcf-foreground);}
+        .mcf-theme-toggle:hover{border-color:var(--mcf-primary);transform:scale(1.1);}
+        .content-wrap{max-width:800px;margin:0 auto;padding:0 1rem;}
+
+        /* HERO */
+        .hero{text-align:center;padding:2.5rem 0 1.5rem;animation:fadeSlideIn 0.6s ease-out;}
+        .hero-badge{display:inline-flex;align-items:center;gap:0.4rem;background:linear-gradient(135deg,var(--mcf-brand-blue),var(--mcf-primary));color:#fff;font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.35rem 1rem;border-radius:50px;margin-bottom:1rem;}
+        .hero-title{font-size:2rem;font-weight:900;line-height:1.15;letter-spacing:-0.02em;margin-bottom:0.75rem;}
+        .hero-title span{background:linear-gradient(135deg,var(--mcf-destructive),#dc2626);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .hero-desc{font-size:1rem;color:var(--mcf-muted-foreground);max-width:620px;margin:0 auto;line-height:1.6;}
+
+        /* PROGRESS */
+        .progress-section{margin-bottom:1.25rem;animation:fadeSlideIn 0.6s ease-out 0.1s both;}
+        .progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;}
+        .progress-label{font-size:0.78rem;font-weight:600;color:var(--mcf-foreground);}
+        .progress-score{font-size:0.78rem;font-weight:700;color:var(--mcf-brand-blue);}
+        .progress-track{width:100%;height:10px;background:var(--mcf-secondary);border-radius:50px;overflow:hidden;border:1px solid var(--mcf-border);}
+        .progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--mcf-brand-blue),var(--mcf-primary));border-radius:50px;transition:width 0.5s cubic-bezier(0.22,1,0.36,1);}
+
+        /* LISTING CARD - fake scholarship ad */
+        .listing-card{background:var(--mcf-card);border:2px solid var(--mcf-border);border-radius:calc(var(--mcf-radius)*2);overflow:hidden;margin-bottom:1.25rem;animation:cardIn 0.4s ease-out;transition:var(--mcf-transition);}
+        .listing-banner{padding:1rem 1.25rem;color:#fff;position:relative;}
+        .listing-banner .lb-org{font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;opacity:0.85;margin-bottom:0.15rem;}
+        .listing-banner .lb-name{font-size:1.3rem;font-weight:900;line-height:1.2;}
+        .listing-banner .lb-amount{display:inline-block;margin-top:0.4rem;background:rgba(255,255,255,0.2);padding:0.2rem 0.75rem;border-radius:50px;font-size:0.85rem;font-weight:800;}
+        .listing-body{padding:1.25rem;}
+        .listing-body .lb-desc{font-size:0.88rem;color:var(--mcf-card-foreground);line-height:1.65;margin-bottom:1rem;}
+        .listing-detail{display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;}
+        .listing-detail .ld-chip{display:inline-flex;align-items:center;gap:0.3rem;background:var(--mcf-secondary);padding:0.3rem 0.65rem;border-radius:50px;font-size:0.72rem;font-weight:600;color:var(--mcf-card-foreground);}
+
+        /* Flag buttons */
+        .flag-section{padding:0 1.25rem 1.25rem;}
+        .flag-prompt{font-size:0.82rem;font-weight:700;color:var(--mcf-foreground);margin-bottom:0.6rem;}
+        .flag-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.75rem;}
+        @media(max-width:500px){.flag-grid{grid-template-columns:1fr;}}
+
+        .flag-option{padding:0.65rem 0.85rem;border:2.5px solid var(--mcf-border);border-radius:calc(var(--mcf-radius)*1.5);background:var(--mcf-card);cursor:pointer;transition:all 0.25s ease;display:flex;align-items:flex-start;gap:0.5rem;font-family:inherit;text-align:left;width:100%;color:var(--mcf-foreground);}
+        .flag-option:hover:not(:disabled){border-color:var(--mcf-primary);transform:translateY(-1px);}
+        .flag-option:disabled{cursor:default;}
+        .flag-option .fo-check{width:20px;height:20px;border:2px solid var(--mcf-input);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.7rem;transition:var(--mcf-transition);margin-top:0.05rem;}
+        .flag-option.selected .fo-check{background:var(--mcf-destructive);border-color:var(--mcf-destructive);color:#fff;}
+        .flag-option.selected{border-color:var(--mcf-destructive);background:rgba(239,68,68,0.05);}
+        .flag-option.correct-flag{border-color:var(--mcf-brand-green);background:rgba(38,224,17,0.05);}
+        .flag-option.correct-flag .fo-check{background:var(--mcf-brand-green);border-color:var(--mcf-brand-green);color:#fff;}
+        .flag-option.missed-flag{border-color:var(--mcf-brand-amber);border-style:dashed;}
+        .fo-text{font-size:0.82rem;font-weight:600;line-height:1.4;}
+
+        .verdict-buttons{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.5rem;}
+        .verdict-btn{padding:0.75rem 1rem;border-radius:calc(var(--mcf-radius)*1.5);border:2.5px solid var(--mcf-border);background:var(--mcf-card);font-size:1rem;font-weight:800;cursor:pointer;transition:all 0.25s ease;display:flex;align-items:center;justify-content:center;gap:0.5rem;font-family:inherit;color:var(--mcf-foreground);}
+        .verdict-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.08);}
+        .verdict-btn:disabled{cursor:default;opacity:0.5;}
+        .verdict-btn.scam-btn:hover:not(:disabled){border-color:var(--mcf-destructive);background:rgba(239,68,68,0.06);}
+        .verdict-btn.legit-btn:hover:not(:disabled){border-color:var(--mcf-brand-green);background:rgba(38,224,17,0.06);}
+        .verdict-btn.chosen-correct{border-color:var(--mcf-brand-green);background:rgba(38,224,17,0.08);opacity:1!important;}
+        .verdict-btn.chosen-incorrect{border-color:var(--mcf-destructive);background:rgba(239,68,68,0.08);opacity:1!important;}
+        .verdict-btn.show-answer{border-color:var(--mcf-brand-green);border-style:dashed;opacity:1!important;}
+
+        /* FEEDBACK */
+        .feedback-panel{padding:1.15rem;border-radius:calc(var(--mcf-radius)*1.5);margin-top:0.75rem;animation:feedbackIn 0.35s ease-out;line-height:1.65;}
+        .feedback-panel.correct-fb{background:linear-gradient(135deg,rgba(38,224,17,0.06),rgba(22,163,74,0.06));border:1.5px solid rgba(38,224,17,0.35);}
+        .feedback-panel.incorrect-fb{background:linear-gradient(135deg,rgba(239,68,68,0.06),rgba(220,38,38,0.06));border:1.5px solid rgba(239,68,68,0.35);}
+        .fb-verdict{display:flex;align-items:center;gap:0.5rem;font-size:1rem;font-weight:800;margin-bottom:0.4rem;}
+        .fb-verdict.correct-v{color:#166534;}body.dark-mode .fb-verdict.correct-v{color:var(--mcf-brand-green);}
+        .fb-verdict.incorrect-v{color:#991b1b;}body.dark-mode .fb-verdict.incorrect-v{color:#f87171;}
+        .fb-explain{font-size:0.85rem;color:var(--mcf-card-foreground);margin-bottom:0.5rem;}
+        .fb-redflags{margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--mcf-border);}
+        .fb-redflags-title{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--mcf-foreground);margin-bottom:0.35rem;}
+        .fb-rf-list{list-style:none;padding:0;}
+        .fb-rf-list li{font-size:0.8rem;padding:0.2rem 0;color:var(--mcf-card-foreground);display:flex;align-items:flex-start;gap:0.35rem;}
+        .fb-verification{margin-top:0.75rem;background:linear-gradient(135deg,rgba(1,38,153,0.05),rgba(51,107,255,0.05));border:1px solid rgba(51,107,255,0.15);border-radius:var(--mcf-radius);padding:0.65rem 0.85rem;font-size:0.8rem;color:var(--mcf-card-foreground);line-height:1.6;}
+        body.dark-mode .fb-verification{background:linear-gradient(135deg,rgba(1,57,204,0.1),rgba(76,110,245,0.06));border-color:rgba(76,110,245,0.25);}
+        .fb-verification strong{color:var(--mcf-brand-blue);}
+        .next-btn-wrap{display:flex;justify-content:flex-end;margin-top:0.75rem;}
+
+        /* SUMMARY */
+        .summary-screen{display:none;animation:fadeSlideIn 0.6s ease-out;}
+        .summary-screen.visible{display:block;}
+        .summary-hero{text-align:center;padding:2rem 0 1.5rem;}
+        .summary-icon{font-size:3.5rem;margin-bottom:0.5rem;}
+        .summary-title{font-size:1.75rem;font-weight:900;margin-bottom:0.5rem;}
+        .summary-subtitle{font-size:1rem;color:var(--mcf-muted-foreground);margin-bottom:1.5rem;}
+        .score-display{display:inline-flex;align-items:baseline;gap:0.25rem;background:var(--mcf-card);border:2px solid var(--mcf-border);border-radius:calc(var(--mcf-radius)*2);padding:1rem 2rem;margin-bottom:1.5rem;}
+        .score-big{font-size:3rem;font-weight:900;color:var(--mcf-brand-blue);}
+        .score-total{font-size:1.25rem;font-weight:600;color:var(--mcf-muted-foreground);}
+        .score-label{font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--mcf-muted-foreground);display:block;margin-top:0.25rem;}
+
+        /* SAFETY GUIDE */
+        .safety-card{background:var(--mcf-card);border:2px solid var(--mcf-border);border-radius:calc(var(--mcf-radius)*1.5);padding:1.15rem;margin-bottom:0.65rem;transition:var(--mcf-transition);}
+        .safety-card:hover{border-color:var(--mcf-brand-blue);}
+        .safety-card .sf-header{display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;}
+        .safety-card .sf-icon{font-size:1.3rem;}
+        .safety-card .sf-title{font-size:0.92rem;font-weight:700;color:var(--mcf-foreground);}
+        .safety-card .sf-desc{font-size:0.82rem;color:var(--mcf-muted-foreground);line-height:1.55;}
+
+        /* REVIEW */
+        .ref-title{font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--mcf-foreground);margin:1.5rem 0 0.75rem;padding-bottom:0.5rem;border-bottom:2px solid var(--mcf-border);}
+        .review-card{background:var(--mcf-card);border:2px solid var(--mcf-border);border-radius:calc(var(--mcf-radius)*1.5);padding:1rem;margin-bottom:0.6rem;}
+        .review-card.rev-correct{border-left:5px solid var(--mcf-brand-green);}
+        .review-card.rev-incorrect{border-left:5px solid var(--mcf-destructive);}
+        .rev-header{display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem;margin-bottom:0.35rem;}
+        .rev-name{font-size:0.88rem;font-weight:700;color:var(--mcf-foreground);flex:1;}
+        .rev-badge{flex-shrink:0;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:0.15rem 0.55rem;border-radius:50px;color:#fff;}
+        .rev-badge.badge-scam{background:var(--mcf-destructive);}
+        .rev-badge.badge-legit{background:#16a34a;}
+        .rev-result{font-size:0.72rem;font-weight:600;margin-bottom:0.3rem;}
+        .rev-result.rr-c{color:#166534;}body.dark-mode .rev-result.rr-c{color:var(--mcf-brand-green);}
+        .rev-result.rr-w{color:#991b1b;}body.dark-mode .rev-result.rr-w{color:#f87171;}
+        .rev-explain{font-size:0.78rem;color:var(--mcf-muted-foreground);line-height:1.5;}
+
+        /* BUTTONS */
+        .mcf-btn{display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;padding:0.6rem 1.25rem;font-size:0.82rem;font-weight:600;border-radius:var(--mcf-radius);transition:var(--mcf-transition);cursor:pointer;border:none;font-family:inherit;text-decoration:none;}
+        .mcf-btn-primary{background:var(--mcf-primary);color:var(--mcf-primary-foreground);}
+        .mcf-btn-primary:hover{background:var(--mcf-brand-blue);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.12);}
+        .mcf-btn-outline{background:transparent;border:2px solid var(--mcf-border);color:var(--mcf-foreground);}
+        .mcf-btn-outline:hover{border-color:var(--mcf-primary);background:rgba(51,107,255,0.05);}
+        .mcf-btn-amber{background:var(--mcf-brand-amber);color:#000516;}
+        .mcf-btn-amber:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(253,192,3,0.3);}
+        .action-bar{display:flex;flex-wrap:wrap;justify-content:center;gap:0.75rem;margin:1.5rem 0 2rem;}
+        .reset-row{display:flex;justify-content:center;margin-top:0.75rem;}
+
+        /* FOOTER */
+        .mcf-footer{background:linear-gradient(to bottom,#111827,#000000);color:white;padding:2.5rem 1rem;margin-top:2rem;text-align:center;}
+        .mcf-footer-inner{max-width:700px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:1rem;}
+        .mcf-footer .mcf-logo-footer{width:60px;height:60px;object-fit:contain;}
+        .mcf-footer-title{font-size:1.1rem;font-weight:900;letter-spacing:0.05em;}
+        .mcf-footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:0.5rem;align-items:center;}
+        .mcf-footer-links a{color:rgba(255,255,255,0.7);text-decoration:none;font-size:0.8rem;transition:color 0.3s ease;}
+        .mcf-footer-links a:hover{color:var(--mcf-brand-amber);}
+        .mcf-footer-sep{color:rgba(255,255,255,0.3);font-size:0.8rem;}
+        .mcf-footer-tagline{font-size:0.8rem;letter-spacing:0.1em;color:var(--mcf-brand-amber);font-weight:600;}
+        .mcf-footer-copy{font-size:0.7rem;color:rgba(255,255,255,0.45);}
+
+        @keyframes fadeSlideIn{from{transform:translateY(18px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+        @keyframes feedbackIn{from{transform:translateY(10px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+        @keyframes cardIn{from{transform:scale(0.96) translateY(10px);opacity:0;}to{transform:scale(1) translateY(0);opacity:1;}}
+        @keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-5px);}40%{transform:translateX(5px);}60%{transform:translateX(-3px);}80%{transform:translateX(3px);}}
+
+        @media(max-width:640px){.hero-title{font-size:1.5rem;}.mcf-brand-text{display:none;}.listing-banner .lb-name{font-size:1.05rem;}.score-big{font-size:2.25rem;}.summary-title{font-size:1.35rem;}}
+        @media print{.mcf-header,.mcf-footer,.mcf-theme-toggle,.action-bar,.next-btn-wrap,.reset-row{display:none!important;}body{background:#fff!important;color:#000!important;}}
+    </style>
+</head>
+<body>
+    <header class="mcf-header"><div class="mcf-header-inner"><div class="mcf-header-brand"><img src="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" alt="My College Finance Logo" class="mcf-logo-header"><div class="mcf-brand-text"><div class="mcf-brand-name">My College Finance</div><div class="mcf-tagline">EDUCATE &bull; MOTIVATE &bull; ELEVATE</div></div></div><button id="mcf-theme-toggle" class="mcf-theme-toggle" aria-label="Toggle dark mode"><svg class="mcf-sun-icon" width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="4" fill="currentColor"/><path d="M10 0v4M10 16v4M20 10h-4M4 10H0M17.07 2.93l-2.83 2.83M5.76 14.24l-2.83 2.83M17.07 17.07l-2.83-2.83M5.76 5.76L2.93 2.93" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><svg class="mcf-moon-icon" width="18" height="18" viewBox="0 0 20 20" fill="none" style="display:none;"><path d="M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C10.3395 3 10.6734 3.02389 11 3.07039C9.27477 4.07544 8 5.8965 8 8C8 11.3137 10.6863 14 14 14C15.1035 14 16.0754 13.6238 16.9296 12.9998C16.9762 13.3266 17 13.6605 17 14Z" fill="currentColor"/></svg></button></div></header>
+
+    <div class="content-wrap">
+        <div id="quizScreen">
+            <section class="hero">
+                <div class="hero-badge">Lesson 2.3 &mdash; Finding Legitimate Scholarships</div>
+                <h1 class="hero-title">Scholarship<br><span>Scam Detector</span></h1>
+                <p class="hero-desc">Can you spot a scholarship scam? Review each listing carefully, identify the warning signs, and decide: is it LEGITIMATE or a SCAM? Protect yourself and your money.</p>
+            </section>
+
+            <div class="progress-section">
+                <div class="progress-header">
+                    <span class="progress-label" id="progressLabel">Listing 1 of 10</span>
+                    <span class="progress-score" id="progressScore">Score: 0</span>
+                </div>
+                <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+            </div>
+
+            <div id="cardContainer"></div>
+
+            <div class="reset-row">
+                <button class="mcf-btn mcf-btn-outline" onclick="restartQuiz()" style="font-size:0.75rem;padding:0.45rem 1rem;"><span>&#128260;</span> Reset &amp; Start Over</button>
+            </div>
+        </div>
+
+        <div id="summaryScreen" class="summary-screen">
+            <div class="summary-hero">
+                <div class="summary-icon" id="summaryIcon"></div>
+                <h2 class="summary-title" id="summaryTitle"></h2>
+                <p class="summary-subtitle" id="summarySubtitle"></p>
+                <div class="score-display">
+                    <span class="score-big" id="finalScore"></span>
+                    <span class="score-total" id="finalTotal"></span>
+                    <span class="score-label">Correctly Identified</span>
+                </div>
+            </div>
+
+            <div class="ref-title">Scholarship Scam Safety Guide</div>
+            <div id="safetyGuide"></div>
+
+            <div class="ref-title">Review Your Answers</div>
+            <div id="reviewCards"></div>
+
+            <div class="action-bar">
+                <button class="mcf-btn mcf-btn-primary" onclick="downloadPDF()"><span>&#128196;</span> Save &amp; Download PDF</button>
+                <button class="mcf-btn mcf-btn-outline" onclick="downloadTemplate()"><span>&#128203;</span> Download Blank Template</button>
+                <button class="mcf-btn mcf-btn-amber" onclick="restartQuiz()"><span>&#128260;</span> Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="mcf-footer"><div class="mcf-footer-inner"><img src="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" alt="MCF Logo" class="mcf-logo-footer"><div class="mcf-footer-title">MY COLLEGE FINANCE</div><div class="mcf-footer-links"><a href="https://www.mycollegefinance.com/" target="_blank" rel="noopener">Main Website</a><span class="mcf-footer-sep">&bull;</span><a href="https://www.mycollegefinance.com/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a><span class="mcf-footer-sep">&bull;</span><a href="https://www.mycollegefinance.com/terms-policy" target="_blank" rel="noopener">Terms of Service</a><span class="mcf-footer-sep">&bull;</span><a href="https://linktr.ee/mycollegefinance" target="_blank" rel="noopener">Social Media</a></div><div class="mcf-footer-tagline">EDUCATE &bull; MOTIVATE &bull; ELEVATE</div><div class="mcf-footer-copy">&copy; 2025 My College Finance. All rights reserved.</div></div></footer>
+
+<script>
+const listings = [
+    {
+        org: 'National Academic Excellence Foundation',
+        name: 'Guaranteed $25,000 College Scholarship',
+        amount: '$25,000',
+        bannerColor: '#7c2d12',
+        desc: 'Congratulations! You have been SELECTED to receive our exclusive scholarship award. To claim your $25,000 scholarship, simply pay the one-time $199 processing fee. Act within 48 hours or your award will be given to another student. No application or essay required!',
+        details: ['No application required', 'Deadline: 48 hours', 'Processing fee: $199', 'Guaranteed award'],
+        isScam: true,
+        redFlags: [
+            { id: 'fee', text: 'Requires payment ($199 processing fee)' },
+            { id: 'guaranteed', text: '"Guaranteed" award with no application' },
+            { id: 'pressure', text: 'Urgent pressure tactic (48 hours)' },
+            { id: 'unsolicited', text: 'Unsolicited -- you did not apply' }
+        ],
+        explain: 'This is a classic scholarship scam. Legitimate scholarships NEVER charge fees to apply or claim awards. The urgency pressure, guaranteed money, and no application requirement are all major red flags. The FTC warns that any "scholarship" requiring payment is fraudulent.',
+        verification: 'Always verify: Search the organization name online. Check the BBB. Real scholarships never ask for money. If you did not apply, you cannot win.'
+    },
+    {
+        org: 'The Gates Scholarship (Gates Foundation)',
+        name: 'Full Cost of Attendance Award',
+        amount: 'Full Ride',
+        bannerColor: '#012699',
+        desc: 'The Gates Scholarship is a highly selective, full cost of attendance scholarship for outstanding, Pell-eligible minority high school seniors. Funded by the Bill & Melinda Gates Foundation, it covers tuition, fees, room, board, and personal expenses not already covered by other financial aid.',
+        details: ['Application required (online portal)', 'Deadline: September each year', 'Free to apply', 'Pell-eligible + minority students'],
+        isScam: false,
+        redFlags: [
+            { id: 'fee', text: 'Requires payment to apply' },
+            { id: 'guaranteed', text: '"Guaranteed" with no criteria' },
+            { id: 'pressure', text: 'Uses urgency pressure tactics' },
+            { id: 'unsolicited', text: 'Unsolicited contact you did not initiate' }
+        ],
+        explain: 'This is a well-known, legitimate scholarship funded by the Bill & Melinda Gates Foundation. It has a clear application process, published eligibility criteria, specific deadlines, and is completely free to apply. It is competitively awarded, not guaranteed.',
+        verification: 'The Gates Scholarship has an official website (thegatesscholarship.org), is widely recognized, and has a transparent selection process managed by a reputable foundation.'
+    },
+    {
+        org: 'Universal Student Aid Services',
+        name: 'Federal Student Grant Claim',
+        amount: '$5,500',
+        desc: 'URGENT: Our records indicate you qualify for a $5,500 Federal Student Grant. To process your award, we need your Social Security number, bank account information, and a $75 verification fee. Call our toll-free hotline immediately to secure your funds before the deadline passes.',
+        bannerColor: '#991b1b',
+        details: ['Requires SSN + bank info', 'Verification fee: $75', 'Phone claim only', 'Immediate deadline'],
+        isScam: true,
+        redFlags: [
+            { id: 'personal_info', text: 'Requests SSN and bank account information' },
+            { id: 'fee', text: 'Requires payment ($75 verification fee)' },
+            { id: 'impersonation', text: 'Impersonates a federal agency' },
+            { id: 'pressure', text: 'Uses urgent language and pressure tactics' }
+        ],
+        explain: 'This is a dangerous scam impersonating a federal program. The U.S. government never calls to offer grants or asks for fees. Requesting SSN and bank information is identity theft. Real federal aid only comes through FAFSA, never unsolicited phone calls.',
+        verification: 'The federal government distributes aid ONLY through your FAFSA and school financial aid office. Never give personal financial information to callers. Report scams to the FTC at ftc.gov/complaint.'
+    },
+    {
+        org: 'Coca-Cola Scholars Foundation',
+        name: 'Coca-Cola Scholars Program',
+        amount: '$20,000',
+        bannerColor: '#b91c1c',
+        desc: 'The Coca-Cola Scholars Program provides 150 scholarships of $20,000 each to graduating high school seniors annually. Selection is based on leadership, community service, and academic achievement. The application is completed online and is open to all U.S. high school seniors. No financial need requirement.',
+        details: ['Application via coca-colascholars.org', 'Deadline: October 31 annually', 'Free to apply', '150 awards per year'],
+        isScam: false,
+        redFlags: [
+            { id: 'fee', text: 'Requires payment to apply' },
+            { id: 'guaranteed', text: '"Guaranteed" award to all applicants' },
+            { id: 'no_criteria', text: 'No selection criteria or requirements' },
+            { id: 'personal_info', text: 'Asks for bank information upfront' }
+        ],
+        explain: 'The Coca-Cola Scholars Foundation is one of the most prestigious corporate scholarship programs in the country. It has a transparent, competitive application process with clear criteria, an official website, and is completely free to apply.',
+        verification: 'Verify at coca-colascholars.org. The Foundation has awarded over $75 million since 1989 and is widely recognized by high school counselors and college admissions offices nationwide.'
+    },
+    {
+        org: 'Elite Scholarship Finders LLC',
+        name: 'Personalized Scholarship Match Service',
+        amount: '$500 - $50,000',
+        bannerColor: '#4a1d96',
+        desc: 'For a one-time fee of $299, we guarantee to find you at least $10,000 in scholarship money or your money back! Our proprietary database has exclusive scholarships not found anywhere else. Pay now and receive your personalized scholarship matches within 24 hours. Limited spots available.',
+        details: ['Service fee: $299', 'Money-back guarantee', 'Exclusive database', 'Limited availability'],
+        isScam: true,
+        redFlags: [
+            { id: 'fee', text: 'Charges a fee ($299) for scholarship search' },
+            { id: 'guaranteed_money', text: '"Guarantees" finding you money' },
+            { id: 'exclusive', text: 'Claims exclusive scholarships not found elsewhere' },
+            { id: 'pressure', text: 'Artificial scarcity with "limited spots"' }
+        ],
+        explain: 'Paid scholarship search services are a well-known scam. All scholarships listed in paid databases can be found for free on sites like Fastweb, Scholarships.com, and Going Merry. No service can guarantee scholarship awards. "Money-back guarantees" are designed to be impossible to claim.',
+        verification: 'Never pay for a scholarship search. Free legitimate databases include Fastweb.com, Scholarships.com, GoingMerry.com, and Scholly. Your school counselor also maintains local scholarship lists at no cost.'
+    },
+    {
+        org: 'Jack Kent Cooke Foundation',
+        name: 'College Scholarship Program',
+        amount: 'Up to $55,000/year',
+        bannerColor: '#012699',
+        desc: 'The Jack Kent Cooke Foundation College Scholarship Program is open to high-achieving high school seniors with financial need. Recipients receive up to $55,000 per year for up to four years of undergraduate study, plus comprehensive advising and support services. Selection is based on academic ability, financial need, and leadership.',
+        details: ['Online application required', 'Deadline: November annually', 'Free to apply', 'Includes advising support'],
+        isScam: false,
+        redFlags: [
+            { id: 'fee', text: 'Requires an application fee' },
+            { id: 'guaranteed', text: '"Guaranteed" with no selection process' },
+            { id: 'pressure', text: 'High-pressure urgency tactics' },
+            { id: 'personal_info', text: 'Requests bank information to apply' }
+        ],
+        explain: 'The Jack Kent Cooke Foundation is one of the most generous and reputable scholarship organizations in the U.S. It has a rigorous, competitive application with clear criteria, extensive support services, and costs nothing to apply. It has been operating since 2000.',
+        verification: 'Verify at jkcf.org. The Foundation has awarded over $230 million in scholarships and is consistently ranked among the top scholarship programs in the country.'
+    },
+    {
+        org: 'Winners Circle Scholarship Network',
+        name: 'Text-to-Win $10,000 Scholarship',
+        amount: '$10,000',
+        bannerColor: '#854d0e',
+        desc: 'WIN $10,000 for college! Simply text SCHOLARSHIP to 55555 and enter your name, email, phone, date of birth, and home address. Winners selected monthly! By entering, you agree to receive promotional messages from our partners. Standard messaging rates apply. Must be 18+.',
+        details: ['Text entry only', 'Monthly drawings', 'Shares data with partners', 'Promotional messages'],
+        isScam: true,
+        redFlags: [
+            { id: 'data_harvesting', text: 'Collects extensive personal data (data harvesting)' },
+            { id: 'partner_sharing', text: 'Shares your data with unnamed "partners"' },
+            { id: 'sweepstakes', text: 'Designed as marketing, not genuine scholarship' },
+            { id: 'no_criteria', text: 'No academic or eligibility criteria whatsoever' }
+        ],
+        explain: 'While technically a sweepstakes (not illegal), this is a data harvesting scheme disguised as a scholarship. The real purpose is collecting personal information to sell to marketers. You will receive spam calls, texts, and emails. Legitimate scholarships evaluate applicants on some criteria -- random text entries are marketing schemes.',
+        verification: 'Ask yourself: Who is funding this? What do they gain? If the answer is "your personal data," it is a marketing scheme, not a scholarship. Stick to scholarships that evaluate you on academic, personal, or financial criteria.'
+    },
+    {
+        org: 'Dell Scholars Program',
+        name: 'Dell Scholars Award',
+        amount: '$20,000 + Laptop',
+        bannerColor: '#012699',
+        desc: 'The Dell Scholars Program awards $20,000 scholarships plus a laptop and textbook credits to students who have overcome significant obstacles to pursue their education. Applicants must be Pell-eligible, have a minimum 2.4 GPA, and be enrolled in an approved college-readiness program. Selection emphasizes determination and grit.',
+        details: ['Free online application', 'Deadline: December 1 annually', 'Requires college-readiness program', 'Includes tech support'],
+        isScam: false,
+        redFlags: [
+            { id: 'fee', text: 'Charges a fee to apply' },
+            { id: 'guaranteed', text: '"Guaranteed" award to everyone' },
+            { id: 'pressure', text: 'Uses urgency tactics' },
+            { id: 'unsolicited', text: 'Unsolicited contact via text/phone' }
+        ],
+        explain: 'The Dell Scholars Program is a well-established, legitimate scholarship run by the Michael & Susan Dell Foundation. It has clear eligibility requirements, a free application process, and provides ongoing support including laptop computers, textbook credits, and dedicated staff advisors.',
+        verification: 'Verify at dellscholars.org. The program has awarded over $70 million since 2004 and partners with recognized college-readiness organizations like AVID, GEAR UP, and Upward Bound.'
+    },
+    {
+        org: 'National Scholarship Registry',
+        name: 'Register Now for Scholarship Access',
+        amount: '$1,000 - $100,000',
+        bannerColor: '#7c2d12',
+        desc: 'You MUST register with the National Scholarship Registry to be eligible for federal and state scholarships. Registration fee is only $49.99. Failure to register may result in loss of scholarship eligibility. Our registry is the official clearinghouse for all major scholarship programs in the United States.',
+        details: ['Registration fee: $49.99', 'Claims to be "official" registry', 'Implies mandatory enrollment', 'Vague award range'],
+        isScam: true,
+        redFlags: [
+            { id: 'fee', text: 'Charges a registration fee ($49.99)' },
+            { id: 'impersonation', text: 'Falsely claims to be an "official" registry' },
+            { id: 'fear_tactic', text: 'Uses fear of losing eligibility' },
+            { id: 'vague', text: 'Extremely vague award range ($1K - $100K)' }
+        ],
+        explain: 'There is NO official "National Scholarship Registry." This is a scam using an authoritative-sounding name to trick families into paying fees. No legitimate clearinghouse controls scholarship eligibility. The only required form for federal aid is the free FAFSA.',
+        verification: 'The ONLY registration needed for federal aid is FAFSA at studentaid.gov, which is always FREE. Any organization claiming to be an official scholarship registry is fraudulent. Report to the FTC.'
+    },
+    {
+        org: 'Elks National Foundation',
+        name: 'Most Valuable Student Scholarship',
+        amount: 'Up to $50,000',
+        bannerColor: '#1e3a5f',
+        desc: 'The Elks National Foundation Most Valuable Student Scholarship awards up to $50,000 over four years to graduating high school seniors based on scholarship, leadership, and financial need. Applications must be submitted through a local Elks Lodge. Over 500 awards are given annually.',
+        details: ['Apply through local Elks Lodge', 'Deadline: November annually', 'Free to apply', '500+ awards per year'],
+        isScam: false,
+        redFlags: [
+            { id: 'fee', text: 'Requires payment to apply' },
+            { id: 'guaranteed', text: '"Guaranteed" to all applicants' },
+            { id: 'no_org', text: 'No verifiable organization behind it' },
+            { id: 'personal_info', text: 'Asks for bank information upfront' }
+        ],
+        explain: 'The Elks National Foundation has been awarding scholarships since 1933 and is one of the most established community-based scholarship programs in America. It operates through local Elks Lodges nationwide, has a competitive but transparent application process, and is completely free.',
+        verification: 'Verify at elks.org/scholars. The Elks National Foundation has invested over $500 million in charitable programs. Local Lodges across all 50 states facilitate the application process.'
+    }
+];
+
+/* STATE */
+let currentIdx = 0, score = 0, answers = [], shuffled = [], waiting = false;
+let selectedFlags = [];
+
+/* DARK MODE */
+function initDarkMode(){const s=localStorage.getItem('mcf-theme')||'light';if(s==='dark'){document.body.classList.add('dark-mode');updI(true);}document.getElementById('mcf-theme-toggle').addEventListener('click',()=>{const d=document.body.classList.toggle('dark-mode');localStorage.setItem('mcf-theme',d?'dark':'light');updI(d);});}
+function updI(d){document.querySelectorAll('.mcf-sun-icon').forEach(i=>i.style.display=d?'none':'block');document.querySelectorAll('.mcf-moon-icon').forEach(i=>i.style.display=d?'block':'none');}
+
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+
+/* RENDER */
+function renderCard(){
+    if(currentIdx>=shuffled.length){showSummary();return;}
+    waiting=false; selectedFlags=[];
+    const L=shuffled[currentIdx];
+
+    document.getElementById('progressLabel').textContent=`Listing ${currentIdx+1} of ${shuffled.length}`;
+    document.getElementById('progressScore').textContent=`Score: ${score}`;
+    document.getElementById('progressFill').style.width=((currentIdx)/shuffled.length*100)+'%';
+
+    document.getElementById('cardContainer').innerHTML=`
+    <div class="listing-card" id="activeCard">
+        <div class="listing-banner" style="background:${L.bannerColor};">
+            <div class="lb-org">${L.org}</div>
+            <div class="lb-name">${L.name}</div>
+            <div class="lb-amount">${L.amount}</div>
+        </div>
+        <div class="listing-body">
+            <div class="lb-desc">${L.desc}</div>
+            <div class="listing-detail">${L.details.map(d=>`<span class="ld-chip">${d}</span>`).join('')}</div>
+        </div>
+        <div class="flag-section">
+            <div class="flag-prompt">Step 1: Select any warning signs you notice</div>
+            <div class="flag-grid" id="flagGrid">
+                ${L.redFlags.map((f,i)=>`<button class="flag-option" data-flag="${f.id}" onclick="toggleFlag(this,'${f.id}')"><div class="fo-check"></div><div class="fo-text">${f.text}</div></button>`).join('')}
+            </div>
+            <div class="flag-prompt" style="margin-top:0.75rem;">Step 2: What is your verdict?</div>
+            <div class="verdict-buttons" id="verdictBtns">
+                <button class="verdict-btn scam-btn" onclick="submitVerdict(true)"><span style="font-size:1.2rem;">&#128680;</span> SCAM</button>
+                <button class="verdict-btn legit-btn" onclick="submitVerdict(false)"><span style="font-size:1.2rem;">&#9989;</span> LEGITIMATE</button>
+            </div>
+            <div id="feedbackArea"></div>
+        </div>
+    </div>`;
+}
+
+function toggleFlag(btn, flagId){
+    if(waiting) return;
+    btn.classList.toggle('selected');
+    const idx=selectedFlags.indexOf(flagId);
+    if(idx>=0) selectedFlags.splice(idx,1);
+    else selectedFlags.push(flagId);
+    btn.querySelector('.fo-check').innerHTML=btn.classList.contains('selected')?'\u2713':'';
+}
+
+function submitVerdict(calledScam){
+    if(waiting) return;
+    waiting=true;
+    const L=shuffled[currentIdx];
+    const correct=calledScam===L.isScam;
+    if(correct) score++;
+
+    // Check which real red flags user found
+    const realFlagIds = L.isScam ? L.redFlags.map(f=>f.id) : [];
+    const correctlyFlagged = selectedFlags.filter(f => realFlagIds.includes(f));
+    const missedFlags = realFlagIds.filter(f => !selectedFlags.includes(f));
+
+    answers.push({
+        name: L.name, org: L.org, isScam: L.isScam, calledScam, correct,
+        flagsSelected: [...selectedFlags], correctlyFlagged, missedFlags,
+        explain: L.explain, verification: L.verification
+    });
+
+    // Disable verdict buttons
+    document.querySelectorAll('.verdict-btn').forEach(b => b.disabled = true);
+    const scamBtn = document.querySelector('.scam-btn');
+    const legitBtn = document.querySelector('.legit-btn');
+
+    if(calledScam){
+        scamBtn.classList.add(correct?'chosen-correct':'chosen-incorrect');
+        if(!correct) legitBtn.classList.add('show-answer');
+    }else{
+        legitBtn.classList.add(correct?'chosen-correct':'chosen-incorrect');
+        if(!correct) scamBtn.classList.add('show-answer');
+    }
+
+    // Disable & mark flag buttons
+    document.querySelectorAll('.flag-option').forEach(btn=>{
+        btn.disabled=true;
+        const fid=btn.dataset.flag;
+        if(L.isScam){
+            if(realFlagIds.includes(fid)){
+                if(selectedFlags.includes(fid)) btn.classList.add('correct-flag');
+                else btn.classList.add('missed-flag');
+            }
+        }
+    });
+
+    // Feedback
+    const fb=document.getElementById('feedbackArea');
+    let rfHtml='';
+    if(L.isScam){
+        rfHtml=`<div class="fb-redflags"><div class="fb-redflags-title">Red Flags in This Listing</div><ul class="fb-rf-list">${L.redFlags.map(f=>{
+            const found=selectedFlags.includes(f.id);
+            return `<li><span>${found?'\u2705':'\u26A0\uFE0F'}</span><span>${f.text}${found?' -- You caught this!':' -- Missed this one'}</span></li>`;
+        }).join('')}</ul></div>`;
+    }
+
+    fb.innerHTML=`
+    <div class="feedback-panel ${correct?'correct-fb':'incorrect-fb'}">
+        <div class="fb-verdict ${correct?'correct-v':'incorrect-v'}">
+            <span>${correct?'\u{1F6E1}\uFE0F':'\u{1F4A1}'}</span>
+            <span>${correct?'Correct!':'Not quite!'} This listing is <strong>${L.isScam?'a SCAM':'LEGITIMATE'}</strong></span>
+        </div>
+        <div class="fb-explain">${L.explain}</div>
+        ${rfHtml}
+        <div class="fb-verification"><strong>How to Verify:</strong> ${L.verification}</div>
+        <div class="next-btn-wrap">
+            <button class="mcf-btn mcf-btn-primary" onclick="nextCard()">
+                ${currentIdx<shuffled.length-1?'Next Listing \u2192':'See Results \u{1F6E1}\uFE0F'}
+            </button>
+        </div>
+    </div>`;
+
+    document.getElementById('progressScore').textContent=`Score: ${score}`;
+    localStorage.setItem('mcf-scam-progress',JSON.stringify({currentIdx,score,answers,order:shuffled.map(l=>l.name)}));
+}
+
+function nextCard(){currentIdx++;renderCard();document.getElementById('cardContainer').scrollIntoView({behavior:'smooth',block:'start'});}
+
+/* SUMMARY */
+function showSummary(){
+    document.getElementById('quizScreen').style.display='none';
+    document.getElementById('summaryScreen').classList.add('visible');
+    document.getElementById('progressFill').style.width='100%';
+
+    const pct=Math.round((score/shuffled.length)*100);
+    document.getElementById('finalScore').textContent=score;
+    document.getElementById('finalTotal').textContent=`/ ${shuffled.length}`;
+
+    let icon,title,sub;
+    if(pct===100){icon='\u{1F6E1}\uFE0F';title='Perfect Detection!';sub='You are a certified scam spotter!';}
+    else if(pct>=80){icon='\u{1F31F}';title='Sharp Eye!';sub='You caught most of the scams and fakes.';}
+    else if(pct>=60){icon='\u{1F4AA}';title='Good Instincts!';sub='You are developing solid scam awareness.';}
+    else if(pct>=40){icon='\u{1F4DA}';title='Keep Learning!';sub='Review the safety guide below to sharpen your skills.';}
+    else{icon='\u{1F6A8}';title='Stay Alert!';sub='Scammers are tricky -- the guide below will help protect you.';}
+
+    document.getElementById('summaryIcon').innerHTML=icon;
+    document.getElementById('summaryTitle').textContent=title;
+    document.getElementById('summarySubtitle').textContent=sub;
+
+    // Safety guide
+    const safetyTips=[
+        {icon:'\u{1F6AB}',title:'Never Pay to Apply',desc:'Legitimate scholarships are always free. Any request for processing fees, registration fees, or verification payments is a scam.'},
+        {icon:'\u{1F512}',title:'Protect Personal Information',desc:'Never share your Social Security number, bank account details, or credit card information on a scholarship application. Legitimate programs do not need this to evaluate you.'},
+        {icon:'\u26A0\uFE0F',title:'Beware of "Guaranteed" Awards',desc:'No legitimate scholarship can guarantee you will win money. If they say you are guaranteed an award before you even apply, it is a scam.'},
+        {icon:'\u23F0',title:'Watch for Pressure Tactics',desc:'Scammers create artificial urgency. Real scholarships have published deadlines -- they do not pressure you to act within hours or threaten to give your award away.'},
+        {icon:'\u{1F50D}',title:'Verify the Organization',desc:'Search the organization name online. Check the BBB, FTC, and read reviews. Legitimate programs have verifiable histories, real addresses, and professional websites.'},
+        {icon:'\u{1F4E7}',title:'You Cannot Win What You Did Not Enter',desc:'If you receive notification of an award you never applied for, it is almost certainly a scam or data harvesting scheme. Real scholarships require applications.'},
+        {icon:'\u{1F4B0}',title:'Free Resources Exist',desc:'Never pay for scholarship searches. Fastweb, Scholarships.com, Going Merry, and your school counselor all provide free scholarship matching services.'},
+        {icon:'\u{1F4DE}',title:'Report Suspicious Activity',desc:'Report scholarship scams to the FTC at ftc.gov/complaint, your state Attorney General, and the organization being impersonated.'}
+    ];
+
+    document.getElementById('safetyGuide').innerHTML=safetyTips.map(t=>`
+        <div class="safety-card"><div class="sf-header"><span class="sf-icon">${t.icon}</span><span class="sf-title">${t.title}</span></div><div class="sf-desc">${t.desc}</div></div>
+    `).join('');
+
+    // Review
+    document.getElementById('reviewCards').innerHTML=answers.map((a,i)=>`
+        <div class="review-card ${a.correct?'rev-correct':'rev-incorrect'}">
+            <div class="rev-header">
+                <span class="rev-name">${i+1}. ${a.name} <span style="font-size:0.7rem;color:var(--mcf-muted-foreground);font-weight:400;">(${a.org})</span></span>
+                <span class="rev-badge ${a.isScam?'badge-scam':'badge-legit'}">${a.isScam?'SCAM':'LEGIT'}</span>
+            </div>
+            <div class="rev-result ${a.correct?'rr-c':'rr-w'}">${a.correct?'You correctly identified this!':'You called it '+(a.calledScam?'a SCAM':'LEGITIMATE')+' -- it was actually '+(a.isScam?'a SCAM':'LEGITIMATE')}</div>
+            <div class="rev-explain">${a.explain}</div>
+        </div>
+    `).join('');
+
+    localStorage.setItem('mcf-scam-results',JSON.stringify({score,total:shuffled.length,pct,answers}));
+    window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function restartQuiz(){
+    currentIdx=0;score=0;answers=[];selectedFlags=[];waiting=false;
+    shuffled=shuffle(listings);
+    localStorage.removeItem('mcf-scam-progress');
+    document.getElementById('summaryScreen').classList.remove('visible');
+    document.getElementById('quizScreen').style.display='block';
+    renderCard();
+    window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* PDF */
+function downloadPDF(){
+    const now=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+    const pct=Math.round((score/shuffled.length)*100);
+    let html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Scholarship Scam Safety Guide - My College Finance</title>
+    <style>
+        @page{margin:0.6in;size:letter;}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#09090b;font-size:10.5px;line-height:1.5;}
+        .pdf-header{text-align:center;border-bottom:3px solid #012699;padding-bottom:10px;margin-bottom:14px;}
+        .pdf-header img{width:55px;height:55px;}.pdf-header h1{font-size:20px;color:#012699;margin:6px 0 2px;}
+        .pdf-header .tagline{font-size:10px;color:#64748b;letter-spacing:0.1em;}.pdf-header .date{font-size:9px;color:#94a3b8;margin-top:4px;}
+        .score-box{text-align:center;background:#f0f5ff;border:2px solid #dbeafe;border-radius:8px;padding:12px;margin-bottom:14px;}
+        .score-box .big{font-size:28px;font-weight:900;color:#012699;}.score-box .sub{font-size:10px;color:#64748b;}
+        .section-title{font-size:12px;font-weight:800;color:#012699;border-bottom:2px solid #e2e8f0;padding-bottom:3px;margin:14px 0 8px;}
+        .tip-item{display:flex;gap:6px;padding:5px 0;border-bottom:1px solid #f1f5f9;font-size:10px;}
+        .tip-item:last-child{border:none;}.tip-item .ti-icon{font-size:12px;flex-shrink:0;}.tip-item strong{color:#012699;}
+        .listing-item{border:1px solid #e2e8f0;border-radius:6px;padding:8px 12px;margin-bottom:8px;page-break-inside:avoid;}
+        .listing-item.li-scam{border-left:5px solid #ef4444;}.listing-item.li-legit{border-left:5px solid #16a34a;}
+        .listing-item h3{font-size:11px;margin:0 0 2px;display:flex;justify-content:space-between;align-items:center;}
+        .badge-s{background:#ef4444;color:#fff;font-size:7px;font-weight:700;padding:1px 5px;border-radius:50px;text-transform:uppercase;}
+        .badge-l{background:#16a34a;color:#fff;font-size:7px;font-weight:700;padding:1px 5px;border-radius:50px;text-transform:uppercase;}
+        .listing-item .result{font-size:9px;font-weight:700;margin-bottom:3px;}
+        .result-c{color:#166534;}.result-w{color:#991b1b;}
+        .listing-item p{font-size:9.5px;color:#374151;margin:2px 0;}
+        .pdf-footer{text-align:center;border-top:2px solid #e2e8f0;padding-top:10px;margin-top:16px;font-size:9px;color:#94a3b8;}
+        .pdf-footer .amber{color:#d97706;font-weight:600;letter-spacing:0.1em;}
+    </style></head><body>
+    <div class="pdf-header"><img src="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" alt="MCF Logo"><h1>Scholarship Scam Safety Guide</h1><div class="tagline">EDUCATE * MOTIVATE * ELEVATE</div><div class="date">Generated ${now} | The Scholarship Strategy - Lesson 2.3</div></div>
+    <div class="score-box"><div class="big">${score} / ${shuffled.length}</div><div class="sub">${pct}% Correctly Identified</div></div>
+    <div class="section-title">Top 8 Warning Signs of Scholarship Scams</div>`;
+
+    const tips=['Never Pay to Apply -- legitimate scholarships are always free','Protect Personal Info -- never share SSN or bank details on applications','No such thing as "Guaranteed" money without applying','Urgency/pressure tactics are red flags','Always verify the organization through BBB, FTC, and web search','You cannot win what you did not enter','Free search tools exist: Fastweb, Scholarships.com, Going Merry','Report scams to FTC at ftc.gov/complaint'];
+    tips.forEach((t,i)=>{html+=`<div class="tip-item"><span class="ti-icon">${i+1}.</span><span>${t}</span></div>`;});
+
+    html+=`<div class="section-title">Listing Reviews</div>`;
+    answers.forEach((a,i)=>{
+        html+=`<div class="listing-item ${a.isScam?'li-scam':'li-legit'}"><h3><span>${i+1}. ${a.name}</span><span class="${a.isScam?'badge-s':'badge-l'}">${a.isScam?'SCAM':'LEGIT'}</span></h3><div class="result ${a.correct?'result-c':'result-w'}">${a.correct?'Correctly identified':'You answered '+(a.calledScam?'SCAM':'LEGIT')+' -- Answer: '+(a.isScam?'SCAM':'LEGIT')}</div><p>${a.explain}</p></div>`;
+    });
+
+    html+=`<div class="pdf-footer"><div class="amber">EDUCATE * MOTIVATE * ELEVATE</div><div>Copyright 2025 My College Finance. All rights reserved. | www.mycollegefinance.com</div></div>
+    <script src="../../nav-inject.js"></script>
+</body></html>`;
+    openPrint(html,'Scholarship_Scam_Safety_Guide.html');
+}
+
+/* TEMPLATE */
+function downloadTemplate(){
+    let html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Scholarship Scam Detector Worksheet - My College Finance</title>
+    <style>
+        @page{margin:0.6in;size:letter;}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#09090b;font-size:10.5px;line-height:1.5;}
+        .header{text-align:center;border-bottom:3px solid #012699;padding-bottom:10px;margin-bottom:14px;}
+        .header img{width:50px;height:50px;}.header h1{font-size:18px;color:#012699;margin:6px 0 2px;}
+        .header .tagline{font-size:9px;color:#64748b;letter-spacing:0.1em;}.header .sub{font-size:9px;color:#94a3b8;margin-top:4px;}
+        .instructions{background:#f0f5ff;border:1px solid #dbeafe;border-radius:6px;padding:8px 12px;margin-bottom:14px;font-size:10px;color:#1e3a5f;}
+        .instructions strong{color:#012699;}
+        .section-title{font-size:12px;font-weight:800;color:#012699;border-bottom:2px solid #e2e8f0;padding-bottom:3px;margin:12px 0 8px;}
+        .red-flags-ref{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px;}
+        .rf-mini{border:1px solid #e2e8f0;border-radius:4px;padding:5px 8px;font-size:9px;}
+        .rf-mini strong{color:#ef4444;}
+        .scenario{border:1px solid #e2e8f0;border-radius:6px;padding:10px 12px;margin-bottom:10px;page-break-inside:avoid;}
+        .scenario h3{font-size:11px;margin:0 0 4px;}.scenario p{font-size:9.5px;color:#374151;margin:0 0 6px;}
+        .scenario .choices{display:flex;gap:12px;margin-bottom:4px;font-size:10px;font-weight:700;}
+        .choice-box{width:16px;height:16px;border:2px solid #64748b;border-radius:3px;display:inline-block;vertical-align:middle;margin-right:4px;}
+        .write-lines{border-bottom:1px solid #e2e8f0;height:18px;}
+        .write-label{font-size:8px;color:#64748b;font-style:italic;margin-bottom:2px;}
+        .footer{text-align:center;border-top:2px solid #e2e8f0;padding-top:10px;margin-top:14px;}
+        .footer .amber{color:#d97706;font-weight:600;letter-spacing:0.1em;font-size:10px;}.footer .copy{font-size:8px;color:#94a3b8;}
+    </style></head><body>
+    <div class="header"><img src="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" alt="MCF Logo"><h1>Scholarship Scam Detector Worksheet</h1><div class="tagline">EDUCATE * MOTIVATE * ELEVATE</div><div class="sub">The Scholarship Strategy | Lesson 2.3</div></div>
+    <div class="instructions"><strong>Instructions:</strong> Read each scholarship listing carefully. Circle SCAM or LEGITIMATE. List any red flags you noticed and explain your reasoning.</div>
+    <p style="font-size:10px;margin-bottom:10px;"><strong>Name:</strong> _______________________________ <strong>Date:</strong> _______________</p>
+    <div class="section-title">Red Flags Reference Checklist</div>
+    <div class="red-flags-ref">
+        <div class="rf-mini"><strong>Requires payment</strong> to apply or claim</div>
+        <div class="rf-mini"><strong>Guaranteed</strong> money with no application</div>
+        <div class="rf-mini"><strong>Urgency</strong> / pressure to act immediately</div>
+        <div class="rf-mini"><strong>Requests</strong> SSN or bank account info</div>
+        <div class="rf-mini"><strong>Unsolicited</strong> -- you never applied</div>
+        <div class="rf-mini"><strong>Impersonates</strong> a government agency</div>
+        <div class="rf-mini"><strong>Vague</strong> organization with no web presence</div>
+        <div class="rf-mini"><strong>Data harvesting</strong> -- shares info with partners</div>
+    </div>
+    <div class="section-title">Evaluate These Listings</div>`;
+
+    listings.forEach((L,i)=>{
+        html+=`<div class="scenario"><h3>${i+1}. ${L.name} (${L.org})</h3><p>${L.desc}</p>
+        <div class="choices"><span><span class="choice-box"></span> SCAM</span><span><span class="choice-box"></span> LEGITIMATE</span></div>
+        <div class="write-label">Red flags noticed:</div><div class="write-lines"></div>
+        <div class="write-label">Your reasoning:</div><div class="write-lines"></div></div>`;
+    });
+
+    html+=`<div class="footer"><div class="amber">EDUCATE * MOTIVATE * ELEVATE</div><div class="copy">Copyright 2025 My College Finance. All rights reserved. | www.mycollegefinance.com</div></div>
+    <script src="../../nav-inject.js"></script>
+</body></html>`;
+    openPrint(html,'Scholarship_Scam_Detector_Worksheet.html');
+}
+
+function openPrint(html,name){const blob=new Blob([html],{type:'text/html'});const url=URL.createObjectURL(blob);const win=window.open(url,'_blank');if(win){win.onload=()=>{setTimeout(()=>{win.print();},400);};}else{const a=document.createElement('a');a.href=url;a.download=name;a.click();}setTimeout(()=>URL.revokeObjectURL(url),10000);}
+
+/* INIT */
+document.addEventListener('DOMContentLoaded',()=>{
+    initDarkMode();
+    const saved=localStorage.getItem('mcf-scam-progress');
+    if(saved){try{const d=JSON.parse(saved);if(d.order&&d.answers&&d.answers.length<listings.length){shuffled=d.order.map(name=>listings.find(l=>l.name===name)).filter(Boolean);if(shuffled.length===listings.length){currentIdx=d.answers.length;score=d.score;answers=d.answers;renderCard();return;}}}catch(e){}}
+    shuffled=shuffle(listings);
+    renderCard();
+});
+</script>
+
+    <script src="../../nav-inject.js"></script>
+</body>
+</html>

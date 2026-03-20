@@ -1,0 +1,934 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scholarship Source Finder - My College Finance</title>
+    <style>
+        :root {
+            --mcf-brand-blue: #012699;
+            --mcf-brand-green: #26e011;
+            --mcf-brand-amber: #fdc003;
+            --mcf-brand-black: #000516;
+            --mcf-background: #fafafa;
+            --mcf-foreground: #09090b;
+            --mcf-card: #ffffff;
+            --mcf-card-foreground: #09090b;
+            --mcf-primary: #336bff;
+            --mcf-primary-foreground: #f8fafc;
+            --mcf-secondary: #f1f5f9;
+            --mcf-secondary-foreground: #64748b;
+            --mcf-muted: #f1f5f9;
+            --mcf-muted-foreground: #64748b;
+            --mcf-destructive: #ef4444;
+            --mcf-border: #e2e8f0;
+            --mcf-input: #e2e8f0;
+            --mcf-radius: 0.5rem;
+            --mcf-transition: all 0.3s ease;
+        }
+        body.dark-mode {
+            --mcf-background: #09090b;
+            --mcf-foreground: #f8fafc;
+            --mcf-card: #1a1a1f;
+            --mcf-card-foreground: #f8fafc;
+            --mcf-primary: #4c6ef5;
+            --mcf-primary-foreground: #f8fafc;
+            --mcf-secondary: #374151;
+            --mcf-secondary-foreground: #f8fafc;
+            --mcf-muted: #1c1917;
+            --mcf-muted-foreground: #94a3b8;
+            --mcf-border: #374151;
+            --mcf-input: #1f2937;
+            --mcf-brand-blue: #0139cc;
+            --mcf-brand-green: #3ae826;
+            --mcf-brand-amber: #fdc922;
+            --mcf-brand-black: #f0f1ff;
+        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; font-size: 16px; line-height: 1.5; background: var(--mcf-background); color: var(--mcf-foreground); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+
+        /* HEADER */
+        .mcf-header { position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--mcf-border); backdrop-filter: blur(12px); background: rgba(250,250,250,0.92); }
+        body.dark-mode .mcf-header { background: rgba(9,9,11,0.92); }
+        .mcf-header-inner { max-width: 1280px; margin: 0 auto; padding: 0 1rem; display: flex; justify-content: space-between; align-items: center; height: 64px; }
+        .mcf-header-brand { display: flex; align-items: center; gap: 0.75rem; }
+        .mcf-logo-header { width: 50px; height: 50px; object-fit: contain; }
+        .mcf-brand-text { display: flex; flex-direction: column; }
+        .mcf-brand-name { font-size: 1rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; color: var(--mcf-brand-blue); line-height: 1.2; }
+        .mcf-tagline { font-size: 0.6rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mcf-muted-foreground); }
+        .mcf-theme-toggle { width: 40px; height: 40px; padding: 0; border: 2px solid var(--mcf-border); background: var(--mcf-card); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--mcf-transition); color: var(--mcf-foreground); }
+        .mcf-theme-toggle:hover { border-color: var(--mcf-primary); transform: scale(1.1); }
+
+        .content-wrap { max-width: 960px; margin: 0 auto; padding: 0 1rem; }
+
+        /* HERO */
+        .hero { text-align: center; padding: 2.5rem 0 1.5rem; animation: fadeSlideIn 0.6s ease-out; }
+        .hero-badge { display: inline-flex; align-items: center; gap: 0.4rem; background: linear-gradient(135deg, var(--mcf-brand-blue), var(--mcf-primary)); color: #fff; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.35rem 1rem; border-radius: 50px; margin-bottom: 1rem; }
+        .hero-title { font-size: 2rem; font-weight: 900; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 0.75rem; }
+        .hero-title span { background: linear-gradient(135deg, var(--mcf-brand-blue), var(--mcf-primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .hero-desc { font-size: 1rem; color: var(--mcf-muted-foreground); max-width: 620px; margin: 0 auto; line-height: 1.6; }
+
+        /* STEP INDICATOR */
+        .steps-bar { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem; animation: fadeSlideIn 0.6s ease-out 0.1s both; flex-wrap: wrap; }
+        .step-pill { display: flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.9rem; border-radius: 50px; border: 2px solid var(--mcf-border); background: var(--mcf-card); font-size: 0.72rem; font-weight: 700; color: var(--mcf-muted-foreground); transition: var(--mcf-transition); cursor: default; }
+        .step-pill .step-num { width: 20px; height: 20px; border-radius: 50%; background: var(--mcf-border); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 800; color: var(--mcf-muted-foreground); transition: var(--mcf-transition); }
+        .step-pill.active { border-color: var(--mcf-brand-blue); color: var(--mcf-foreground); }
+        .step-pill.active .step-num { background: var(--mcf-brand-blue); color: #fff; }
+        .step-pill.completed { border-color: var(--mcf-brand-green); color: var(--mcf-brand-green); }
+        .step-pill.completed .step-num { background: var(--mcf-brand-green); color: #fff; }
+
+        /* SECTION CARD */
+        .section-card { background: var(--mcf-card); border: 2px solid var(--mcf-border); border-radius: calc(var(--mcf-radius) * 2); padding: 1.75rem; margin-bottom: 1.25rem; transition: var(--mcf-transition); animation: fadeSlideIn 0.5s ease-out; }
+        .section-card.hidden { display: none; }
+        .sc-icon { font-size: 1.6rem; margin-bottom: 0.4rem; }
+        .sc-title { font-size: 1.15rem; font-weight: 800; margin-bottom: 0.15rem; color: var(--mcf-foreground); }
+        .sc-desc { font-size: 0.85rem; color: var(--mcf-muted-foreground); margin-bottom: 1.25rem; line-height: 1.6; }
+
+        /* FORM */
+        .form-group { margin-bottom: 1rem; }
+        .form-label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--mcf-foreground); margin-bottom: 0.35rem; }
+        .form-label .req { color: var(--mcf-destructive); }
+        .mcf-input { width: 100%; padding: 0.7rem 0.85rem; font-size: 0.88rem; background: var(--mcf-background); color: var(--mcf-foreground); border: 2px solid var(--mcf-input); border-radius: var(--mcf-radius); transition: var(--mcf-transition); font-family: inherit; }
+        .mcf-input:focus { outline: none; border-color: var(--mcf-primary); box-shadow: 0 0 0 3px rgba(51,107,255,0.1); }
+        .mcf-input.filled { border-color: var(--mcf-brand-green); }
+        .mcf-select { width: 100%; padding: 0.7rem 2rem 0.7rem 0.85rem; font-size: 0.88rem; background: var(--mcf-background); color: var(--mcf-foreground); border: 2px solid var(--mcf-input); border-radius: var(--mcf-radius); appearance: none; cursor: pointer; font-family: inherit; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 9L1 4h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.75rem center; transition: var(--mcf-transition); }
+        .mcf-select:focus { outline: none; border-color: var(--mcf-primary); box-shadow: 0 0 0 3px rgba(51,107,255,0.1); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+        @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+
+        /* CATEGORY GRID */
+        .cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem; }
+        .cat-card { background: var(--mcf-card); border: 2.5px solid var(--mcf-border); border-radius: calc(var(--mcf-radius) * 1.5); padding: 1rem; cursor: pointer; transition: all 0.35s cubic-bezier(0.175,0.885,0.32,1.275); text-align: center; position: relative; }
+        .cat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 28px rgba(0,0,0,0.08); }
+        .cat-card.selected { border-color: var(--mcf-brand-blue); background: linear-gradient(135deg, rgba(1,38,153,0.04), transparent); }
+        .cat-card .cat-icon { font-size: 2rem; margin-bottom: 0.3rem; }
+        .cat-card .cat-name { font-size: 0.85rem; font-weight: 700; color: var(--mcf-foreground); margin-bottom: 0.15rem; }
+        .cat-card .cat-sub { font-size: 0.68rem; color: var(--mcf-muted-foreground); line-height: 1.4; }
+        .cat-card .check-mark { position: absolute; top: 0.5rem; right: 0.5rem; width: 22px; height: 22px; border-radius: 50%; background: var(--mcf-brand-green); color: #fff; display: none; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; }
+        .cat-card.selected .check-mark { display: flex; }
+
+        /* EXPANDED INFO */
+        .cat-expand { background: var(--mcf-secondary); border-radius: calc(var(--mcf-radius) * 1.5); padding: 1.25rem; margin-bottom: 1rem; animation: fadeSlideIn 0.35s ease-out; }
+        .cat-expand.hidden { display: none; }
+        .cat-expand-title { font-size: 1rem; font-weight: 800; margin-bottom: 0.3rem; color: var(--mcf-foreground); display: flex; align-items: center; gap: 0.5rem; }
+        .cat-expand-desc { font-size: 0.85rem; color: var(--mcf-muted-foreground); line-height: 1.65; margin-bottom: 0.75rem; }
+        .source-list { list-style: none; padding: 0; }
+        .source-list li { padding: 0.5rem 0.65rem; background: var(--mcf-card); border: 1px solid var(--mcf-border); border-radius: var(--mcf-radius); margin-bottom: 0.35rem; font-size: 0.82rem; display: flex; align-items: flex-start; gap: 0.45rem; line-height: 1.5; color: var(--mcf-card-foreground); }
+        .source-list li .sl-icon { flex-shrink: 0; margin-top: 0.1rem; }
+        .cat-expand .search-tip { background: linear-gradient(135deg, rgba(1,38,153,0.05), rgba(51,107,255,0.05)); border: 1px solid rgba(51,107,255,0.15); border-radius: var(--mcf-radius); padding: 0.65rem 0.85rem; font-size: 0.8rem; color: var(--mcf-card-foreground); line-height: 1.6; margin-top: 0.75rem; }
+        body.dark-mode .cat-expand .search-tip { background: linear-gradient(135deg, rgba(1,57,204,0.1), rgba(76,110,245,0.06)); border-color: rgba(76,110,245,0.25); }
+        .cat-expand .search-tip strong { color: var(--mcf-brand-blue); }
+
+        /* LOCATION SECTION */
+        .location-results { margin-top: 1rem; }
+        .loc-prompt-card { background: var(--mcf-secondary); border-radius: var(--mcf-radius); padding: 0.75rem 1rem; margin-bottom: 0.5rem; display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.85rem; line-height: 1.6; color: var(--mcf-card-foreground); animation: fadeSlideIn 0.3s ease-out; }
+        .loc-prompt-card .lp-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.1rem; }
+        .loc-prompt-card strong { color: var(--mcf-foreground); }
+
+        /* CHECKLIST */
+        .checklist { margin-top: 0.75rem; }
+        .checklist-item { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.65rem 0.85rem; background: var(--mcf-card); border: 2px solid var(--mcf-border); border-radius: var(--mcf-radius); margin-bottom: 0.5rem; transition: var(--mcf-transition); cursor: pointer; }
+        .checklist-item:hover { border-color: var(--mcf-primary); }
+        .checklist-item.checked { border-color: var(--mcf-brand-green); background: linear-gradient(135deg, rgba(38,224,17,0.04), transparent); }
+        .cl-checkbox { width: 22px; height: 22px; border: 2px solid var(--mcf-input); border-radius: calc(var(--mcf-radius) * 0.5); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: var(--mcf-transition); margin-top: 0.05rem; font-size: 0.7rem; color: transparent; }
+        .checklist-item.checked .cl-checkbox { background: var(--mcf-brand-green); border-color: var(--mcf-brand-green); color: #fff; }
+        .cl-content { flex: 1; }
+        .cl-title { font-size: 0.85rem; font-weight: 600; color: var(--mcf-foreground); }
+        .cl-desc { font-size: 0.72rem; color: var(--mcf-muted-foreground); line-height: 1.4; }
+
+        /* PROGRESS BAR */
+        .progress-bar-wrap { margin: 1rem 0; }
+        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; }
+        .progress-label { font-size: 0.75rem; font-weight: 600; color: var(--mcf-foreground); }
+        .progress-pct { font-size: 0.75rem; font-weight: 700; color: var(--mcf-brand-blue); }
+        .progress-track { width: 100%; height: 10px; background: var(--mcf-secondary); border-radius: 50px; overflow: hidden; border: 1px solid var(--mcf-border); }
+        .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--mcf-brand-blue), var(--mcf-primary)); border-radius: 50px; transition: width 0.5s cubic-bezier(0.22,1,0.36,1); }
+
+        /* NAV BUTTONS */
+        .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; gap: 0.75rem; flex-wrap: wrap; }
+
+        /* BUTTONS */
+        .mcf-btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.6rem 1.25rem; font-size: 0.82rem; font-weight: 600; border-radius: var(--mcf-radius); transition: var(--mcf-transition); cursor: pointer; border: none; font-family: inherit; text-decoration: none; }
+        .mcf-btn-primary { background: var(--mcf-primary); color: var(--mcf-primary-foreground); }
+        .mcf-btn-primary:hover { background: var(--mcf-brand-blue); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+        .mcf-btn-outline { background: transparent; border: 2px solid var(--mcf-border); color: var(--mcf-foreground); }
+        .mcf-btn-outline:hover { border-color: var(--mcf-primary); background: rgba(51,107,255,0.05); }
+        .mcf-btn-success { background: var(--mcf-brand-green); color: #000516; }
+        .mcf-btn-success:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(38,224,17,0.2); }
+        .mcf-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+        .action-bar { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin: 1.5rem 0 2rem; }
+
+        /* FOOTER */
+        .mcf-footer { background: linear-gradient(to bottom, #111827, #000000); color: white; padding: 2.5rem 1rem; margin-top: 2rem; text-align: center; }
+        .mcf-footer-inner { max-width: 700px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        .mcf-footer .mcf-logo-footer { width: 60px; height: 60px; object-fit: contain; }
+        .mcf-footer-title { font-size: 1.1rem; font-weight: 900; letter-spacing: 0.05em; }
+        .mcf-footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; align-items: center; }
+        .mcf-footer-links a { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.8rem; transition: color 0.3s ease; }
+        .mcf-footer-links a:hover { color: var(--mcf-brand-amber); }
+        .mcf-footer-sep { color: rgba(255,255,255,0.3); font-size: 0.8rem; }
+        .mcf-footer-tagline { font-size: 0.8rem; letter-spacing: 0.1em; color: var(--mcf-brand-amber); font-weight: 600; }
+        .mcf-footer-copy { font-size: 0.7rem; color: rgba(255,255,255,0.45); }
+
+        @keyframes fadeSlideIn { from { transform: translateY(18px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        @media (max-width: 640px) {
+            .hero-title { font-size: 1.5rem; }
+            .mcf-brand-text { display: none; }
+            .cat-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media print { .mcf-header, .mcf-footer, .mcf-theme-toggle, .action-bar, .nav-row { display: none !important; } body { background: #fff !important; color: #000 !important; } }
+    </style>
+</head>
+<body>
+    <header class="mcf-header">
+        <div class="mcf-header-inner">
+            <div class="mcf-header-brand">
+                <img src="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" alt="My College Finance Logo" class="mcf-logo-header">
+                <div class="mcf-brand-text">
+                    <div class="mcf-brand-name">My College Finance</div>
+                    <div class="mcf-tagline">EDUCATE &bull; MOTIVATE &bull; ELEVATE</div>
+                </div>
+            </div>
+            <button id="mcf-theme-toggle" class="mcf-theme-toggle" aria-label="Toggle dark mode">
+                <svg class="mcf-sun-icon" width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="4" fill="currentColor"/><path d="M10 0v4M10 16v4M20 10h-4M4 10H0M17.07 2.93l-2.83 2.83M5.76 14.24l-2.83 2.83M17.07 17.07l-2.83-2.83M5.76 5.76L2.93 2.93" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                <svg class="mcf-moon-icon" width="18" height="18" viewBox="0 0 20 20" fill="none" style="display:none;"><path d="M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C10.3395 3 10.6734 3.02389 11 3.07039C9.27477 4.07544 8 5.8965 8 8C8 11.3137 10.6863 14 14 14C15.1035 14 16.0754 13.6238 16.9296 12.9998C16.9762 13.3266 17 13.6605 17 14Z" fill="currentColor"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="content-wrap">
+        <section class="hero">
+            <div class="hero-badge">Lesson 2.1 &mdash; Where Scholarship Money Actually Lives</div>
+            <h1 class="hero-title">Scholarship<br><span>Source Finder</span></h1>
+            <p class="hero-desc">Learn how to identify scholarship sources in your own community and institutions. Tell us about yourself, explore funding categories, and build your personal search checklist.</p>
+        </section>
+
+        <!-- STEPS BAR -->
+        <div class="steps-bar" id="stepsBar">
+            <div class="step-pill active" data-step="1"><span class="step-num">1</span> Your Profile</div>
+            <div class="step-pill" data-step="2"><span class="step-num">2</span> Explore Sources</div>
+            <div class="step-pill" data-step="3"><span class="step-num">3</span> Your Checklist</div>
+        </div>
+
+        <!-- ===== STEP 1: PROFILE ===== -->
+        <div class="section-card" id="step1">
+            <div class="sc-icon">&#128100;</div>
+            <div class="sc-title">Tell Us About You</div>
+            <div class="sc-desc">Share a few details so we can suggest the most relevant scholarship sources for your situation. All information stays private on your device.</div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Your State <span class="req">*</span></label>
+                    <select class="mcf-select" id="inputState" onchange="markFilled(this)">
+                        <option value="">Select your state...</option>
+                        <option>Alabama</option><option>Alaska</option><option>Arizona</option><option>Arkansas</option><option>California</option><option>Colorado</option><option>Connecticut</option><option>Delaware</option><option>Florida</option><option>Georgia</option><option>Hawaii</option><option>Idaho</option><option>Illinois</option><option>Indiana</option><option>Iowa</option><option>Kansas</option><option>Kentucky</option><option>Louisiana</option><option>Maine</option><option>Maryland</option><option>Massachusetts</option><option>Michigan</option><option>Minnesota</option><option>Mississippi</option><option>Missouri</option><option>Montana</option><option>Nebraska</option><option>Nevada</option><option>New Hampshire</option><option>New Jersey</option><option>New Mexico</option><option>New York</option><option>North Carolina</option><option>North Dakota</option><option>Ohio</option><option>Oklahoma</option><option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option><option>South Carolina</option><option>South Dakota</option><option>Tennessee</option><option>Texas</option><option>Utah</option><option>Vermont</option><option>Virginia</option><option>Washington</option><option>West Virginia</option><option>Wisconsin</option><option>Wyoming</option><option>Washington D.C.</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">City / Town</label>
+                    <input type="text" class="mcf-input" id="inputCity" placeholder="e.g. Atlanta" oninput="markFilled(this)">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Grade Level / Status <span class="req">*</span></label>
+                    <select class="mcf-select" id="inputGrade" onchange="markFilled(this)">
+                        <option value="">Select...</option>
+                        <option>High School Freshman</option><option>High School Sophomore</option><option>High School Junior</option><option>High School Senior</option><option>College Freshman</option><option>College Sophomore</option><option>College Junior</option><option>College Senior</option><option>Graduate Student</option><option>Transfer Student</option><option>Adult Learner / Non-Traditional</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Intended Major / Field</label>
+                    <input type="text" class="mcf-input" id="inputMajor" placeholder="e.g. Nursing, Business, STEM" oninput="markFilled(this)">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">School Name (current or intended)</label>
+                <input type="text" class="mcf-input" id="inputSchool" placeholder="e.g. Georgia State University" oninput="markFilled(this)">
+            </div>
+
+            <div class="nav-row">
+                <div></div>
+                <button class="mcf-btn mcf-btn-primary" id="toStep2Btn" onclick="goToStep(2)">Explore Sources &#8594;</button>
+            </div>
+        </div>
+
+        <!-- ===== STEP 2: EXPLORE CATEGORIES ===== -->
+        <div class="section-card hidden" id="step2">
+            <div class="sc-icon">&#128269;</div>
+            <div class="sc-title">Explore Scholarship Source Categories</div>
+            <div class="sc-desc">Click each category to learn where scholarship money lives. The more categories you explore, the more sources will appear in your personal checklist.</div>
+
+            <div class="cat-grid" id="catGrid"></div>
+            <div id="catExpandContainer"></div>
+
+            <!-- Location-based prompts -->
+            <div class="location-results" id="locationResults"></div>
+
+            <div class="nav-row">
+                <button class="mcf-btn mcf-btn-outline" onclick="goToStep(1)">&#8592; Back</button>
+                <button class="mcf-btn mcf-btn-primary" id="toStep3Btn" onclick="goToStep(3)">Build My Checklist &#8594;</button>
+            </div>
+        </div>
+
+        <!-- ===== STEP 3: CHECKLIST ===== -->
+        <div class="section-card hidden" id="step3">
+            <div class="sc-icon">&#9989;</div>
+            <div class="sc-title">Your Personal Search Checklist</div>
+            <div class="sc-desc">Based on your profile and the categories you explored, here is your personalized scholarship search checklist. Check off each item as you research it!</div>
+
+            <div class="progress-bar-wrap">
+                <div class="progress-header">
+                    <span class="progress-label" id="clProgressLabel">0 of 0 completed</span>
+                    <span class="progress-pct" id="clProgressPct">0%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="clProgressFill"></div>
+                </div>
+            </div>
+
+            <div class="checklist" id="checklistContainer"></div>
+
+            <div class="nav-row">
+                <button class="mcf-btn mcf-btn-outline" onclick="goToStep(2)">&#8592; Back</button>
+            </div>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="action-bar">
+            <button class="mcf-btn mcf-btn-primary" onclick="downloadPDF()"><span>&#128196;</span> Save &amp; Download PDF</button>
+            <button class="mcf-btn mcf-btn-outline" onclick="downloadTemplate()"><span>&#128203;</span> Download Blank Template</button>
+        </div>
+    </div>
+
+    <footer class="mcf-footer">
+        <div class="mcf-footer-inner">
+            <img src="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" alt="My College Finance Logo" class="mcf-logo-footer">
+            <div class="mcf-footer-title">MY COLLEGE FINANCE</div>
+            <div class="mcf-footer-links">
+                <a href="https://www.mycollegefinance.com/" target="_blank" rel="noopener">Main Website</a><span class="mcf-footer-sep">&bull;</span>
+                <a href="https://www.mycollegefinance.com/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a><span class="mcf-footer-sep">&bull;</span>
+                <a href="https://www.mycollegefinance.com/terms-policy" target="_blank" rel="noopener">Terms of Service</a><span class="mcf-footer-sep">&bull;</span>
+                <a href="https://linktr.ee/mycollegefinance" target="_blank" rel="noopener">Social Media</a>
+            </div>
+            <div class="mcf-footer-tagline">EDUCATE &bull; MOTIVATE &bull; ELEVATE</div>
+            <div class="mcf-footer-copy">&copy; 2025 My College Finance. All rights reserved.</div>
+        </div>
+    </footer>
+
+<script>
+/* ==========================================
+   DATA
+   ========================================== */
+const categories = [
+    {
+        id: 'corporations', icon: '\u{1F3E2}', name: 'Corporations & Employers',
+        sub: 'Fortune 500 companies, local businesses, parent employers',
+        description: 'Major corporations fund scholarship programs through their foundations and HR departments. These include national programs open to all students, employee-dependent scholarships, and industry-specific awards targeting future talent pipelines.',
+        sources: [
+            { icon: '\u2615', text: 'National corporate programs (Starbucks, Google, Dell, Coca-Cola, etc.)' },
+            { icon: '\u{1F46A}', text: 'Parent/guardian employer dependent scholarship programs' },
+            { icon: '\u{1F3ED}', text: 'Local business owner scholarships and community investments' },
+            { icon: '\u{1F4BC}', text: 'Industry-specific workforce development scholarships' },
+            { icon: '\u{1F6D2}', text: 'Retail and service employer tuition assistance (UPS, Walmart, Amazon, etc.)' }
+        ],
+        tip: 'Ask your parents to check their employee benefits handbook. Over 60% of Fortune 500 companies offer dependent education benefits that many families never use!',
+        checklistItems: [
+            { title: 'Check parent/guardian employer benefits', desc: 'Ask HR about dependent scholarship programs' },
+            { title: 'Search major corporate scholarship programs', desc: 'Google, Dell, Coca-Cola, Starbucks, etc.' },
+            { title: 'Identify local businesses offering scholarships', desc: 'Check with Chamber of Commerce' },
+            { title: 'Research industry-specific scholarships in your field', desc: 'Companies invest in future talent pipelines' }
+        ]
+    },
+    {
+        id: 'nonprofits', icon: '\u{1F91D}', name: 'Nonprofits & Foundations',
+        sub: 'Private foundations, charitable orgs, advocacy groups',
+        description: 'Private foundations and nonprofits represent one of the largest sources of scholarship funding. They range from massive national organizations distributing millions annually to small family trusts with very specific eligibility criteria -- often making them less competitive.',
+        sources: [
+            { icon: '\u{1F31F}', text: 'Large national foundations (Gates, Jack Kent Cooke, Horatio Alger)' },
+            { icon: '\u{1F3A4}', text: 'Identity-based organizations (Hispanic Scholarship Fund, UNCF, APIA Scholars)' },
+            { icon: '\u{1F4D6}', text: 'Professional association foundations (medical, legal, engineering societies)' },
+            { icon: '\u{1F30D}', text: 'International service organizations (Rotary International, Lions Club International)' },
+            { icon: '\u{1F4DA}', text: 'Small family-funded trusts and memorial scholarships' }
+        ],
+        tip: 'Niche foundation scholarships tied to specific backgrounds, interests, or career goals often have far fewer applicants. Cast a wide net across many small awards -- they add up quickly.',
+        checklistItems: [
+            { title: 'Search national foundation scholarship databases', desc: 'Fastweb, Scholarships.com, Going Merry' },
+            { title: 'Look for identity-specific foundation awards', desc: 'Heritage, background, first-generation status' },
+            { title: 'Research professional associations in your field', desc: 'Many offer student chapter scholarships' },
+            { title: 'Search for memorial and family trust scholarships', desc: 'Often very specific criteria with fewer applicants' }
+        ]
+    },
+    {
+        id: 'community', icon: '\u{1F3D8}', name: 'Community Organizations',
+        sub: 'Civic clubs, religious groups, local associations',
+        description: 'Community organizations are the hidden goldmine of scholarships. Local civic clubs, religious institutions, veterans organizations, and neighborhood associations collectively offer billions in smaller awards that fly under the radar of most students -- meaning significantly less competition.',
+        sources: [
+            { icon: '\u{1F3E0}', text: 'Civic clubs: Rotary, Kiwanis, Elks, Lions, Optimist, Soroptimist' },
+            { icon: '\u26EA', text: 'Religious organizations and church-based scholarships' },
+            { icon: '\u{1F396}', text: 'Veterans organizations (VFW, American Legion, DAR)' },
+            { icon: '\u{1F3AA}', text: 'Community foundations and United Way chapters' },
+            { icon: '\u{1F9D1}\u200D\u{1F527}', text: 'Trade unions and labor organizations' }
+        ],
+        tip: 'Visit your local library, community center, and high school counselor office. Many community scholarships are not listed online -- they are posted on bulletin boards and shared by word of mouth.',
+        checklistItems: [
+            { title: 'Visit local Rotary, Kiwanis, and Lions clubs', desc: 'Ask about student scholarship programs' },
+            { title: 'Check with religious organizations and churches', desc: 'Many offer awards regardless of membership' },
+            { title: 'Contact veterans organizations', desc: 'VFW, American Legion, DAR for veteran-connected students' },
+            { title: 'Search community foundation grants', desc: 'Your local community foundation likely offers awards' },
+            { title: 'Ask at the public library', desc: 'Librarians often know about local scholarships' }
+        ]
+    },
+    {
+        id: 'universities', icon: '\u{1F3EB}', name: 'Universities & Colleges',
+        sub: 'Institutional aid, departmental awards, athletic',
+        description: 'Your college or university itself is likely your biggest potential source of scholarship funding. Institutional aid includes merit scholarships, need-based grants, departmental awards, athletic scholarships, and special talent-based awards that come directly from the school.',
+        sources: [
+            { icon: '\u{1F3C6}', text: 'Merit-based admissions scholarships (Presidential, Dean\'s, etc.)' },
+            { icon: '\u{1F4CA}', text: 'Need-based institutional grants' },
+            { icon: '\u{1F52C}', text: 'Departmental and major-specific awards' },
+            { icon: '\u26BD', text: 'Athletic scholarships (NCAA Division I, II, NAIA)' },
+            { icon: '\u{1F3A8}', text: 'Fine arts, music, theater, and performance scholarships' },
+            { icon: '\u{1F91D}', text: 'Transfer student and community college pipeline awards' }
+        ],
+        tip: 'Always contact the financial aid office AND your specific department. Departmental scholarships are often separate from admissions scholarships and require separate applications.',
+        checklistItems: [
+            { title: 'Contact the admissions office about merit scholarships', desc: 'Ask about automatic and competitive awards' },
+            { title: 'Reach out to your department/major', desc: 'Departmental awards require separate applications' },
+            { title: 'Check the financial aid office for need-based grants', desc: 'Complete FAFSA and any institutional forms' },
+            { title: 'Research school-specific scholarship databases', desc: 'Many schools have their own scholarship search portals' }
+        ]
+    },
+    {
+        id: 'government', icon: '\u{1F3DB}', name: 'Government Programs',
+        sub: 'Federal aid, state grants, military benefits',
+        description: 'Government programs at the federal and state level represent the single largest source of financial aid. These include grants (free money), work-study programs, and specialized scholarships for specific career paths like teaching, healthcare, and public service.',
+        sources: [
+            { icon: '\u2B50', text: 'Federal Pell Grants (up to $7,395/year based on need)' },
+            { icon: '\u{1F4B0}', text: 'State grant and scholarship programs (vary by state)' },
+            { icon: '\u{1F396}', text: 'Military and veterans education benefits (GI Bill, ROTC)' },
+            { icon: '\u{1F468}\u200D\u{1F3EB}', text: 'TEACH Grants for future educators' },
+            { icon: '\u{1F3E5}', text: 'Healthcare workforce shortage scholarships (NURSE Corps, NHSC)' }
+        ],
+        tip: 'FAFSA is the single most important form you will fill out. It unlocks federal AND most state aid. File it as early as possible -- some state funds run out on a first-come, first-served basis.',
+        checklistItems: [
+            { title: 'Complete the FAFSA as early as possible', desc: 'Opens October 1 each year - do not wait!' },
+            { title: 'Research your state grant programs', desc: 'Check your state\'s higher education agency website' },
+            { title: 'Explore career-specific government scholarships', desc: 'Teaching, nursing, public service forgiveness programs' },
+            { title: 'Look into military and ROTC scholarships', desc: 'Available even without active duty commitment in some cases' }
+        ]
+    },
+    {
+        id: 'online', icon: '\u{1F4BB}', name: 'Online Platforms & Contests',
+        sub: 'Scholarship databases, essay contests, social media awards',
+        description: 'The internet has created entirely new categories of scholarships. Online platforms aggregate thousands of opportunities, while social media contests, video competitions, and no-essay sweepstakes-style awards make it easier than ever to apply for multiple scholarships quickly.',
+        sources: [
+            { icon: '\u{1F310}', text: 'Scholarship aggregator platforms (Fastweb, Scholarships.com, Going Merry, Scholly)' },
+            { icon: '\u{1F4F1}', text: 'Social media scholarship contests (Instagram, TikTok, YouTube)' },
+            { icon: '\u270D\uFE0F', text: 'National essay contests (Ayn Rand, JFK Profile in Courage, etc.)' },
+            { icon: '\u{1F3B2}', text: 'No-essay and quick-apply scholarships' },
+            { icon: '\u{1F3A5}', text: 'Video submission and creative portfolio competitions' }
+        ],
+        tip: 'Create profiles on at least 3 scholarship search platforms. Set up email alerts for new matches. Dedicate 30 minutes per week to quick-apply scholarships -- consistency beats one-time effort.',
+        checklistItems: [
+            { title: 'Create profiles on scholarship search platforms', desc: 'Fastweb, Scholarships.com, Going Merry, Scholly' },
+            { title: 'Set up email alerts for new scholarship matches', desc: 'Automate your search to save time' },
+            { title: 'Search for quick-apply and no-essay scholarships', desc: 'Apply to many small awards for better odds' },
+            { title: 'Look for creative and video-based competitions', desc: 'Less competition for non-traditional formats' }
+        ]
+    }
+];
+
+/* ==========================================
+   STATE
+   ========================================== */
+let currentStep = 1;
+let exploredCategories = [];
+let checklistState = {}; // { "item-id": true/false }
+
+/* ==========================================
+   DARK MODE
+   ========================================== */
+function initDarkMode() {
+    const saved = localStorage.getItem('mcf-theme') || 'light';
+    if (saved === 'dark') { document.body.classList.add('dark-mode'); updateIcons(true); }
+    document.getElementById('mcf-theme-toggle').addEventListener('click', () => {
+        const isDark = document.body.classList.toggle('dark-mode');
+        localStorage.setItem('mcf-theme', isDark ? 'dark' : 'light');
+        updateIcons(isDark);
+    });
+}
+function updateIcons(isDark) {
+    document.querySelectorAll('.mcf-sun-icon').forEach(i => i.style.display = isDark ? 'none' : 'block');
+    document.querySelectorAll('.mcf-moon-icon').forEach(i => i.style.display = isDark ? 'block' : 'none');
+}
+
+/* ==========================================
+   STEP NAVIGATION
+   ========================================== */
+function goToStep(step) {
+    if (step === 2) {
+        if (!document.getElementById('inputState').value || !document.getElementById('inputGrade').value) {
+            alert('Please select your state and grade level to continue.');
+            return;
+        }
+        buildLocationPrompts();
+    }
+    if (step === 3) {
+        buildChecklist();
+    }
+
+    currentStep = step;
+    document.querySelectorAll('.section-card').forEach(c => c.classList.add('hidden'));
+    document.getElementById('step' + step).classList.remove('hidden');
+
+    // Update step pills
+    document.querySelectorAll('.step-pill').forEach(p => {
+        const s = parseInt(p.dataset.step);
+        p.classList.remove('active', 'completed');
+        if (s === step) p.classList.add('active');
+        else if (s < step) p.classList.add('completed');
+    });
+
+    saveState();
+    window.scrollTo({ top: 200, behavior: 'smooth' });
+}
+
+function markFilled(el) {
+    if (el.value) el.classList.add('filled');
+    else el.classList.remove('filled');
+    saveState();
+}
+
+/* ==========================================
+   CATEGORY GRID
+   ========================================== */
+function buildCategoryGrid() {
+    const grid = document.getElementById('catGrid');
+    grid.innerHTML = '';
+    categories.forEach(cat => {
+        const selected = exploredCategories.includes(cat.id);
+        grid.innerHTML += `
+            <div class="cat-card ${selected ? 'selected' : ''}" data-cat="${cat.id}" onclick="toggleCategory('${cat.id}')">
+                <div class="check-mark">&#10003;</div>
+                <div class="cat-icon">${cat.icon}</div>
+                <div class="cat-name">${cat.name}</div>
+                <div class="cat-sub">${cat.sub}</div>
+            </div>
+        `;
+    });
+}
+
+function toggleCategory(catId) {
+    const idx = exploredCategories.indexOf(catId);
+    if (idx >= 0) {
+        exploredCategories.splice(idx, 1);
+    } else {
+        exploredCategories.push(catId);
+    }
+
+    // Update card visual
+    document.querySelectorAll('.cat-card').forEach(c => {
+        c.classList.toggle('selected', exploredCategories.includes(c.dataset.cat));
+    });
+
+    // Show expanded info
+    showCategoryExpand(catId);
+    saveState();
+}
+
+function showCategoryExpand(catId) {
+    const container = document.getElementById('catExpandContainer');
+    const cat = categories.find(c => c.id === catId);
+
+    if (!exploredCategories.includes(catId)) {
+        const existing = container.querySelector(`[data-expand="${catId}"]`);
+        if (existing) existing.remove();
+        return;
+    }
+
+    // Remove if already shown
+    const existing = container.querySelector(`[data-expand="${catId}"]`);
+    if (existing) return;
+
+    const div = document.createElement('div');
+    div.className = 'cat-expand';
+    div.dataset.expand = catId;
+    div.innerHTML = `
+        <div class="cat-expand-title">${cat.icon} ${cat.name}</div>
+        <div class="cat-expand-desc">${cat.description}</div>
+        <ul class="source-list">
+            ${cat.sources.map(s => `<li><span class="sl-icon">${s.icon}</span><span>${s.text}</span></li>`).join('')}
+        </ul>
+        <div class="search-tip"><strong>Search Tip:</strong> ${cat.tip}</div>
+    `;
+    container.appendChild(div);
+}
+
+/* ==========================================
+   LOCATION-BASED PROMPTS
+   ========================================== */
+function buildLocationPrompts() {
+    const state = document.getElementById('inputState').value;
+    const city = document.getElementById('inputCity').value.trim();
+    const grade = document.getElementById('inputGrade').value;
+    const major = document.getElementById('inputMajor').value.trim();
+    const school = document.getElementById('inputSchool').value.trim();
+    const container = document.getElementById('locationResults');
+
+    if (!state) { container.innerHTML = ''; return; }
+
+    let prompts = [];
+
+    prompts.push({ icon: '\u{1F3DB}', text: `<strong>${state} State Grants:</strong> Search your state's higher education agency for grant programs. Many require only your FAFSA. Search: "${state} state scholarship grant program"` });
+
+    if (city) {
+        prompts.push({ icon: '\u{1F3D8}', text: `<strong>Local ${city} Scholarships:</strong> Check with the ${city} Community Foundation, local Rotary and Kiwanis clubs, and your city's Chamber of Commerce for community-funded awards.` });
+        prompts.push({ icon: '\u{1F4F0}', text: `<strong>${city} Area Businesses:</strong> Local businesses often sponsor scholarships. Search: "${city} local scholarship" or check with your school counselor.` });
+    }
+
+    if (school) {
+        prompts.push({ icon: '\u{1F3EB}', text: `<strong>${school} Institutional Aid:</strong> Contact the financial aid office at ${school} directly. Ask about merit scholarships, departmental awards, and any school-specific scholarship portals.` });
+    }
+
+    if (major) {
+        prompts.push({ icon: '\u{1F52C}', text: `<strong>${major} Field Scholarships:</strong> Professional associations in ${major} often offer student scholarships. Search: "${major} student scholarship association"` });
+    }
+
+    const isHS = grade.toLowerCase().includes('high school');
+    if (isHS) {
+        prompts.push({ icon: '\u{1F393}', text: `<strong>High School Counselor:</strong> Your school counselor has a list of local scholarships. Many are only shared through schools, not online. Make an appointment!` });
+    } else {
+        prompts.push({ icon: '\u{1F4DA}', text: `<strong>Department Office:</strong> As a college student, visit your department office and ask about upperclassman, research, and departmental scholarships that are often separate from general financial aid.` });
+    }
+
+    prompts.push({ icon: '\u{1F4F1}', text: `<strong>Online Platforms:</strong> Create profiles on Fastweb, Scholarships.com, and Going Merry with your ${state} location. Enable email alerts for new matches in your area.` });
+
+    container.innerHTML = `
+        <div style="font-size:0.82rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--mcf-foreground); margin-bottom:0.5rem; padding-bottom:0.35rem; border-bottom:2px solid var(--mcf-border);">
+            Personalized Search Prompts for ${city ? city + ', ' : ''}${state}
+        </div>
+        ${prompts.map(p => `<div class="loc-prompt-card"><span class="lp-icon">${p.icon}</span><span>${p.text}</span></div>`).join('')}
+    `;
+}
+
+/* ==========================================
+   CHECKLIST
+   ========================================== */
+function buildChecklist() {
+    const container = document.getElementById('checklistContainer');
+    container.innerHTML = '';
+
+    const state = document.getElementById('inputState').value;
+    const city = document.getElementById('inputCity').value.trim();
+    const major = document.getElementById('inputMajor').value.trim();
+    const school = document.getElementById('inputSchool').value.trim();
+
+    let items = [];
+
+    // Always include core items
+    items.push({ id: 'fafsa', title: 'Complete the FAFSA', desc: 'The #1 most important step for any student seeking financial aid', category: 'Essential' });
+    if (state) items.push({ id: 'state-grants', title: `Research ${state} state grant programs`, desc: 'Check your state higher education agency website', category: 'Government' });
+    if (school) items.push({ id: 'school-aid', title: `Contact ${school} financial aid office`, desc: 'Ask about merit, need-based, and departmental scholarships', category: 'Institutional' });
+
+    // Add items from explored categories
+    exploredCategories.forEach(catId => {
+        const cat = categories.find(c => c.id === catId);
+        if (!cat) return;
+        cat.checklistItems.forEach((item, i) => {
+            let desc = item.desc;
+            if (city && desc.includes('Chamber of Commerce')) desc = desc.replace('Chamber of Commerce', `${city} Chamber of Commerce`);
+            if (major && item.title.includes('your field')) desc = desc.replace('your field', major);
+            items.push({ id: `${catId}-${i}`, title: item.title, desc: desc, category: cat.name });
+        });
+    });
+
+    // Location-specific items
+    if (city) {
+        items.push({ id: 'local-library', title: `Visit the ${city} public library`, desc: 'Librarians often maintain local scholarship lists', category: 'Local' });
+        items.push({ id: 'local-foundation', title: `Search ${city} Community Foundation`, desc: 'Community foundations manage local scholarship endowments', category: 'Local' });
+    }
+
+    // Deduplicate by id
+    const seen = new Set();
+    items = items.filter(item => { if (seen.has(item.id)) return false; seen.add(item.id); return true; });
+
+    if (items.length === 0) {
+        container.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--mcf-muted-foreground);font-style:italic;">Explore some categories in Step 2 to build your personalized checklist!</div>';
+        return;
+    }
+
+    // Group by category
+    const grouped = {};
+    items.forEach(item => {
+        if (!grouped[item.category]) grouped[item.category] = [];
+        grouped[item.category].push(item);
+    });
+
+    Object.keys(grouped).forEach(cat => {
+        container.innerHTML += `<div style="font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--mcf-brand-blue); margin:0.75rem 0 0.35rem; padding-top:0.5rem;">${cat}</div>`;
+        grouped[cat].forEach(item => {
+            const checked = checklistState[item.id] === true;
+            container.innerHTML += `
+                <div class="checklist-item ${checked ? 'checked' : ''}" data-cl="${item.id}" onclick="toggleChecklistItem('${item.id}')">
+                    <div class="cl-checkbox">${checked ? '&#10003;' : ''}</div>
+                    <div class="cl-content">
+                        <div class="cl-title">${item.title}</div>
+                        <div class="cl-desc">${item.desc}</div>
+                    </div>
+                </div>
+            `;
+        });
+    });
+
+    updateChecklistProgress(items.length);
+}
+
+function toggleChecklistItem(id) {
+    checklistState[id] = !checklistState[id];
+    const item = document.querySelector(`.checklist-item[data-cl="${id}"]`);
+    if (item) {
+        item.classList.toggle('checked', checklistState[id]);
+        const cb = item.querySelector('.cl-checkbox');
+        cb.innerHTML = checklistState[id] ? '&#10003;' : '';
+    }
+
+    const total = document.querySelectorAll('.checklist-item').length;
+    updateChecklistProgress(total);
+    saveState();
+}
+
+function updateChecklistProgress(total) {
+    const checked = Object.values(checklistState).filter(v => v).length;
+    const pct = total > 0 ? Math.round((checked / total) * 100) : 0;
+    document.getElementById('clProgressLabel').textContent = `${checked} of ${total} completed`;
+    document.getElementById('clProgressPct').textContent = pct + '%';
+    document.getElementById('clProgressFill').style.width = pct + '%';
+}
+
+/* ==========================================
+   SAVE / LOAD
+   ========================================== */
+function saveState() {
+    const data = {
+        state: document.getElementById('inputState').value,
+        city: document.getElementById('inputCity').value,
+        grade: document.getElementById('inputGrade').value,
+        major: document.getElementById('inputMajor').value,
+        school: document.getElementById('inputSchool').value,
+        explored: exploredCategories,
+        checklist: checklistState,
+        step: currentStep
+    };
+    localStorage.setItem('mcf-source-finder', JSON.stringify(data));
+}
+
+function loadState() {
+    const raw = localStorage.getItem('mcf-source-finder');
+    if (!raw) return;
+    try {
+        const d = JSON.parse(raw);
+        if (d.state) { document.getElementById('inputState').value = d.state; markFilled(document.getElementById('inputState')); }
+        if (d.city) { document.getElementById('inputCity').value = d.city; markFilled(document.getElementById('inputCity')); }
+        if (d.grade) { document.getElementById('inputGrade').value = d.grade; markFilled(document.getElementById('inputGrade')); }
+        if (d.major) { document.getElementById('inputMajor').value = d.major; markFilled(document.getElementById('inputMajor')); }
+        if (d.school) { document.getElementById('inputSchool').value = d.school; markFilled(document.getElementById('inputSchool')); }
+        if (d.explored) exploredCategories = d.explored;
+        if (d.checklist) checklistState = d.checklist;
+        buildCategoryGrid();
+        exploredCategories.forEach(catId => showCategoryExpand(catId));
+        if (d.step && d.step > 1) goToStep(d.step);
+    } catch(e) {}
+}
+
+/* ==========================================
+   PDF DOWNLOAD
+   ========================================== */
+function downloadPDF() {
+    const now = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+    const state = document.getElementById('inputState').value || 'N/A';
+    const city = document.getElementById('inputCity').value || '';
+    const grade = document.getElementById('inputGrade').value || 'N/A';
+    const major = document.getElementById('inputMajor').value || 'N/A';
+    const school = document.getElementById('inputSchool').value || 'N/A';
+    const checked = Object.entries(checklistState).filter(([k,v]) => v).map(([k]) => k);
+
+    let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Local Scholarship Search Checklist - My College Finance</title>
+    <style>
+        @page { margin: 0.6in; size: letter; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; color: #09090b; font-size: 10.5px; line-height: 1.5; }
+        .pdf-header { text-align: center; border-bottom: 3px solid #012699; padding-bottom: 10px; margin-bottom: 14px; }
+        .pdf-header img { width: 55px; height: 55px; }
+        .pdf-header h1 { font-size: 20px; color: #012699; margin: 6px 0 2px; }
+        .pdf-header .tagline { font-size: 10px; color: #64748b; letter-spacing: 0.1em; }
+        .pdf-header .date { font-size: 9px; color: #94a3b8; margin-top: 4px; }
+        .profile-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 14px; margin-bottom: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; font-size: 10px; }
+        .profile-box strong { color: #012699; }
+        .section-title { font-size: 12px; font-weight: 800; color: #012699; border-bottom: 2px solid #e2e8f0; padding-bottom: 3px; margin: 14px 0 8px; }
+        .cl-item { display: flex; align-items: flex-start; gap: 6px; padding: 5px 0; border-bottom: 1px solid #f1f5f9; font-size: 10px; }
+        .cl-box { width: 14px; height: 14px; border: 2px solid #d1d5db; border-radius: 3px; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; font-size: 9px; }
+        .cl-box.done { background: #26e011; border-color: #26e011; color: #fff; }
+        .cl-item .cl-t { font-weight: 600; color: #09090b; }
+        .cl-item .cl-d { color: #64748b; font-size: 9px; }
+        .cat-block { margin-bottom: 12px; page-break-inside: avoid; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 12px; }
+        .cat-block h3 { font-size: 11px; color: #012699; margin: 0 0 3px; }
+        .cat-block p { font-size: 10px; color: #374151; margin: 0 0 4px; }
+        .cat-block .tip { background: #f0f5ff; border: 1px solid #dbeafe; border-radius: 4px; padding: 5px 8px; font-size: 9px; color: #1e3a5f; margin-top: 4px; }
+        .cat-block .tip strong { color: #012699; }
+        .pdf-footer { text-align: center; border-top: 2px solid #e2e8f0; padding-top: 10px; margin-top: 16px; font-size: 9px; color: #94a3b8; }
+        .pdf-footer .amber { color: #d97706; font-weight: 600; letter-spacing: 0.1em; }
+    </style></head><body>
+    <div class="pdf-header">
+        <img src="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" alt="MCF Logo">
+        <h1>Local Scholarship Search Checklist</h1>
+        <div class="tagline">EDUCATE * MOTIVATE * ELEVATE</div>
+        <div class="date">Generated ${now} | The Scholarship Strategy - Lesson 2.1</div>
+    </div>
+    <div class="profile-box">
+        <div><strong>State:</strong> ${state}</div>
+        <div><strong>City:</strong> ${city || 'N/A'}</div>
+        <div><strong>Grade Level:</strong> ${grade}</div>
+        <div><strong>Major/Field:</strong> ${major}</div>
+        <div><strong>School:</strong> ${school}</div>
+        <div><strong>Categories Explored:</strong> ${exploredCategories.length} of ${categories.length}</div>
+    </div>`;
+
+    // Explored categories detail
+    if (exploredCategories.length > 0) {
+        html += `<div class="section-title">Explored Scholarship Sources</div>`;
+        exploredCategories.forEach(catId => {
+            const cat = categories.find(c => c.id === catId);
+            if (!cat) return;
+            html += `<div class="cat-block"><h3>${cat.icon} ${cat.name}</h3><p>${cat.description.substring(0, 200)}...</p><div class="tip"><strong>Search Tip:</strong> ${cat.tip}</div></div>`;
+        });
+    }
+
+    // Checklist
+    html += `<div class="section-title">Your Personal Search Checklist</div>`;
+    // Rebuild items
+    let items = [];
+    items.push({ id: 'fafsa', title: 'Complete the FAFSA', desc: 'The #1 most important step', cat: 'Essential' });
+    if (state !== 'N/A') items.push({ id: 'state-grants', title: `Research ${state} state grant programs`, desc: 'Check state education agency', cat: 'Government' });
+    if (school !== 'N/A') items.push({ id: 'school-aid', title: `Contact ${school} financial aid office`, desc: 'Merit, need-based, departmental', cat: 'Institutional' });
+    exploredCategories.forEach(catId => {
+        const cat = categories.find(c => c.id === catId);
+        if (!cat) return;
+        cat.checklistItems.forEach((item, i) => items.push({ id: `${catId}-${i}`, title: item.title, desc: item.desc, cat: cat.name }));
+    });
+    if (city) {
+        items.push({ id: 'local-library', title: `Visit ${city} public library`, desc: 'Local scholarship lists', cat: 'Local' });
+        items.push({ id: 'local-foundation', title: `Search ${city} Community Foundation`, desc: 'Endowed scholarships', cat: 'Local' });
+    }
+
+    items.forEach(item => {
+        const done = checklistState[item.id] === true;
+        html += `<div class="cl-item"><div class="cl-box ${done ? 'done' : ''}">${done ? '&#10003;' : ''}</div><div><span class="cl-t">${item.title}</span><br><span class="cl-d">${item.desc}</span></div></div>`;
+    });
+
+    html += `<div class="pdf-footer"><div class="amber">EDUCATE * MOTIVATE * ELEVATE</div><div>Copyright 2025 My College Finance. All rights reserved. | www.mycollegefinance.com</div></div>
+    <script src="../../nav-inject.js"></script>
+</body></html>`;
+    openPrintWindow(html, 'Local_Scholarship_Search_Checklist.html');
+}
+
+/* ==========================================
+   BLANK TEMPLATE
+   ========================================== */
+function downloadTemplate() {
+    let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Scholarship Source Finder Worksheet - My College Finance</title>
+    <style>
+        @page { margin: 0.65in; size: letter; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; color: #09090b; font-size: 10.5px; line-height: 1.5; }
+        .header { text-align: center; border-bottom: 3px solid #012699; padding-bottom: 10px; margin-bottom: 16px; }
+        .header img { width: 50px; height: 50px; }
+        .header h1 { font-size: 18px; color: #012699; margin: 6px 0 2px; }
+        .header .tagline { font-size: 9px; color: #64748b; letter-spacing: 0.1em; }
+        .header .sub { font-size: 9px; color: #94a3b8; margin-top: 4px; }
+        .instructions { background: #f0f5ff; border: 1px solid #dbeafe; border-radius: 6px; padding: 8px 12px; margin-bottom: 14px; font-size: 10px; color: #1e3a5f; }
+        .instructions strong { color: #012699; }
+        .section-title { font-size: 12px; font-weight: 800; color: #012699; border-bottom: 2px solid #e2e8f0; padding-bottom: 3px; margin: 14px 0 8px; }
+        .write-lines { border-bottom: 1px solid #e2e8f0; height: 20px; }
+        .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+        .profile-field .label { font-size: 9px; color: #64748b; font-weight: 600; }
+        .cat-section { margin-bottom: 12px; page-break-inside: avoid; }
+        .cat-section h3 { font-size: 11px; color: #012699; margin-bottom: 4px; }
+        .cat-section .prompt { font-size: 9px; color: #64748b; font-style: italic; margin-bottom: 4px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+        th, td { padding: 6px 8px; border: 1px solid #d1d5db; font-size: 10px; }
+        th { background: #f0f5ff; color: #012699; font-weight: 700; text-align: left; font-size: 9px; text-transform: uppercase; }
+        .footer { text-align: center; border-top: 2px solid #e2e8f0; padding-top: 10px; margin-top: 16px; }
+        .footer .amber { color: #d97706; font-weight: 600; letter-spacing: 0.1em; font-size: 10px; }
+        .footer .copy { font-size: 8px; color: #94a3b8; }
+    </style></head><body>
+    <div class="header">
+        <img src="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" alt="MCF Logo">
+        <h1>Scholarship Source Finder Worksheet</h1>
+        <div class="tagline">EDUCATE * MOTIVATE * ELEVATE</div>
+        <div class="sub">The Scholarship Strategy | Lesson 2.1</div>
+    </div>
+    <div class="instructions"><strong>Instructions:</strong> Fill in your profile information, then research and list specific scholarship sources for each category. Use this as your master reference for scholarship searching.</div>
+
+    <div class="section-title">Your Profile</div>
+    <div class="profile-grid">
+        <div class="profile-field"><div class="label">Name:</div><div class="write-lines"></div></div>
+        <div class="profile-field"><div class="label">State:</div><div class="write-lines"></div></div>
+        <div class="profile-field"><div class="label">City:</div><div class="write-lines"></div></div>
+        <div class="profile-field"><div class="label">Grade Level:</div><div class="write-lines"></div></div>
+        <div class="profile-field"><div class="label">Major/Field:</div><div class="write-lines"></div></div>
+        <div class="profile-field"><div class="label">School:</div><div class="write-lines"></div></div>
+    </div>`;
+
+    categories.forEach(cat => {
+        html += `<div class="cat-section">
+            <h3>${cat.icon} ${cat.name}</h3>
+            <div class="prompt">Research and list specific scholarships from this category that you may qualify for:</div>
+            <table>
+                <tr><th style="width:40%;">Scholarship Name</th><th style="width:30%;">Amount / Deadline</th><th style="width:30%;">Notes / Requirements</th></tr>
+                <tr><td style="height:22px;"></td><td></td><td></td></tr>
+                <tr><td style="height:22px;"></td><td></td><td></td></tr>
+                <tr><td style="height:22px;"></td><td></td><td></td></tr>
+            </table>
+        </div>`;
+    });
+
+    html += `<div class="section-title">My Top 10 Scholarship Sources to Apply For</div>
+    <table>
+        <tr><th>#</th><th>Scholarship Name</th><th>Deadline</th><th>Amount</th><th>Status</th></tr>`;
+    for (let i = 1; i <= 10; i++) {
+        html += `<tr><td style="text-align:center;">${i}</td><td style="height:20px;"></td><td></td><td></td><td></td></tr>`;
+    }
+    html += `</table>
+
+    <div class="footer">
+        <div class="amber">EDUCATE * MOTIVATE * ELEVATE</div>
+        <div class="copy">Copyright 2025 My College Finance. All rights reserved. | www.mycollegefinance.com</div>
+    </div>
+    <script src="../../nav-inject.js"></script>
+</body></html>`;
+    openPrintWindow(html, 'Scholarship_Source_Finder_Worksheet.html');
+}
+
+function openPrintWindow(html, fallbackName) {
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const win = window.open(url, '_blank');
+    if (win) { win.onload = () => { setTimeout(() => { win.print(); }, 400); }; }
+    else { const a = document.createElement('a'); a.href = url; a.download = fallbackName; a.click(); }
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+
+/* ==========================================
+   INIT
+   ========================================== */
+document.addEventListener('DOMContentLoaded', () => {
+    initDarkMode();
+    buildCategoryGrid();
+    loadState();
+});
+</script>
+
+    <script src="../../nav-inject.js"></script>
+</body>
+</html>

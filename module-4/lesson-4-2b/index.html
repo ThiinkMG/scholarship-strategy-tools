@@ -1,0 +1,545 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aid Risk Detector - My College Finance</title>
+    <style>
+        :root {
+            --mcf-brand-blue:#012699;--mcf-brand-green:#26e011;--mcf-brand-amber:#fdc003;--mcf-brand-black:#000516;
+            --mcf-background:#fafafa;--mcf-foreground:#09090b;--mcf-card:#ffffff;--mcf-card-foreground:#09090b;
+            --mcf-primary:#336bff;--mcf-primary-foreground:#f8fafc;--mcf-secondary:#f1f5f9;--mcf-secondary-foreground:#64748b;
+            --mcf-muted:#f1f5f9;--mcf-muted-foreground:#64748b;--mcf-destructive:#ef4444;--mcf-border:#e2e8f0;
+            --mcf-input:#e2e8f0;--mcf-radius:0.5rem;--mcf-transition:all 0.3s ease;
+            --risk-low:#16a34a;--risk-med:#f59e0b;--risk-high:#ef4444;--risk-clear:#06b6d4;
+        }
+        body.dark-mode {
+            --mcf-background:#09090b;--mcf-foreground:#f8fafc;--mcf-card:#1a1a1f;--mcf-card-foreground:#f8fafc;
+            --mcf-primary:#4c6ef5;--mcf-primary-foreground:#f8fafc;--mcf-secondary:#374151;--mcf-secondary-foreground:#f8fafc;
+            --mcf-muted:#1c1917;--mcf-muted-foreground:#94a3b8;--mcf-border:#374151;--mcf-input:#1f2937;
+            --mcf-brand-blue:#0139cc;--mcf-brand-green:#3ae826;--mcf-brand-amber:#fdc922;--mcf-brand-black:#f0f1ff;
+            --risk-low:#22c55e;--risk-med:#fbbf24;--risk-high:#f87171;--risk-clear:#22d3ee;
+        }
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,'Noto Sans',sans-serif;font-size:16px;line-height:1.5;background:var(--mcf-background);color:var(--mcf-foreground);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+
+        .mcf-header{position:sticky;top:0;z-index:100;border-bottom:2px solid var(--mcf-border);backdrop-filter:blur(12px);background:rgba(250,250,250,0.92);}
+        body.dark-mode .mcf-header{background:rgba(9,9,11,0.92);}
+        .mcf-header-inner{max-width:1280px;margin:0 auto;padding:0 1rem;display:flex;justify-content:space-between;align-items:center;height:64px;}
+        .mcf-header-brand{display:flex;align-items:center;gap:0.75rem;}
+        .mcf-logo-header{width:50px;height:50px;object-fit:contain;}
+        .mcf-brand-text{display:flex;flex-direction:column;}
+        .mcf-brand-name{font-size:1rem;font-weight:900;text-transform:uppercase;letter-spacing:0.05em;color:var(--mcf-brand-blue);line-height:1.2;}
+        .mcf-tagline{font-size:0.6rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--mcf-muted-foreground);}
+        .mcf-theme-toggle{width:40px;height:40px;padding:0;border:2px solid var(--mcf-border);background:var(--mcf-card);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--mcf-transition);color:var(--mcf-foreground);}
+        .mcf-theme-toggle:hover{border-color:var(--mcf-primary);transform:scale(1.1);}
+        .content-wrap{max-width:820px;margin:0 auto;padding:0 1rem;}
+
+        .hero{text-align:center;padding:2.5rem 0 1.5rem;animation:fadeSlideIn 0.6s ease-out;}
+        .hero-badge{display:inline-flex;align-items:center;gap:0.4rem;background:linear-gradient(135deg,var(--mcf-brand-blue),var(--mcf-primary));color:#fff;font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.35rem 1rem;border-radius:50px;margin-bottom:1rem;}
+        .hero-title{font-size:2rem;font-weight:900;line-height:1.15;letter-spacing:-0.02em;margin-bottom:0.75rem;}
+        .hero-title span{background:linear-gradient(135deg,var(--mcf-destructive),#dc2626);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .hero-desc{font-size:1rem;color:var(--mcf-muted-foreground);max-width:640px;margin:0 auto;line-height:1.6;}
+
+        /* PROGRESS */
+        .progress-wrap{margin-bottom:1.25rem;animation:fadeSlideIn 0.6s ease-out 0.1s both;}
+        .progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.35rem;}
+        .progress-label{font-size:0.75rem;font-weight:600;color:var(--mcf-foreground);}
+        .progress-pct{font-size:0.75rem;font-weight:700;color:var(--mcf-brand-blue);}
+        .progress-track{width:100%;height:10px;background:var(--mcf-secondary);border-radius:50px;overflow:hidden;border:1px solid var(--mcf-border);}
+        .progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--mcf-brand-blue),var(--mcf-primary));border-radius:50px;transition:width 0.5s ease;}
+
+        /* QUESTION CARDS */
+        .q-card{background:var(--mcf-card);border:2px solid var(--mcf-border);border-radius:calc(var(--mcf-radius)*2);padding:1.5rem;margin-bottom:1rem;transition:var(--mcf-transition);animation:fadeSlideIn 0.4s ease-out;}
+        .q-card.answered{border-color:var(--mcf-brand-green);background:linear-gradient(135deg,rgba(38,224,17,0.02),transparent);}
+        .q-num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--mcf-brand-blue);color:#fff;font-size:0.72rem;font-weight:800;margin-bottom:0.5rem;}
+        .q-text{font-size:1rem;font-weight:700;color:var(--mcf-foreground);margin-bottom:0.25rem;line-height:1.4;}
+        .q-helper{font-size:0.75rem;color:var(--mcf-muted-foreground);margin-bottom:0.85rem;line-height:1.5;}
+        .q-helper strong{color:var(--mcf-foreground);}
+
+        /* ANSWER OPTIONS */
+        .answer-grid{display:flex;flex-direction:column;gap:0.4rem;}
+        .answer-option{display:flex;align-items:center;gap:0.6rem;padding:0.65rem 0.85rem;border:2.5px solid var(--mcf-border);border-radius:calc(var(--mcf-radius)*1.5);cursor:pointer;transition:all 0.25s ease;background:var(--mcf-card);}
+        .answer-option:hover{border-color:var(--mcf-primary);transform:translateX(4px);}
+        .answer-option.selected{border-color:var(--mcf-brand-blue);background:linear-gradient(135deg,rgba(1,38,153,0.04),transparent);}
+        .ao-radio{width:20px;height:20px;border:2.5px solid var(--mcf-input);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:var(--mcf-transition);}
+        .answer-option.selected .ao-radio{border-color:var(--mcf-brand-blue);background:var(--mcf-brand-blue);}
+        .answer-option.selected .ao-radio::after{content:'';width:8px;height:8px;border-radius:50%;background:#fff;}
+        .ao-text{font-size:0.85rem;font-weight:600;color:var(--mcf-foreground);}
+        .ao-risk{font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:0.1rem 0.4rem;border-radius:50px;margin-left:auto;display:none;}
+        .answer-option.selected .ao-risk{display:inline-block;}
+        .ao-risk.risk-none{background:rgba(6,182,212,0.1);color:var(--risk-clear);}
+        .ao-risk.risk-low{background:rgba(22,163,74,0.1);color:var(--risk-low);}
+        .ao-risk.risk-med{background:rgba(245,158,11,0.1);color:var(--risk-med);}
+        .ao-risk.risk-high{background:rgba(239,68,68,0.1);color:var(--risk-high);}
+
+        /* INPUT QUESTIONS */
+        .mcf-input{width:100%;padding:0.65rem 0.8rem;font-size:0.85rem;background:var(--mcf-background);color:var(--mcf-foreground);border:2px solid var(--mcf-input);border-radius:var(--mcf-radius);transition:var(--mcf-transition);font-family:inherit;}
+        .mcf-input:focus{outline:none;border-color:var(--mcf-primary);box-shadow:0 0 0 3px rgba(51,107,255,0.1);}
+        .mcf-input.filled{border-color:var(--mcf-brand-green);}
+        .mcf-select{width:100%;padding:0.65rem 2rem 0.65rem 0.8rem;font-size:0.85rem;background:var(--mcf-background);color:var(--mcf-foreground);border:2px solid var(--mcf-input);border-radius:var(--mcf-radius);appearance:none;cursor:pointer;font-family:inherit;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 9L1 4h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 0.75rem center;transition:var(--mcf-transition);}
+        .mcf-select:focus{outline:none;border-color:var(--mcf-primary);box-shadow:0 0 0 3px rgba(51,107,255,0.1);}
+        .form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.65rem;}
+        @media(max-width:500px){.form-row{grid-template-columns:1fr;}}
+
+        /* GENERATE BUTTON */
+        .generate-btn{width:100%;padding:0.85rem;border-radius:var(--mcf-radius);border:none;background:linear-gradient(135deg,var(--mcf-brand-blue),var(--mcf-primary));color:#fff;font-size:0.95rem;font-weight:800;cursor:pointer;transition:var(--mcf-transition);font-family:inherit;display:flex;align-items:center;justify-content:center;gap:0.5rem;margin-top:0.5rem;}
+        .generate-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 28px rgba(1,38,153,0.25);}
+        .generate-btn:disabled{opacity:0.5;cursor:not-allowed;}
+
+        /* ===== RESULTS SCREEN ===== */
+        .results-screen{display:none;animation:fadeSlideIn 0.6s ease-out;}
+        .results-screen.visible{display:block;}
+
+        /* RISK METER */
+        .risk-meter-wrap{text-align:center;padding:2rem 0;animation:fadeSlideIn 0.5s ease-out;}
+        .risk-meter{position:relative;width:200px;height:100px;margin:0 auto 1rem;overflow:hidden;}
+        .meter-bg{width:200px;height:200px;border-radius:50%;border:16px solid var(--mcf-secondary);border-bottom-color:transparent;border-left-color:transparent;transform:rotate(225deg);position:absolute;top:0;left:0;}
+        .meter-fill{width:200px;height:200px;border-radius:50%;border:16px solid transparent;position:absolute;top:0;left:0;transform:rotate(225deg);transition:all 1s cubic-bezier(0.22,1,0.36,1);}
+        .meter-needle{position:absolute;bottom:0;left:50%;width:4px;height:85px;background:var(--mcf-foreground);transform-origin:bottom center;border-radius:2px;transition:transform 1s cubic-bezier(0.22,1,0.36,1);}
+        .meter-center{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);width:16px;height:16px;border-radius:50%;background:var(--mcf-foreground);}
+        .meter-labels{display:flex;justify-content:space-between;width:220px;margin:-0.5rem auto 0;padding:0 0.25rem;}
+        .meter-labels span{font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;}
+
+        .risk-title{font-size:1.75rem;font-weight:900;margin-bottom:0.25rem;}
+        .risk-subtitle{font-size:1rem;color:var(--mcf-muted-foreground);margin-bottom:0.5rem;}
+        .risk-score-badge{display:inline-block;font-size:0.78rem;font-weight:800;padding:0.3rem 1rem;border-radius:50px;color:#fff;margin-bottom:1rem;}
+
+        /* RISK AREA CARDS */
+        .risk-area-card{background:var(--mcf-card);border:2px solid var(--mcf-border);border-radius:calc(var(--mcf-radius)*1.5);padding:1.15rem;margin-bottom:0.65rem;transition:var(--mcf-transition);}
+        .risk-area-card:hover{border-color:var(--mcf-brand-blue);}
+        .ra-header{display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;}
+        .ra-icon{font-size:1.3rem;}
+        .ra-title{font-size:0.92rem;font-weight:700;color:var(--mcf-foreground);flex:1;}
+        .ra-badge{font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:0.15rem 0.55rem;border-radius:50px;color:#fff;flex-shrink:0;}
+        .ra-badge.clear{background:var(--risk-clear);}
+        .ra-badge.low{background:var(--risk-low);}
+        .ra-badge.medium{background:var(--risk-med);}
+        .ra-badge.high{background:var(--risk-high);}
+        .ra-desc{font-size:0.82rem;color:var(--mcf-muted-foreground);line-height:1.55;margin-bottom:0.5rem;}
+        .ra-action{background:var(--mcf-secondary);border-radius:var(--mcf-radius);padding:0.55rem 0.75rem;font-size:0.78rem;color:var(--mcf-card-foreground);line-height:1.5;}
+        .ra-action strong{color:var(--mcf-foreground);}
+
+        /* PREVENTION CHECKLIST */
+        .prevention-card{background:var(--mcf-secondary);border-radius:calc(var(--mcf-radius)*1.5);padding:0.75rem 1rem;margin-bottom:0.4rem;display:flex;align-items:flex-start;gap:0.5rem;font-size:0.82rem;line-height:1.55;color:var(--mcf-card-foreground);}
+        .prevention-card .pc-icon{font-size:1rem;flex-shrink:0;margin-top:0.05rem;}
+        .prevention-card strong{color:var(--mcf-foreground);}
+
+        .sec-title{font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--mcf-foreground);margin:1.5rem 0 0.75rem;padding-bottom:0.5rem;border-bottom:2px solid var(--mcf-border);}
+
+        .tip-box{background:linear-gradient(135deg,rgba(1,38,153,0.05),rgba(51,107,255,0.05));border:1.5px solid rgba(51,107,255,0.15);border-radius:calc(var(--mcf-radius)*1.5);padding:0.85rem 1rem;font-size:0.82rem;line-height:1.6;color:var(--mcf-card-foreground);margin:1rem 0;}
+        body.dark-mode .tip-box{background:linear-gradient(135deg,rgba(1,57,204,0.1),rgba(76,110,245,0.06));border-color:rgba(76,110,245,0.25);}
+        .tip-box strong{color:var(--mcf-brand-blue);}
+
+        .mcf-btn{display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;padding:0.6rem 1.25rem;font-size:0.82rem;font-weight:600;border-radius:var(--mcf-radius);transition:var(--mcf-transition);cursor:pointer;border:none;font-family:inherit;text-decoration:none;}
+        .mcf-btn-primary{background:var(--mcf-primary);color:var(--mcf-primary-foreground);}
+        .mcf-btn-primary:hover{background:var(--mcf-brand-blue);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.12);}
+        .mcf-btn-outline{background:transparent;border:2px solid var(--mcf-border);color:var(--mcf-foreground);}
+        .mcf-btn-outline:hover{border-color:var(--mcf-primary);background:rgba(51,107,255,0.05);}
+        .mcf-btn-amber{background:var(--mcf-brand-amber);color:#000516;border:none;}
+        .mcf-btn-amber:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(253,192,3,0.3);}
+        .action-bar{display:flex;flex-wrap:wrap;justify-content:center;gap:0.75rem;margin:1.5rem 0 2rem;}
+
+        .mcf-footer{background:linear-gradient(to bottom,#111827,#000000);color:white;padding:2.5rem 1rem;margin-top:2rem;text-align:center;}
+        .mcf-footer-inner{max-width:700px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:1rem;}
+        .mcf-footer .mcf-logo-footer{width:60px;height:60px;object-fit:contain;}
+        .mcf-footer-title{font-size:1.1rem;font-weight:900;letter-spacing:0.05em;}
+        .mcf-footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:0.5rem;align-items:center;}
+        .mcf-footer-links a{color:rgba(255,255,255,0.7);text-decoration:none;font-size:0.8rem;transition:color 0.3s ease;}
+        .mcf-footer-links a:hover{color:var(--mcf-brand-amber);}
+        .mcf-footer-sep{color:rgba(255,255,255,0.3);font-size:0.8rem;}
+        .mcf-footer-tagline{font-size:0.8rem;letter-spacing:0.1em;color:var(--mcf-brand-amber);font-weight:600;}
+        .mcf-footer-copy{font-size:0.7rem;color:rgba(255,255,255,0.45);}
+
+        @keyframes fadeSlideIn{from{transform:translateY(18px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+        @media(max-width:640px){.hero-title{font-size:1.5rem;}.mcf-brand-text{display:none;}.risk-meter-wrap{padding:1.5rem 0;}}
+        @media print{.mcf-header,.mcf-footer,.mcf-theme-toggle,.action-bar,.generate-btn{display:none!important;}body{background:#fff!important;color:#000!important;}}
+    </style>
+</head>
+<body>
+    <header class="mcf-header"><div class="mcf-header-inner"><div class="mcf-header-brand"><img src="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" alt="My College Finance Logo" class="mcf-logo-header"><div class="mcf-brand-text"><div class="mcf-brand-name">My College Finance</div><div class="mcf-tagline">EDUCATE &bull; MOTIVATE &bull; ELEVATE</div></div></div><button id="mcf-theme-toggle" class="mcf-theme-toggle" aria-label="Toggle dark mode"><svg class="mcf-sun-icon" width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="4" fill="currentColor"/><path d="M10 0v4M10 16v4M20 10h-4M4 10H0M17.07 2.93l-2.83 2.83M5.76 14.24l-2.83 2.83M17.07 17.07l-2.83-2.83M5.76 5.76L2.93 2.93" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><svg class="mcf-moon-icon" width="18" height="18" viewBox="0 0 20 20" fill="none" style="display:none;"><path d="M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C10.3395 3 10.6734 3.02389 11 3.07039C9.27477 4.07544 8 5.8965 8 8C8 11.3137 10.6863 14 14 14C15.1035 14 16.0754 13.6238 16.9296 12.9998C16.9762 13.3266 17 13.6605 17 14Z" fill="currentColor"/></svg></button></div></header>
+
+    <div class="content-wrap">
+        <section class="hero">
+            <div class="hero-badge">Lesson 4.2 &mdash; Maintaining and Renewing Scholarships</div>
+            <h1 class="hero-title">Aid Risk<br><span>Detector</span></h1>
+            <p class="hero-desc">Are you at risk of losing your financial aid? Answer a few questions about your academics, enrollment, and scholarship requirements to get a personalized risk assessment with action steps to protect your funding.</p>
+        </section>
+
+        <!-- ASSESSMENT -->
+        <div id="assessmentScreen">
+            <div class="progress-wrap">
+                <div class="progress-header"><span class="progress-label" id="progressLabel">Question 1 of 10</span><span class="progress-pct" id="progressPct">0%</span></div>
+                <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+            </div>
+            <div id="questionsContainer"></div>
+            <button class="generate-btn" id="generateBtn" onclick="generateReport()" disabled><span>&#128737;</span> Generate My Risk Report</button>
+        </div>
+
+        <!-- RESULTS -->
+        <div id="resultsScreen" class="results-screen">
+            <div class="risk-meter-wrap" id="riskMeterWrap"></div>
+            <div class="sec-title">Risk Assessment by Area</div>
+            <div id="riskAreasContainer"></div>
+            <div class="sec-title">Prevention Action Plan</div>
+            <div id="preventionContainer"></div>
+            <div class="tip-box" id="resultsTip"></div>
+            <div class="action-bar" style="margin-top:1rem;">
+                <button class="mcf-btn mcf-btn-amber" onclick="retakeAssessment()"><span>&#128260;</span> Retake Assessment</button>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <button class="mcf-btn mcf-btn-primary" onclick="downloadPDF()"><span>&#128196;</span> Save &amp; Download PDF</button>
+            <button class="mcf-btn mcf-btn-outline" onclick="downloadTemplate()"><span>&#128203;</span> Download Blank Template</button>
+        </div>
+    </div>
+
+    <footer class="mcf-footer"><div class="mcf-footer-inner"><img src="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" alt="MCF Logo" class="mcf-logo-footer"><div class="mcf-footer-title">MY COLLEGE FINANCE</div><div class="mcf-footer-links"><a href="https://www.mycollegefinance.com/" target="_blank" rel="noopener">Main Website</a><span class="mcf-footer-sep">&bull;</span><a href="https://www.mycollegefinance.com/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a><span class="mcf-footer-sep">&bull;</span><a href="https://www.mycollegefinance.com/terms-policy" target="_blank" rel="noopener">Terms of Service</a><span class="mcf-footer-sep">&bull;</span><a href="https://linktr.ee/mycollegefinance" target="_blank" rel="noopener">Social Media</a></div><div class="mcf-footer-tagline">EDUCATE &bull; MOTIVATE &bull; ELEVATE</div><div class="mcf-footer-copy">&copy; 2025 My College Finance. All rights reserved.</div></div></footer>
+
+<script>
+const questions=[
+{id:'gpa',num:1,text:'What is your current cumulative GPA?',helper:'Most scholarships and federal aid require a minimum GPA. <strong>Satisfactory Academic Progress (SAP)</strong> typically requires a 2.0 for federal aid, while many scholarships require 2.5-3.5+.',
+options:[
+{text:'3.5 or above',risk:0,level:'none',area:'gpa'},
+{text:'3.0 - 3.49',risk:1,level:'low',area:'gpa'},
+{text:'2.5 - 2.99',risk:2,level:'med',area:'gpa'},
+{text:'2.0 - 2.49',risk:3,level:'high',area:'gpa'},
+{text:'Below 2.0',risk:5,level:'high',area:'gpa'},
+{text:'Not sure',risk:2,level:'med',area:'gpa'}
+]},
+{id:'gpa_trend',num:2,text:'How is your GPA trending compared to last semester?',helper:'A declining GPA is an early warning sign, even if you are still above the minimum. Catching a downward trend early is key.',
+options:[
+{text:'Going up (improving)',risk:0,level:'none',area:'gpa'},
+{text:'Staying about the same',risk:0,level:'none',area:'gpa'},
+{text:'Going down slightly',risk:2,level:'med',area:'gpa'},
+{text:'Dropping significantly',risk:4,level:'high',area:'gpa'},
+{text:'First semester (no trend yet)',risk:0,level:'none',area:'gpa'}
+]},
+{id:'credits',num:3,text:'How many credit hours are you enrolled in this semester?',helper:'<strong>Full-time status</strong> is typically 12+ credits. Many scholarships, federal loans, and grants require full-time enrollment. Dropping below can trigger aid loss.',
+options:[
+{text:'15+ credits (full-time, on track to graduate)',risk:0,level:'none',area:'enrollment'},
+{text:'12-14 credits (full-time minimum)',risk:1,level:'low',area:'enrollment'},
+{text:'9-11 credits (three-quarter time)',risk:3,level:'high',area:'enrollment'},
+{text:'6-8 credits (half-time)',risk:4,level:'high',area:'enrollment'},
+{text:'Less than 6 credits',risk:5,level:'high',area:'enrollment'}
+]},
+{id:'fulltime_req',num:4,text:'Do any of your scholarships require full-time enrollment (12+ credits)?',helper:'Many institutional scholarships, state grants, and federal aid programs require full-time status. Check every scholarship\'s terms.',
+options:[
+{text:'Yes, and I am enrolled full-time',risk:0,level:'none',area:'enrollment'},
+{text:'Yes, but I am considering dropping a class',risk:3,level:'high',area:'enrollment'},
+{text:'Yes, and I am currently below full-time',risk:5,level:'high',area:'enrollment'},
+{text:'No, my aid does not require full-time',risk:0,level:'none',area:'enrollment'},
+{text:'I am not sure about the requirements',risk:2,level:'med',area:'enrollment'}
+]},
+{id:'completion_rate',num:5,text:'What percentage of courses you have attempted have you successfully completed?',helper:'<strong>SAP requires a 67% completion rate.</strong> Withdrawals (W), incompletes (I), and failing grades (F) all count as attempted but not completed. This is a commonly overlooked requirement.',
+options:[
+{text:'90-100% (completed nearly all courses)',risk:0,level:'none',area:'sap'},
+{text:'80-89%',risk:1,level:'low',area:'sap'},
+{text:'67-79%',risk:2,level:'med',area:'sap'},
+{text:'Below 67%',risk:5,level:'high',area:'sap'},
+{text:'Not sure how to calculate this',risk:2,level:'med',area:'sap'}
+]},
+{id:'withdrawals',num:6,text:'Have you withdrawn from (dropped) any courses this academic year?',helper:'Withdrawals count against your completion rate and can affect aid. Multiple withdrawals are a red flag for financial aid offices.',
+options:[
+{text:'No withdrawals',risk:0,level:'none',area:'sap'},
+{text:'One withdrawal',risk:1,level:'low',area:'sap'},
+{text:'Two or more withdrawals',risk:3,level:'high',area:'sap'},
+{text:'Considering withdrawing from a course now',risk:2,level:'med',area:'sap'}
+]},
+{id:'scholarship_gpa',num:7,text:'Do you know the specific GPA requirements for each of your scholarships?',helper:'Different scholarships may have different GPA thresholds. Some check annually, some each semester. Knowing exact requirements lets you monitor proactively.',
+options:[
+{text:'Yes, I know every requirement and I meet them all',risk:0,level:'none',area:'scholarship'},
+{text:'I know most but not all requirements',risk:1,level:'low',area:'scholarship'},
+{text:'I am close to or below one or more GPA thresholds',risk:4,level:'high',area:'scholarship'},
+{text:'I do not know my scholarship GPA requirements',risk:3,level:'med',area:'scholarship'}
+]},
+{id:'renewal_deadlines',num:8,text:'Are you aware of renewal deadlines for your scholarships?',helper:'Some scholarships require annual renewal applications, service hour verification, or updated FAFSA. Missing a deadline can permanently forfeit an award.',
+options:[
+{text:'Yes, I track all renewal dates and requirements',risk:0,level:'none',area:'scholarship'},
+{text:'I know some but have not tracked them formally',risk:1,level:'low',area:'scholarship'},
+{text:'I assumed they renewed automatically',risk:3,level:'high',area:'scholarship'},
+{text:'I did not know scholarships needed renewal',risk:4,level:'high',area:'scholarship'}
+]},
+{id:'fafsa',num:9,text:'Have you filed your FAFSA for next academic year?',helper:'FAFSA must be filed every year to maintain federal and state aid. Many state grants are first-come first-served and run out of funding early.',
+options:[
+{text:'Yes, already filed for next year',risk:0,level:'none',area:'fafsa'},
+{text:'Not yet, but I plan to soon',risk:1,level:'low',area:'fafsa'},
+{text:'I did not know I needed to file again',risk:4,level:'high',area:'fafsa'},
+{text:'Not applicable (I do not receive federal aid)',risk:0,level:'none',area:'fafsa'}
+]},
+{id:'maxtime',num:10,text:'How close are you to the maximum timeframe for your program?',helper:'<strong>SAP limits federal aid to 150% of your program length.</strong> For a 4-year (120 credit) degree, that is 180 attempted credits max. Changing majors or retaking courses counts against this limit.',
+options:[
+{text:'Well within limits (expected to graduate on time)',risk:0,level:'none',area:'sap'},
+{text:'Slightly behind but not near the limit',risk:1,level:'low',area:'sap'},
+{text:'Getting close to 150% of required credits',risk:3,level:'high',area:'sap'},
+{text:'Have changed majors and unsure about credit count',risk:2,level:'med',area:'sap'},
+{text:'Not sure what the maximum timeframe is',risk:2,level:'med',area:'sap'}
+]}
+];
+
+let answers={};
+let reportData=null;
+
+function initDarkMode(){const s=localStorage.getItem('mcf-theme')||'light';if(s==='dark'){document.body.classList.add('dark-mode');updI(true);}document.getElementById('mcf-theme-toggle').addEventListener('click',()=>{const d=document.body.classList.toggle('dark-mode');localStorage.setItem('mcf-theme',d?'dark':'light');updI(d);});}
+function updI(d){document.querySelectorAll('.mcf-sun-icon').forEach(i=>i.style.display=d?'none':'block');document.querySelectorAll('.mcf-moon-icon').forEach(i=>i.style.display=d?'block':'none');}
+
+function buildQuestions(){
+    const c=document.getElementById('questionsContainer');
+    c.innerHTML=questions.map(q=>`
+    <div class="q-card" id="qcard-${q.id}" data-qid="${q.id}">
+        <div class="q-num">${q.num}</div>
+        <div class="q-text">${q.text}</div>
+        <div class="q-helper">${q.helper}</div>
+        <div class="answer-grid">${q.options.map((o,i)=>`
+            <div class="answer-option" data-qid="${q.id}" data-idx="${i}" onclick="selectAnswer('${q.id}',${i})">
+                <div class="ao-radio"></div>
+                <span class="ao-text">${o.text}</span>
+                <span class="ao-risk risk-${o.level}">${o.level==='none'?'Clear':o.level==='low'?'Low Risk':o.level==='med'?'Monitor':o.level==='high'?'At Risk':''}</span>
+            </div>`).join('')}
+        </div>
+    </div>`).join('');
+    updateProgress();
+}
+
+function selectAnswer(qid,idx){
+    answers[qid]=idx;
+    document.querySelectorAll(`.answer-option[data-qid="${qid}"]`).forEach(o=>o.classList.remove('selected'));
+    document.querySelector(`.answer-option[data-qid="${qid}"][data-idx="${idx}"]`).classList.add('selected');
+    document.getElementById('qcard-'+qid).classList.add('answered');
+    updateProgress();
+    saveState();
+}
+
+function updateProgress(){
+    const answered=Object.keys(answers).length;
+    const total=questions.length;
+    const pct=Math.round((answered/total)*100);
+    document.getElementById('progressLabel').textContent=`Question ${Math.min(answered+1,total)} of ${total}`;
+    document.getElementById('progressPct').textContent=pct+'%';
+    document.getElementById('progressFill').style.width=pct+'%';
+    document.getElementById('generateBtn').disabled=answered<total;
+}
+
+function generateReport(){
+    let totalRisk=0;
+    const areaRisks={gpa:{score:0,max:0,items:[]},enrollment:{score:0,max:0,items:[]},sap:{score:0,max:0,items:[]},scholarship:{score:0,max:0,items:[]},fafsa:{score:0,max:0,items:[]}};
+
+    questions.forEach(q=>{
+        const idx=answers[q.id];
+        if(idx===undefined)return;
+        const opt=q.options[idx];
+        totalRisk+=opt.risk;
+        const area=opt.area;
+        areaRisks[area].score+=opt.risk;
+        areaRisks[area].max+=5;
+        areaRisks[area].items.push({question:q.text,answer:opt.text,risk:opt.risk,level:opt.level});
+    });
+
+    const maxRisk=questions.length*5;
+    const riskPct=Math.round((totalRisk/maxRisk)*100);
+    let overallLevel,overallLabel,overallColor,overallDesc;
+    if(riskPct<=10){overallLevel='clear';overallLabel='All Clear';overallColor='var(--risk-clear)';overallDesc='Your financial aid appears to be in great shape. Keep doing what you are doing and stay vigilant about renewal deadlines.';}
+    else if(riskPct<=25){overallLevel='low';overallLabel='Low Risk';overallColor='var(--risk-low)';overallDesc='You have minor areas to monitor but no immediate threats. Review the action items below to stay on track.';}
+    else if(riskPct<=50){overallLevel='medium';overallLabel='Moderate Risk';overallColor='var(--risk-med)';overallDesc='There are areas that need your attention. Without action, you could face aid reductions or loss. Follow the action plan below.';}
+    else{overallLevel='high';overallLabel='High Risk';overallColor='var(--risk-high)';overallDesc='You are at significant risk of losing financial aid. Take immediate action on the items flagged below. Contact your financial aid office this week.';}
+
+    reportData={totalRisk,maxRisk,riskPct,overallLevel,overallLabel,overallColor,overallDesc,areaRisks,answers:{...answers}};
+
+    document.getElementById('assessmentScreen').style.display='none';
+    const rs=document.getElementById('resultsScreen');
+    rs.classList.add('visible');
+
+    // Meter
+    const needleAngle=-90+(riskPct/100)*180;
+    document.getElementById('riskMeterWrap').innerHTML=`
+        <div class="risk-meter">
+            <div class="meter-bg"></div>
+            <div class="meter-fill" style="border-top-color:${overallColor};border-right-color:${overallColor};clip-path:inset(0 0 50% 0);"></div>
+            <div class="meter-needle" style="transform:rotate(${needleAngle}deg);"></div>
+            <div class="meter-center"></div>
+        </div>
+        <div class="meter-labels"><span style="color:var(--risk-clear);">Clear</span><span style="color:var(--risk-low);">Low</span><span style="color:var(--risk-med);">Medium</span><span style="color:var(--risk-high);">High</span></div>
+        <div class="risk-title" style="color:${overallColor};">${overallLabel}</div>
+        <div class="risk-subtitle">${overallDesc}</div>
+        <span class="risk-score-badge" style="background:${overallColor};">Risk Score: ${riskPct}%</span>
+    `;
+
+    // Area cards
+    const areaInfo={
+        gpa:{icon:'\u{1F4CA}',title:'GPA & Academic Performance',actions:{clear:'Continue maintaining your strong GPA. Set up grade alerts if your school offers them.',low:'Your GPA is acceptable but could be closer to some scholarship thresholds. Consider visiting a tutor or professor during office hours for challenging courses.',med:'Your GPA needs attention. Meet with your academic advisor to create a plan. Identify your weakest courses and seek tutoring immediately.',high:'Your GPA is at or below critical thresholds. Contact your financial aid office NOW to understand your options. Explore academic support services, tutoring, and consider reducing course load (if your aid allows part-time).'}},
+        enrollment:{icon:'\u{1F4CB}',title:'Enrollment & Credit Hours',actions:{clear:'You are enrolled at a safe level. Keep your schedule stable and avoid dropping courses unless absolutely necessary.',low:'You are at the minimum for full-time. Be cautious about dropping any courses as it could affect aid status.',med:'Your enrollment may not meet all aid requirements. Check every scholarship and aid program\'s enrollment requirements before making changes.',high:'You may be below required enrollment thresholds. Contact your financial aid office IMMEDIATELY to understand the impact. Some aid can be prorated for part-time; others are lost entirely.'}},
+        sap:{icon:'\u{1F6A6}',title:'Satisfactory Academic Progress (SAP)',actions:{clear:'You are well within SAP requirements. Keep your completion rate high and stay on track for timely graduation.',low:'Your SAP metrics are acceptable but worth monitoring. Avoid unnecessary withdrawals and retakes when possible.',med:'Your completion rate or timeframe is approaching limits. Meet with your advisor to map out remaining requirements and avoid exceeding the 150% credit limit.',high:'You may be failing SAP requirements. File a SAP appeal with your financial aid office if you have extenuating circumstances. Get documentation ready (medical records, family emergency proof, etc.).'}},
+        scholarship:{icon:'\u{1F3C6}',title:'Scholarship Requirements',actions:{clear:'You are meeting all known scholarship requirements. Keep a tracking document with every requirement and deadline.',low:'You know most requirements but should create a comprehensive tracker. Contact each scholarship provider to confirm all terms.',med:'You may be missing key requirements or are unaware of some terms. Pull out every scholarship award letter and create a checklist of GPA thresholds, service hours, and renewal deadlines.',high:'You are at risk of losing one or more scholarships. Contact providers immediately to ask about probation periods or appeal processes. Many will give you a semester to improve before revoking.'}},
+        fafsa:{icon:'\u{1F4DD}',title:'FAFSA & Federal Aid',actions:{clear:'Your FAFSA is up to date. Mark next year\'s filing date (October 1) on your calendar now.',low:'File your FAFSA for next year as soon as possible. Some state aid is first-come first-served.',med:'You may be at risk of losing federal or state aid. File FAFSA immediately if you have not already. Contact your aid office about any changes in financial circumstances.',high:'You need to file FAFSA immediately or risk losing all federal and state aid. Contact your financial aid office this week to understand your timeline and options.'}}
+    };
+
+    const ac=document.getElementById('riskAreasContainer');
+    ac.innerHTML='';
+    Object.entries(areaRisks).forEach(([key,area])=>{
+        if(area.items.length===0)return;
+        const areaPct=area.max>0?Math.round((area.score/area.max)*100):0;
+        const aLevel=areaPct<=10?'clear':areaPct<=25?'low':areaPct<=50?'medium':'high';
+        const info=areaInfo[key];
+        const actionText=info.actions[aLevel==='medium'?'med':aLevel];
+        ac.innerHTML+=`<div class="risk-area-card">
+            <div class="ra-header"><span class="ra-icon">${info.icon}</span><span class="ra-title">${info.title}</span><span class="ra-badge ${aLevel}">${aLevel==='clear'?'All Clear':aLevel==='low'?'Low Risk':aLevel==='medium'?'Monitor':'At Risk'}</span></div>
+            <div class="ra-desc">${area.items.map(i=>`<span style="display:inline-block;margin-right:0.5rem;"><strong>${i.answer}</strong></span>`).join('')}</div>
+            <div class="ra-action"><strong>Action:</strong> ${actionText}</div>
+        </div>`;
+    });
+
+    // Prevention checklist
+    const prevention=[
+        {icon:'\u{1F4C5}',text:'<strong>Create a Scholarship Requirements Tracker:</strong> List every scholarship with its GPA threshold, credit hour requirement, renewal deadline, and any service or essay requirements. Check it monthly.'},
+        {icon:'\u{1F4CA}',text:'<strong>Monitor Your GPA After Every Exam:</strong> Do not wait until the end of the semester. Calculate your projected GPA after each major assignment or test so you can adjust your effort early.'},
+        {icon:'\u{1F6AB}',text:'<strong>Think Twice Before Dropping a Course:</strong> Every withdrawal affects your completion rate. Explore tutoring, study groups, or switching to pass/fail (if allowed) before withdrawing.'},
+        {icon:'\u{1F4DD}',text:'<strong>File FAFSA Every Year by October:</strong> Mark October 1 on your calendar. Some state aid runs out within weeks of opening. Early filing protects your eligibility.'},
+        {icon:'\u{1F4DE}',text:'<strong>Visit Financial Aid at Least Once Per Semester:</strong> Build a relationship with your aid counselor. They can warn you about issues before they become problems and help you navigate appeals.'},
+        {icon:'\u{1F91D}',text:'<strong>Know Your SAP Requirements:</strong> Understand the 2.0 GPA minimum, 67% completion rate, and 150% maximum timeframe. These are federal requirements that apply to all aid recipients.'},
+        {icon:'\u{1F4E7}',text:'<strong>Check Your School Email Weekly:</strong> Financial aid offices send critical notices via email. A missed notice about SAP warnings, renewal deadlines, or verification requirements can cost you thousands.'},
+        {icon:'\u{1F4B0}',text:'<strong>Have a Backup Plan:</strong> If you lose one scholarship, know what other options exist. Keep applying for new scholarships every semester -- your aid portfolio should always be growing.'}
+    ];
+
+    document.getElementById('preventionContainer').innerHTML=prevention.map(p=>`<div class="prevention-card"><span class="pc-icon">${p.icon}</span><span>${p.text}</span></div>`).join('');
+
+    document.getElementById('resultsTip').innerHTML=`<strong>Important Reminder:</strong> This assessment is an educational self-check tool, not an official financial aid evaluation. For definitive information about YOUR specific aid status, contact your school's financial aid office directly. They can access your actual records, explain your specific scholarship terms, and help you create a plan if any issues are identified.`;
+
+    saveState();
+    window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function retakeAssessment(){
+    answers={};reportData=null;
+    document.getElementById('resultsScreen').classList.remove('visible');
+    document.getElementById('assessmentScreen').style.display='block';
+    document.querySelectorAll('.answer-option').forEach(o=>o.classList.remove('selected'));
+    document.querySelectorAll('.q-card').forEach(c=>c.classList.remove('answered'));
+    updateProgress();
+    localStorage.removeItem('mcf-aid-risk');
+    window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function saveState(){localStorage.setItem('mcf-aid-risk',JSON.stringify({answers,reportData}));}
+function loadState(){const raw=localStorage.getItem('mcf-aid-risk');if(!raw)return;try{const d=JSON.parse(raw);if(d.answers){answers=d.answers;Object.entries(answers).forEach(([qid,idx])=>{const opt=document.querySelector(`.answer-option[data-qid="${qid}"][data-idx="${idx}"]`);if(opt){opt.classList.add('selected');document.getElementById('qcard-'+qid).classList.add('answered');}});updateProgress();}if(d.reportData){reportData=d.reportData;generateReport();}}catch(e){}}
+
+function downloadPDF(){
+    if(!reportData){alert('Please complete the assessment first.');return;}
+    const now=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+    const rd=reportData;
+    let html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Financial Aid Risk Assessment - My College Finance</title>
+    <style>
+        @page{margin:0.6in;size:letter;}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#09090b;font-size:10.5px;line-height:1.5;}
+        .pdf-header{text-align:center;border-bottom:3px solid #012699;padding-bottom:10px;margin-bottom:14px;}
+        .pdf-header img{width:55px;height:55px;}.pdf-header h1{font-size:20px;color:#012699;margin:6px 0 2px;}
+        .pdf-header .tagline{font-size:10px;color:#64748b;letter-spacing:0.1em;}.pdf-header .date{font-size:9px;color:#94a3b8;margin-top:4px;}
+        .score-box{text-align:center;border:2px solid #e2e8f0;border-radius:8px;padding:14px;margin-bottom:14px;}
+        .score-box .label{font-size:24px;font-weight:900;margin-bottom:2px;}
+        .score-box .pct{font-size:12px;font-weight:700;padding:2px 10px;border-radius:50px;color:#fff;display:inline-block;margin-bottom:4px;}
+        .score-box .desc{font-size:10px;color:#374151;}
+        .section-title{font-size:12px;font-weight:800;color:#012699;border-bottom:2px solid #e2e8f0;padding-bottom:3px;margin:14px 0 8px;}
+        .area-card{border:1px solid #e2e8f0;border-radius:6px;padding:8px 12px;margin-bottom:6px;page-break-inside:avoid;}
+        .area-card h3{font-size:11px;margin:0 0 3px;display:flex;justify-content:space-between;align-items:center;}
+        .area-card h3 .badge{font-size:7px;font-weight:700;text-transform:uppercase;padding:1px 6px;border-radius:50px;color:#fff;}
+        .badge-clear{background:#06b6d4;}.badge-low{background:#16a34a;}.badge-medium{background:#f59e0b;}.badge-high{background:#ef4444;}
+        .area-card .action{background:#f0f5ff;border:1px solid #dbeafe;border-radius:4px;padding:5px 8px;font-size:9px;color:#1e3a5f;margin-top:4px;}
+        .area-card .action strong{color:#012699;}
+        .prevention-item{padding:4px 0;border-bottom:1px solid #f1f5f9;font-size:10px;}
+        .prevention-item:last-child{border:none;}
+        .prevention-item strong{color:#012699;}
+        .disclaimer{background:#fefce8;border:1px solid #fde68a;border-radius:6px;padding:8px 12px;font-size:9px;color:#92400e;margin-top:12px;}
+        .pdf-footer{text-align:center;border-top:2px solid #e2e8f0;padding-top:10px;margin-top:16px;font-size:9px;color:#94a3b8;}
+        .pdf-footer .amber{color:#d97706;font-weight:600;letter-spacing:0.1em;}
+    </style></head><body>
+    <div class="pdf-header"><img src="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" alt="MCF Logo"><h1>Financial Aid Risk Assessment</h1><div class="tagline">EDUCATE * MOTIVATE * ELEVATE</div><div class="date">Generated ${now} | The Scholarship Strategy - Lesson 4.2</div></div>
+    <div class="score-box"><div class="label" style="color:${rd.overallLevel==='clear'?'#06b6d4':rd.overallLevel==='low'?'#16a34a':rd.overallLevel==='medium'?'#f59e0b':'#ef4444'};">${rd.overallLabel}</div><span class="pct" style="background:${rd.overallLevel==='clear'?'#06b6d4':rd.overallLevel==='low'?'#16a34a':rd.overallLevel==='medium'?'#f59e0b':'#ef4444'};">Risk Score: ${rd.riskPct}%</span><div class="desc">${rd.overallDesc}</div></div>`;
+
+    const areaInfo={gpa:'GPA & Academic Performance',enrollment:'Enrollment & Credit Hours',sap:'Satisfactory Academic Progress',scholarship:'Scholarship Requirements',fafsa:'FAFSA & Federal Aid'};
+    html+=`<div class="section-title">Risk by Area</div>`;
+    Object.entries(rd.areaRisks).forEach(([key,area])=>{
+        if(!area.items.length)return;
+        const areaPct=area.max>0?Math.round((area.score/area.max)*100):0;
+        const aLevel=areaPct<=10?'clear':areaPct<=25?'low':areaPct<=50?'medium':'high';
+        html+=`<div class="area-card"><h3><span>${areaInfo[key]||key}</span><span class="badge badge-${aLevel}">${aLevel==='clear'?'Clear':aLevel==='low'?'Low':aLevel==='medium'?'Monitor':'At Risk'}</span></h3>`;
+        area.items.forEach(i=>{html+=`<div style="font-size:9.5px;color:#374151;">Q: ${i.question} -- <strong>${i.answer}</strong></div>`;});
+        html+=`</div>`;
+    });
+
+    html+=`<div class="section-title">Prevention Action Plan</div>`;
+    const prevTexts=['Create a Scholarship Requirements Tracker with all GPA thresholds and deadlines','Monitor your GPA after every exam -- do not wait until end of semester','Think twice before dropping courses -- withdrawals affect completion rate','File FAFSA every year by October 1','Visit Financial Aid office at least once per semester','Know your SAP: 2.0 GPA, 67% completion, 150% maximum timeframe','Check school email weekly for aid notices','Keep applying for new scholarships as backup'];
+    prevTexts.forEach(t=>{html+=`<div class="prevention-item">${t}</div>`;});
+
+    html+=`<div class="disclaimer"><strong>Disclaimer:</strong> This is an educational self-assessment tool. For official information about your financial aid status, contact your school's financial aid office directly.</div>`;
+    html+=`<div class="pdf-footer"><div class="amber">EDUCATE * MOTIVATE * ELEVATE</div><div>Copyright 2025 My College Finance. All rights reserved. | www.mycollegefinance.com</div></div>
+    <script src="../../nav-inject.js"></script>
+</body></html>`;
+    openPrint(html,'Financial_Aid_Risk_Assessment.html');
+}
+
+function downloadTemplate(){
+    let html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Aid Risk Self-Check Worksheet - My College Finance</title>
+    <style>
+        @page{margin:0.6in;size:letter;}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#09090b;font-size:10.5px;line-height:1.5;}
+        .header{text-align:center;border-bottom:3px solid #012699;padding-bottom:10px;margin-bottom:14px;}
+        .header img{width:50px;height:50px;}.header h1{font-size:18px;color:#012699;margin:6px 0 2px;}
+        .header .tagline{font-size:9px;color:#64748b;letter-spacing:0.1em;}.header .sub{font-size:9px;color:#94a3b8;margin-top:4px;}
+        .instructions{background:#f0f5ff;border:1px solid #dbeafe;border-radius:6px;padding:8px 12px;margin-bottom:14px;font-size:10px;color:#1e3a5f;}
+        .instructions strong{color:#012699;}
+        .section-title{font-size:12px;font-weight:800;color:#012699;border-bottom:2px solid #e2e8f0;padding-bottom:3px;margin:14px 0 8px;}
+        .q-block{border:1px solid #e2e8f0;border-radius:6px;padding:8px 10px;margin-bottom:8px;page-break-inside:avoid;}
+        .q-block h3{font-size:10.5px;color:#09090b;margin:0 0 4px;}
+        .q-block .info{font-size:9px;color:#64748b;font-style:italic;margin-bottom:4px;}
+        .write-lines{border-bottom:1px solid #e2e8f0;height:20px;}
+        .risk-ref{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px;}
+        .ref-box{border:1px solid #e2e8f0;border-radius:4px;padding:6px 8px;}
+        .ref-box h4{font-size:9px;color:#012699;margin:0 0 2px;text-transform:uppercase;letter-spacing:0.04em;}
+        .ref-box p{font-size:8.5px;color:#374151;margin:0;}
+        table{width:100%;border-collapse:collapse;margin-bottom:12px;}
+        th,td{padding:6px 8px;border:1px solid #d1d5db;font-size:10px;}
+        th{background:#f0f5ff;color:#012699;font-weight:700;text-align:left;font-size:9px;text-transform:uppercase;}
+        .footer{text-align:center;border-top:2px solid #e2e8f0;padding-top:10px;margin-top:14px;}
+        .footer .amber{color:#d97706;font-weight:600;letter-spacing:0.1em;font-size:10px;}.footer .copy{font-size:8px;color:#94a3b8;}
+    </style></head><body>
+    <div class="header"><img src="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" alt="MCF Logo"><h1>Aid Risk Self-Check Worksheet</h1><div class="tagline">EDUCATE * MOTIVATE * ELEVATE</div><div class="sub">The Scholarship Strategy | Lesson 4.2</div></div>
+    <div class="instructions"><strong>Instructions:</strong> Answer each question honestly about your current academic and financial aid situation. Use the risk reference guide below to understand what puts your aid at risk. After completing, create an action plan for any areas of concern.</div>
+    <p style="font-size:10px;margin-bottom:10px;"><strong>Name:</strong> _________________ <strong>School:</strong> _________________ <strong>Date:</strong> _________</p>
+
+    <div class="section-title">Key SAP Requirements Reference</div>
+    <div class="risk-ref">
+        <div class="ref-box"><h4>Minimum GPA</h4><p>2.0 cumulative for federal aid. Scholarships may require 2.5-3.5+.</p></div>
+        <div class="ref-box"><h4>Completion Rate</h4><p>Must complete 67%+ of attempted credits. W, I, F all count against you.</p></div>
+        <div class="ref-box"><h4>Maximum Timeframe</h4><p>150% of program length (120 cr degree = 180 max attempted credits).</p></div>
+        <div class="ref-box"><h4>Enrollment</h4><p>Full-time = 12+ credits. Many scholarships require full-time status.</p></div>
+    </div>
+
+    <div class="section-title">Self-Assessment Questions</div>`;
+    questions.forEach(q=>{
+        html+=`<div class="q-block"><h3>${q.num}. ${q.text}</h3><div class="info">${q.helper.replace(/<[^>]*>/g,'')}</div><div class="write-lines"></div></div>`;
+    });
+
+    html+=`<div class="section-title">My Scholarship Tracking Table</div>
+    <table><tr><th>Scholarship Name</th><th>GPA Required</th><th>Credits Required</th><th>Renewal Deadline</th><th>Other Requirements</th><th>My Status</th></tr>`;
+    for(let i=0;i<6;i++) html+=`<tr><td style="height:20px;"></td><td></td><td></td><td></td><td></td><td></td></tr>`;
+    html+=`</table>
+
+    <div class="section-title">My Action Plan</div>
+    <table><tr><th>Risk Area</th><th>Issue Identified</th><th>Action I Will Take</th><th>Deadline</th></tr>
+    <tr><td style="height:20px;"></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td></tr></table>
+
+    <div class="footer"><div class="amber">EDUCATE * MOTIVATE * ELEVATE</div><div class="copy">Copyright 2025 My College Finance. All rights reserved. | www.mycollegefinance.com</div></div>
+    <script src="../../nav-inject.js"></script>
+</body></html>`;
+    openPrint(html,'Aid_Risk_Self_Check_Worksheet.html');
+}
+
+function openPrint(html,name){const blob=new Blob([html],{type:'text/html'});const url=URL.createObjectURL(blob);const win=window.open(url,'_blank');if(win){win.onload=()=>{setTimeout(()=>{win.print();},400);};}else{const a=document.createElement('a');a.href=url;a.download=name;a.click();}setTimeout(()=>URL.revokeObjectURL(url),10000);}
+
+document.addEventListener('DOMContentLoaded',()=>{initDarkMode();buildQuestions();loadState();});
+</script>
+
+    <script src="../../nav-inject.js"></script>
+</body>
+</html>

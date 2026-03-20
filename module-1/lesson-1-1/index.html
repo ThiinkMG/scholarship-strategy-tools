@@ -1,0 +1,1492 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scholarship Ecosystem Map Explorer - My College Finance</title>
+    <style>
+        /* ========================================
+           MCF CSS VARIABLES
+           ======================================== */
+        :root {
+            --mcf-brand-blue: #012699;
+            --mcf-brand-green: #26e011;
+            --mcf-brand-amber: #fdc003;
+            --mcf-brand-black: #000516;
+            --mcf-background: #fafafa;
+            --mcf-foreground: #09090b;
+            --mcf-card: #ffffff;
+            --mcf-card-foreground: #09090b;
+            --mcf-primary: #336bff;
+            --mcf-primary-foreground: #f8fafc;
+            --mcf-secondary: #f1f5f9;
+            --mcf-secondary-foreground: #64748b;
+            --mcf-muted: #f1f5f9;
+            --mcf-muted-foreground: #64748b;
+            --mcf-destructive: #ef4444;
+            --mcf-destructive-foreground: #f8fafc;
+            --mcf-border: #e2e8f0;
+            --mcf-input: #e2e8f0;
+            --mcf-radius: 0.5rem;
+            --mcf-transition: all 0.3s ease;
+            --mcf-accent: #f1f5f9;
+            --mcf-accent-foreground: #64748b;
+            --glow-blue: rgba(1, 38, 153, 0.15);
+            --glow-green: rgba(38, 224, 17, 0.15);
+            --glow-amber: rgba(253, 192, 3, 0.15);
+            --node-size: 110px;
+            --center-size: 140px;
+        }
+
+        body.dark-mode {
+            --mcf-background: #09090b;
+            --mcf-foreground: #f8fafc;
+            --mcf-card: #1a1a1f;
+            --mcf-card-foreground: #f8fafc;
+            --mcf-primary: #4c6ef5;
+            --mcf-primary-foreground: #f8fafc;
+            --mcf-secondary: #374151;
+            --mcf-secondary-foreground: #f8fafc;
+            --mcf-muted: #1c1917;
+            --mcf-muted-foreground: #94a3b8;
+            --mcf-accent: #374151;
+            --mcf-accent-foreground: #f8fafc;
+            --mcf-destructive: #991b1b;
+            --mcf-destructive-foreground: #f8fafc;
+            --mcf-border: #374151;
+            --mcf-input: #1f2937;
+            --mcf-brand-blue: #0139cc;
+            --mcf-brand-green: #3ae826;
+            --mcf-brand-amber: #fdc922;
+            --mcf-brand-black: #f0f1ff;
+            --glow-blue: rgba(1, 57, 204, 0.25);
+            --glow-green: rgba(58, 232, 38, 0.25);
+            --glow-amber: rgba(253, 201, 34, 0.25);
+        }
+    
+        /* ========================================
+           BASE STYLES
+           ======================================== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+    
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                         'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+            font-size: 16px;
+            line-height: 1.5;
+            background-color: var(--mcf-background);
+            color: var(--mcf-foreground);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+    
+        /* ========================================
+           HEADER
+           ======================================== */
+        .mcf-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: var(--mcf-background);
+            border-bottom: 2px solid var(--mcf-border);
+            backdrop-filter: blur(12px);
+            background-color: rgba(250, 250, 250, 0.92);
+        }
+    
+        body.dark-mode .mcf-header {
+            background-color: rgba(9, 9, 11, 0.92);
+        }
+    
+        .mcf-header-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 64px;
+        }
+    
+        .mcf-header-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+    
+        .mcf-logo-header {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
+    
+        .mcf-brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+    
+        .mcf-brand-name {
+            font-size: 1rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--mcf-brand-blue);
+            line-height: 1.2;
+        }
+    
+        .mcf-tagline {
+            font-size: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--mcf-muted-foreground);
+        }
+    
+        .mcf-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    
+        .mcf-theme-toggle {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border: 2px solid var(--mcf-border);
+            background: var(--mcf-card);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--mcf-transition);
+            color: var(--mcf-foreground);
+        }
+    
+        .mcf-theme-toggle:hover {
+            border-color: var(--mcf-primary);
+            transform: scale(1.1);
+        }
+    
+        /* ========================================
+           HERO SECTION
+           ======================================== */
+        .hero-section {
+            text-align: center;
+            padding: 2.5rem 1rem 1.5rem;
+            max-width: 800px;
+            margin: 0 auto;
+            animation: fadeSlideIn 0.6s ease-out;
+        }
+    
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: linear-gradient(135deg, var(--mcf-brand-blue), var(--mcf-primary));
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.35rem 1rem;
+            border-radius: 50px;
+            margin-bottom: 1rem;
+        }
+    
+        .hero-title {
+            font-size: 2rem;
+            font-weight: 900;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.75rem;
+            color: var(--mcf-foreground);
+        }
+    
+        .hero-title span {
+            background: linear-gradient(135deg, var(--mcf-brand-blue), var(--mcf-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    
+        .hero-desc {
+            font-size: 1rem;
+            color: var(--mcf-muted-foreground);
+            max-width: 600px;
+            margin: 0 auto 1rem;
+            line-height: 1.6;
+        }
+    
+        .hero-instructions {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--mcf-card);
+            border: 1px solid var(--mcf-border);
+            border-radius: var(--mcf-radius);
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            color: var(--mcf-muted-foreground);
+        }
+    
+        /* ========================================
+           FILTER BAR
+           ======================================== */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            max-width: 900px;
+            margin: 0 auto 1rem;
+            animation: fadeSlideIn 0.6s ease-out 0.15s both;
+        }
+    
+        .filter-btn {
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            border: 2px solid var(--mcf-border);
+            background: var(--mcf-card);
+            color: var(--mcf-foreground);
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--mcf-transition);
+            white-space: nowrap;
+        }
+    
+        .filter-btn:hover {
+            border-color: var(--mcf-primary);
+            background: rgba(51, 107, 255, 0.05);
+        }
+    
+        .filter-btn.active {
+            background: var(--mcf-brand-blue);
+            color: #fff;
+            border-color: var(--mcf-brand-blue);
+        }
+    
+        body.dark-mode .filter-btn.active {
+            background: var(--mcf-primary);
+            border-color: var(--mcf-primary);
+        }
+    
+        /* ========================================
+           ECOSYSTEM MAP
+           ======================================== */
+        .map-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            padding: 1rem;
+            min-height: 520px;
+            animation: fadeSlideIn 0.6s ease-out 0.3s both;
+        }
+    
+        .map-visual {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            max-height: 500px;
+        }
+    
+        /* Center Student Node */
+        .center-node {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: var(--center-size);
+            height: var(--center-size);
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--mcf-brand-blue), var(--mcf-primary));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            z-index: 10;
+            box-shadow: 0 0 0 6px rgba(51, 107, 255, 0.15),
+                        0 0 40px rgba(51, 107, 255, 0.2);
+            cursor: default;
+            transition: var(--mcf-transition);
+        }
+    
+        .center-node .node-icon {
+            font-size: 2rem;
+            margin-bottom: 0.15rem;
+        }
+    
+        .center-node .node-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+    
+        /* Source Nodes */
+        .source-node {
+            position: absolute;
+            width: var(--node-size);
+            height: var(--node-size);
+            border-radius: 50%;
+            background: var(--mcf-card);
+            border: 3px solid var(--mcf-border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 5;
+            text-align: center;
+            padding: 0.5rem;
+        }
+    
+        .source-node:hover {
+            transform: scale(1.12);
+            z-index: 15;
+        }
+    
+        .source-node.active {
+            transform: scale(1.15);
+            z-index: 15;
+        }
+    
+        .source-node[data-category="government"] {
+            border-color: var(--mcf-brand-blue);
+        }
+        .source-node[data-category="government"]:hover,
+        .source-node[data-category="government"].active {
+            box-shadow: 0 0 0 6px var(--glow-blue), 0 8px 30px var(--glow-blue);
+            border-color: var(--mcf-brand-blue);
+        }
+    
+        .source-node[data-category="institutional"] {
+            border-color: var(--mcf-brand-green);
+        }
+        .source-node[data-category="institutional"]:hover,
+        .source-node[data-category="institutional"].active {
+            box-shadow: 0 0 0 6px var(--glow-green), 0 8px 30px var(--glow-green);
+            border-color: var(--mcf-brand-green);
+        }
+    
+        .source-node[data-category="private"] {
+            border-color: var(--mcf-brand-amber);
+        }
+        .source-node[data-category="private"]:hover,
+        .source-node[data-category="private"].active {
+            box-shadow: 0 0 0 6px var(--glow-amber), 0 8px 30px var(--glow-amber);
+            border-color: var(--mcf-brand-amber);
+        }
+    
+        .source-node[data-category="community"] {
+            border-color: #a855f7;
+        }
+        .source-node[data-category="community"]:hover,
+        .source-node[data-category="community"].active {
+            box-shadow: 0 0 0 6px rgba(168, 85, 247, 0.2), 0 8px 30px rgba(168, 85, 247, 0.15);
+            border-color: #a855f7;
+        }
+    
+        .source-node .node-icon {
+            font-size: 1.6rem;
+            margin-bottom: 0.2rem;
+        }
+    
+        .source-node .node-label {
+            font-size: 0.62rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--mcf-foreground);
+            line-height: 1.2;
+        }
+    
+        .source-node.hidden-by-filter {
+            opacity: 0.12;
+            pointer-events: none;
+            transform: scale(0.85);
+        }
+    
+        /* Connection Lines (SVG) */
+        .connection-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+    
+        .connection-line {
+            stroke: var(--mcf-border);
+            stroke-width: 2;
+            stroke-dasharray: 6 4;
+            fill: none;
+            transition: all 0.4s ease;
+        }
+    
+        .connection-line.active-line[data-category="government"] { stroke: var(--mcf-brand-blue); stroke-width: 3; stroke-dasharray: none; }
+        .connection-line.active-line[data-category="institutional"] { stroke: var(--mcf-brand-green); stroke-width: 3; stroke-dasharray: none; }
+        .connection-line.active-line[data-category="private"] { stroke: var(--mcf-brand-amber); stroke-width: 3; stroke-dasharray: none; }
+        .connection-line.active-line[data-category="community"] { stroke: #a855f7; stroke-width: 3; stroke-dasharray: none; }
+    
+        .connection-line.hidden-line {
+            opacity: 0.08;
+        }
+    
+        /* ========================================
+           INFO PANEL (EXPANDED CARD)
+           ======================================== */
+        .info-panel-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 200;
+            animation: fadeIn 0.2s ease;
+        }
+    
+        .info-panel-overlay.visible {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+    
+        body.dark-mode .info-panel-overlay {
+            background: rgba(0, 0, 0, 0.7);
+        }
+    
+        .info-panel {
+            background: var(--mcf-card);
+            border: 2px solid var(--mcf-border);
+            border-radius: calc(var(--mcf-radius) * 2);
+            width: 100%;
+            max-width: 560px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+            animation: panelSlideIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+    
+        .info-panel-close {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid var(--mcf-border);
+            background: var(--mcf-card);
+            color: var(--mcf-foreground);
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--mcf-transition);
+        }
+    
+        .info-panel-close:hover {
+            border-color: var(--mcf-destructive);
+            color: var(--mcf-destructive);
+        }
+    
+        .info-panel-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+    
+        .info-panel-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+            color: var(--mcf-foreground);
+        }
+    
+        .info-panel-category {
+            display: inline-block;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 0.2rem 0.6rem;
+            border-radius: 50px;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+    
+        .info-panel-category.government { background: var(--mcf-brand-blue); }
+        .info-panel-category.institutional { background: #16a34a; }
+        .info-panel-category.private { background: #d97706; }
+        .info-panel-category.community { background: #a855f7; }
+    
+        .info-panel-desc {
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: var(--mcf-muted-foreground);
+            margin-bottom: 1.25rem;
+        }
+    
+        .info-panel-section-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--mcf-foreground);
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.35rem;
+            border-bottom: 2px solid var(--mcf-border);
+        }
+    
+        .example-list {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 1.25rem;
+        }
+    
+        .example-list li {
+            padding: 0.5rem 0.75rem;
+            background: var(--mcf-secondary);
+            border-radius: var(--mcf-radius);
+            margin-bottom: 0.4rem;
+            font-size: 0.82rem;
+            color: var(--mcf-card-foreground);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            line-height: 1.5;
+        }
+    
+        .example-list li .ex-icon {
+            flex-shrink: 0;
+            margin-top: 0.1rem;
+        }
+    
+        .info-panel-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+        }
+    
+        .stat-box {
+            background: var(--mcf-secondary);
+            border-radius: var(--mcf-radius);
+            padding: 0.75rem;
+            text-align: center;
+        }
+    
+        .stat-box .stat-value {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--mcf-brand-blue);
+        }
+    
+        .stat-box .stat-label {
+            font-size: 0.68rem;
+            color: var(--mcf-muted-foreground);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+    
+        .info-panel-tip {
+            background: linear-gradient(135deg, rgba(1, 38, 153, 0.06), rgba(51, 107, 255, 0.06));
+            border: 1px solid rgba(51, 107, 255, 0.15);
+            border-radius: var(--mcf-radius);
+            padding: 0.75rem;
+            font-size: 0.82rem;
+            color: var(--mcf-foreground);
+            line-height: 1.6;
+        }
+    
+        body.dark-mode .info-panel-tip {
+            background: linear-gradient(135deg, rgba(1, 57, 204, 0.12), rgba(76, 110, 245, 0.08));
+            border-color: rgba(76, 110, 245, 0.25);
+        }
+    
+        .info-panel-tip strong {
+            color: var(--mcf-brand-blue);
+        }
+    
+        /* ========================================
+           STATS SUMMARY
+           ======================================== */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 0.75rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            padding: 0 1rem;
+            animation: fadeSlideIn 0.6s ease-out 0.45s both;
+        }
+    
+        .summary-stat {
+            background: var(--mcf-card);
+            border: 2px solid var(--mcf-border);
+            border-radius: calc(var(--mcf-radius) * 1.5);
+            padding: 1rem;
+            text-align: center;
+            transition: var(--mcf-transition);
+        }
+    
+        .summary-stat:hover {
+            border-color: var(--mcf-brand-blue);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+    
+        .summary-stat .stat-number {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--mcf-brand-blue);
+        }
+    
+        .summary-stat .stat-text {
+            font-size: 0.72rem;
+            color: var(--mcf-muted-foreground);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            font-weight: 600;
+        }
+    
+        /* ========================================
+           CATEGORY LEGEND
+           ======================================== */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            padding: 0 1rem;
+        }
+    
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--mcf-muted-foreground);
+        }
+    
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+    
+        .legend-dot.gov { background: var(--mcf-brand-blue); }
+        .legend-dot.inst { background: var(--mcf-brand-green); }
+        .legend-dot.priv { background: var(--mcf-brand-amber); }
+        .legend-dot.comm { background: #a855f7; }
+    
+        /* ========================================
+           ACTION BAR
+           ======================================== */
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            padding: 0 1rem;
+        }
+    
+        .mcf-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.25rem;
+            font-size: 0.82rem;
+            font-weight: 600;
+            border-radius: var(--mcf-radius);
+            transition: var(--mcf-transition);
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+            text-decoration: none;
+        }
+    
+        .mcf-btn-primary {
+            background: var(--mcf-primary);
+            color: var(--mcf-primary-foreground);
+        }
+        .mcf-btn-primary:hover {
+            background: var(--mcf-brand-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+    
+        .mcf-btn-outline {
+            background: transparent;
+            border: 2px solid var(--mcf-border);
+            color: var(--mcf-foreground);
+        }
+        .mcf-btn-outline:hover {
+            border-color: var(--mcf-primary);
+            background: rgba(51, 107, 255, 0.05);
+        }
+    
+        .mcf-btn-success {
+            background: var(--mcf-brand-green);
+            color: var(--mcf-brand-black);
+        }
+    
+        body.dark-mode .mcf-btn-success {
+            color: #000516;
+        }
+    
+        .mcf-btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(38, 224, 17, 0.2);
+        }
+    
+        /* ========================================
+           FOOTER
+           ======================================== */
+        .mcf-footer {
+            background: linear-gradient(to bottom, #111827, #000000);
+            color: white;
+            padding: 2.5rem 1rem;
+            margin-top: 2rem;
+            text-align: center;
+        }
+    
+        .mcf-footer-inner {
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+    
+        .mcf-footer .mcf-logo-footer {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+        }
+    
+        .mcf-footer-title {
+            font-size: 1.1rem;
+            font-weight: 900;
+            letter-spacing: 0.05em;
+        }
+    
+        .mcf-footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+            align-items: center;
+        }
+    
+        .mcf-footer-links a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: color 0.3s ease;
+        }
+        .mcf-footer-links a:hover { color: var(--mcf-brand-amber); }
+    
+        .mcf-footer-sep { color: rgba(255,255,255,0.3); font-size: 0.8rem; }
+    
+        .mcf-footer-tagline {
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            color: var(--mcf-brand-amber);
+            font-weight: 600;
+        }
+    
+        .mcf-footer-copy {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.45);
+        }
+    
+        /* ========================================
+           ANIMATIONS
+           ======================================== */
+        @keyframes fadeSlideIn {
+            from { transform: translateY(18px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    
+        @keyframes panelSlideIn {
+            from { transform: scale(0.9) translateY(20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+    
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 0 6px rgba(51, 107, 255, 0.15), 0 0 40px rgba(51, 107, 255, 0.2); }
+            50% { box-shadow: 0 0 0 10px rgba(51, 107, 255, 0.1), 0 0 60px rgba(51, 107, 255, 0.25); }
+        }
+    
+        .center-node {
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+    
+        /* ========================================
+           RESPONSIVE
+           ======================================== */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 1.5rem; }
+            .hero-desc { font-size: 0.88rem; }
+            .mcf-brand-text { display: none; }
+            .map-visual { aspect-ratio: 1 / 1; }
+            --node-size: 80px;
+            --center-size: 100px;
+            .source-node { width: 80px; height: 80px; }
+            .source-node .node-icon { font-size: 1.2rem; }
+            .source-node .node-label { font-size: 0.52rem; }
+            .center-node { width: 100px; height: 100px; }
+            .center-node .node-icon { font-size: 1.5rem; }
+            .center-node .node-label { font-size: 0.6rem; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+        }
+    
+        @media (max-width: 480px) {
+            .source-node { width: 68px; height: 68px; }
+            .source-node .node-icon { font-size: 1rem; }
+            .source-node .node-label { font-size: 0.46rem; }
+            .center-node { width: 85px; height: 85px; }
+            .center-node .node-icon { font-size: 1.2rem; }
+            .center-node .node-label { font-size: 0.5rem; }
+            .info-panel { padding: 1.25rem; }
+        }
+    
+        /* Print / PDF styles */
+        @media print {
+            .mcf-header, .mcf-footer, .mcf-theme-toggle, .action-bar, .filter-bar { display: none !important; }
+            body { background: #fff !important; color: #000 !important; }
+            .source-node { border-width: 2px !important; }
+        }
+    
+        /* Scrollbar */
+        .info-panel::-webkit-scrollbar { width: 6px; }
+        .info-panel::-webkit-scrollbar-track { background: transparent; }
+        .info-panel::-webkit-scrollbar-thumb { background: var(--mcf-border); border-radius: 3px; }
+    </style>
+
+</head>
+<body>
+    <!-- ===== HEADER ===== -->
+    <header class="mcf-header">
+        <div class="mcf-header-inner">
+            <div class="mcf-header-brand">
+                <img src="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" alt="My College Finance Logo" class="mcf-logo-header">
+                <div class="mcf-brand-text">
+                    <div class="mcf-brand-name">My College Finance</div>
+                    <div class="mcf-tagline">EDUCATE • MOTIVATE • ELEVATE</div>
+                </div>
+            </div>
+            <div class="mcf-header-actions">
+                <button id="mcf-theme-toggle" class="mcf-theme-toggle" aria-label="Toggle dark mode">
+                    <svg class="mcf-sun-icon" width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="4" fill="currentColor"/><path d="M10 0v4M10 16v4M20 10h-4M4 10H0M17.07 2.93l-2.83 2.83M5.76 14.24l-2.83 2.83M17.07 17.07l-2.83-2.83M5.76 5.76L2.93 2.93" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    <svg class="mcf-moon-icon" width="18" height="18" viewBox="0 0 20 20" fill="none" style="display:none;"><path d="M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C10.3395 3 10.6734 3.02389 11 3.07039C9.27477 4.07544 8 5.8965 8 8C8 11.3137 10.6863 14 14 14C15.1035 14 16.0754 13.6238 16.9296 12.9998C16.9762 13.3266 17 13.6605 17 14Z" fill="currentColor"/></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero-section">
+        <div class="hero-badge">Lesson 1.1 — The Scholarship Landscape</div>
+        <h1 class="hero-title">Scholarship Ecosystem<br><span>Map Explorer</span></h1>
+        <p class="hero-desc">Discover where scholarship money actually comes from. Click on any funding source to explore how organizations, institutions, and communities invest in students like you.</p>
+        <div class="hero-instructions">
+            <span>&#128073;</span> Click any circle on the map to learn more
+        </div>
+    </section>
+    
+    <!-- ===== FILTERS ===== -->
+    <div class="filter-bar" id="filterBar">
+        <button class="filter-btn active" data-filter="all">All Sources</button>
+        <button class="filter-btn" data-filter="government">Government</button>
+        <button class="filter-btn" data-filter="institutional">Institutional</button>
+        <button class="filter-btn" data-filter="private">Private & Corporate</button>
+        <button class="filter-btn" data-filter="community">Community & Local</button>
+    </div>
+    
+    <!-- ===== LEGEND ===== -->
+    <div class="legend">
+        <div class="legend-item"><span class="legend-dot gov"></span> Government</div>
+        <div class="legend-item"><span class="legend-dot inst"></span> Institutional</div>
+        <div class="legend-item"><span class="legend-dot priv"></span> Private & Corporate</div>
+        <div class="legend-item"><span class="legend-dot comm"></span> Community & Local</div>
+    </div>
+    
+    <!-- ===== MAP ===== -->
+    <div class="map-container">
+        <div class="map-visual" id="mapVisual">
+            <svg class="connection-lines" id="connectionLines"></svg>
+            <div class="center-node" id="centerNode">
+                <span class="node-icon">&#127891;</span>
+                <span class="node-label">You<br>(Student)</span>
+            </div>
+            <!-- Source nodes will be placed by JS -->
+        </div>
+    </div>
+    
+    <!-- ===== STATS ===== -->
+    <div class="stats-row">
+        <div class="summary-stat">
+            <div class="stat-number">$46B+</div>
+            <div class="stat-text">Total Scholarships Awarded Annually</div>
+        </div>
+        <div class="summary-stat">
+            <div class="stat-number">1.7M+</div>
+            <div class="stat-text">Scholarships Available</div>
+        </div>
+        <div class="summary-stat">
+            <div class="stat-number">$7,400</div>
+            <div class="stat-text">Avg. Scholarship Award</div>
+        </div>
+        <div class="summary-stat">
+            <div class="stat-number">6</div>
+            <div class="stat-text">Major Funding Categories</div>
+        </div>
+    </div>
+    
+    <!-- ===== ACTIONS ===== -->
+    <div class="action-bar">
+        <button class="mcf-btn mcf-btn-primary" onclick="downloadPDF()">
+            <span>&#128196;</span> Save & Download PDF
+        </button>
+        <button class="mcf-btn mcf-btn-outline" onclick="downloadTemplate()">
+            <span>&#128203;</span> Download Blank Template
+        </button>
+    </div>
+    
+    <!-- ===== INFO PANEL OVERLAY ===== -->
+    <div class="info-panel-overlay" id="infoPanelOverlay">
+        <div class="info-panel" id="infoPanel">
+            <button class="info-panel-close" id="infoPanelClose" aria-label="Close">×</button>
+            <div id="infoPanelContent"></div>
+        </div>
+    </div>
+    
+    <!-- ===== FOOTER ===== -->
+    <footer class="mcf-footer">
+        <div class="mcf-footer-inner">
+            <img src="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" alt="My College Finance Logo" class="mcf-logo-footer">
+            <div class="mcf-footer-title">MY COLLEGE FINANCE</div>
+            <div class="mcf-footer-links">
+                <a href="https://www.mycollegefinance.com/" target="_blank" rel="noopener">Main Website</a>
+                <span class="mcf-footer-sep">•</span>
+                <a href="https://www.mycollegefinance.com/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a>
+                <span class="mcf-footer-sep">•</span>
+                <a href="https://www.mycollegefinance.com/terms-policy" target="_blank" rel="noopener">Terms of Service</a>
+                <span class="mcf-footer-sep">•</span>
+                <a href="https://linktr.ee/mycollegefinance" target="_blank" rel="noopener">Social Media</a>
+            </div>
+            <div class="mcf-footer-tagline">EDUCATE • MOTIVATE • ELEVATE</div>
+            <div class="mcf-footer-copy">© 2025 My College Finance. All rights reserved.</div>
+        </div>
+    </footer>
+    
+    <script>
+    /* ==========================================
+       DATA: Scholarship Sources
+       ========================================== */
+    const scholarshipSources = [
+        {
+            id: 'federal',
+            label: 'Federal\nGovernment',
+            icon: '\u{1F3DB}',
+            category: 'government',
+            angle: 0,
+            title: 'Federal Government',
+            description: 'The U.S. federal government is the single largest source of financial aid for college students. Through the Department of Education and other agencies, billions of dollars flow to students annually via grants, work-study programs, and specialized scholarships.',
+            examples: [
+                { icon: '\u2B50', text: 'Pell Grants - Up to $7,395/year for low-income students' },
+                { icon: '\u{1F4BC}', text: 'Federal Work-Study - Part-time campus employment' },
+                { icon: '\u{1F396}', text: 'TEACH Grants - For future teachers ($4,000/year)' },
+                { icon: '\u{1F3D6}', text: 'Iraq & Afghanistan Service Grants' },
+                { icon: '\u{1F52C}', text: 'NSF & NIH Research Fellowships' }
+            ],
+            stats: { amount: '$30B+', label: 'Annual Federal Aid', count: '7M+', countLabel: 'Students Served' },
+            tip: 'Start with FAFSA! It is the gateway to ALL federal financial aid. Even if you think you will not qualify, apply anyway - many students are surprised by what they receive.'
+        },
+        {
+            id: 'state',
+            label: 'State\nGovernment',
+            icon: '\u{1F3E4}',
+            category: 'government',
+            angle: 60,
+            title: 'State Government Programs',
+            description: 'Every U.S. state runs its own scholarship and grant programs. These are often less competitive than national awards and specifically designed for residents attending in-state institutions.',
+            examples: [
+                { icon: '\u{1F31F}', text: 'HOPE Scholarship (Georgia) - GPA-based tuition coverage' },
+                { icon: '\u{1F4B0}', text: 'Cal Grant (California) - Need-based state grants' },
+                { icon: '\u{1F393}', text: 'Bright Futures (Florida) - Merit-based awards' },
+                { icon: '\u{1F4DA}', text: 'State-specific lottery scholarships' },
+                { icon: '\u{1F3EB}', text: 'State teacher/nurse shortage incentive programs' }
+            ],
+            stats: { amount: '$14B+', label: 'Total State Grant Aid', count: '50', countLabel: 'States With Programs' },
+            tip: 'Check your state higher education agency website. Many state grants require only your FAFSA - no separate application. Some states have deadlines EARLIER than federal deadlines.'
+        },
+        {
+            id: 'university',
+            label: 'Universities\n& Colleges',
+            icon: '\u{1F3EB}',
+            category: 'institutional',
+            angle: 120,
+            title: 'Universities & Colleges',
+            description: 'Colleges and universities are among the most generous scholarship providers. Institutional aid comes directly from the school and can include merit scholarships, need-based grants, athletic scholarships, and departmental awards.',
+            examples: [
+                { icon: '\u{1F3C6}', text: 'Presidential & Dean\'s Scholarships - Top academic achievers' },
+                { icon: '\u26BD', text: 'Athletic Scholarships - NCAA Division I & II' },
+                { icon: '\u{1F3A8}', text: 'Fine Arts & Performance Scholarships' },
+                { icon: '\u{1F4CA}', text: 'Need-based Institutional Grants' },
+                { icon: '\u{1F91D}', text: 'Transfer Student Scholarships' }
+            ],
+            stats: { amount: '$60B+', label: 'Institutional Aid Annually', count: '4,000+', countLabel: 'Schools Offering Aid' },
+            tip: 'Always negotiate! If you receive a better offer from a comparable school, contact the financial aid office. Many institutions will match or increase awards to attract strong candidates.'
+        },
+        {
+            id: 'corporate',
+            label: 'Corporations\n& Employers',
+            icon: '\u{1F3E2}',
+            category: 'private',
+            angle: 180,
+            title: 'Corporations & Employers',
+            description: 'Major corporations fund scholarships as part of their social responsibility programs, workforce development, and employee benefits. These range from highly competitive national programs to local community investments.',
+            examples: [
+                { icon: '\u2615', text: 'Starbucks College Achievement Plan - Full ASU tuition' },
+                { icon: '\u{1F4BB}', text: 'Google Generation Scholarship - CS/tech students' },
+                { icon: '\u{1F680}', text: 'Dell Scholars Program - $20,000 + laptop + textbooks' },
+                { icon: '\u{1F4E6}', text: 'UPS Earn & Learn - Tuition assistance for employees' },
+                { icon: '\u{1F48A}', text: 'Johnson & Johnson Bridge to Employment' }
+            ],
+            stats: { amount: '$3B+', label: 'Corporate Scholarships', count: '500+', countLabel: 'Major Programs' },
+            tip: 'Check if your parent\'s employer offers dependent scholarships! Many large companies provide awards for employees\' children that fewer people apply for, improving your odds significantly.'
+        },
+        {
+            id: 'foundation',
+            label: 'Foundations\n& Nonprofits',
+            icon: '\u{1F91D}',
+            category: 'private',
+            angle: 240,
+            title: 'Foundations & Nonprofits',
+            description: 'Private foundations and nonprofit organizations collectively provide billions in scholarship funding. These range from large national foundations to small family-funded trusts with very specific eligibility criteria.',
+            examples: [
+                { icon: '\u{1F31F}', text: 'Gates Millennium Scholars - Full cost of attendance' },
+                { icon: '\u{1F4D6}', text: 'Jack Kent Cooke Foundation - Up to $55,000/year' },
+                { icon: '\u{1F3A4}', text: 'Hispanic Scholarship Fund - $500-$5,000' },
+                { icon: '\u{1F4D8}', text: 'Elks National Foundation - Most Valuable Student' },
+                { icon: '\u{1F30D}', text: 'Rotary International Scholarships' }
+            ],
+            stats: { amount: '$6B+', label: 'Foundation Awards', count: '10,000+', countLabel: 'Active Foundations' },
+            tip: 'Niche scholarships from small foundations often have fewer applicants. Search for scholarships tied to your specific heritage, interests, career goals, or even your hometown for better odds.'
+        },
+        {
+            id: 'community',
+            label: 'Community\nOrgs & Local',
+            icon: '\u{1F3D8}',
+            category: 'community',
+            angle: 300,
+            title: 'Community & Local Organizations',
+            description: 'Local organizations - civic groups, religious institutions, professional associations, and community foundations - offer scholarships that are often smaller in dollar amount but significantly less competitive. These "hidden" scholarships are an untapped goldmine.',
+            examples: [
+                { icon: '\u{1F3E0}', text: 'Rotary, Kiwanis, & Lions Club local awards' },
+                { icon: '\u26EA', text: 'Church & religious organization scholarships' },
+                { icon: '\u{1F9D1}\u200D\u{1F527}', text: 'Local trade unions & professional groups' },
+                { icon: '\u{1F3AA}', text: 'Community foundation grants' },
+                { icon: '\u{1F6D2}', text: 'Local business owner scholarships' }
+            ],
+            stats: { amount: '$2B+', label: 'Local Scholarships', count: '100K+', countLabel: 'Local Awards Available' },
+            tip: 'Visit your high school counselor, local library, and community center. Ask about local scholarships that may not appear in online databases. These smaller awards ($250-$2,500) add up fast and have far fewer applicants!'
+        }
+    ];
+    
+    /* ==========================================
+       DARK MODE
+       ========================================== */
+    function initDarkMode() {
+        const saved = localStorage.getItem('mcf-theme') || 'light';
+        if (saved === 'dark') {
+            document.body.classList.add('dark-mode');
+            updateIcons(true);
+        }
+        document.getElementById('mcf-theme-toggle').addEventListener('click', () => {
+            const isDark = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('mcf-theme', isDark ? 'dark' : 'light');
+            updateIcons(isDark);
+            drawConnections();
+        });
+    }
+    
+    function updateIcons(isDark) {
+        document.querySelectorAll('.mcf-sun-icon').forEach(i => i.style.display = isDark ? 'none' : 'block');
+        document.querySelectorAll('.mcf-moon-icon').forEach(i => i.style.display = isDark ? 'block' : 'none');
+    }
+    
+    /* ==========================================
+       MAP: Place Nodes & Draw Lines
+       ========================================== */
+    const mapVisual = document.getElementById('mapVisual');
+    let activeNodeId = null;
+    let activeFilter = 'all';
+    
+    function placeNodes() {
+        // Remove old nodes (keep SVG and center node)
+        mapVisual.querySelectorAll('.source-node').forEach(n => n.remove());
+    
+        const rect = mapVisual.getBoundingClientRect();
+        const cx = rect.width / 2;
+        const cy = rect.height / 2;
+        const rx = Math.min(cx * 0.72, 320);
+        const ry = Math.min(cy * 0.72, 200);
+    
+        scholarshipSources.forEach((src, i) => {
+            const angle = (src.angle - 90) * (Math.PI / 180);
+            const x = cx + rx * Math.cos(angle);
+            const y = cy + ry * Math.sin(angle);
+    
+            const node = document.createElement('div');
+            node.className = 'source-node';
+            node.dataset.id = src.id;
+            node.dataset.category = src.category;
+            node.innerHTML = `<span class="node-icon">${src.icon}</span><span class="node-label">${src.label.replace('\n', '<br>')}</span>`;
+            node.style.left = (x - getNodeRadius()) + 'px';
+            node.style.top = (y - getNodeRadius()) + 'px';
+    
+            if (activeFilter !== 'all' && src.category !== activeFilter) {
+                node.classList.add('hidden-by-filter');
+            }
+            if (activeNodeId === src.id) {
+                node.classList.add('active');
+            }
+    
+            node.addEventListener('click', () => openInfoPanel(src));
+            mapVisual.appendChild(node);
+        });
+    
+        drawConnections();
+    }
+    
+    function getNodeRadius() {
+        if (window.innerWidth <= 480) return 34;
+        if (window.innerWidth <= 768) return 40;
+        return 55;
+    }
+    
+    function drawConnections() {
+        const svg = document.getElementById('connectionLines');
+        const rect = mapVisual.getBoundingClientRect();
+        svg.setAttribute('viewBox', `0 0 ${rect.width} ${rect.height}`);
+        svg.innerHTML = '';
+    
+        const cx = rect.width / 2;
+        const cy = rect.height / 2;
+        const rx = Math.min(cx * 0.72, 320);
+        const ry = Math.min(cy * 0.72, 200);
+    
+        scholarshipSources.forEach(src => {
+            const angle = (src.angle - 90) * (Math.PI / 180);
+            const x = cx + rx * Math.cos(angle);
+            const y = cy + ry * Math.sin(angle);
+    
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', cx);
+            line.setAttribute('y1', cy);
+            line.setAttribute('x2', x);
+            line.setAttribute('y2', y);
+            line.setAttribute('data-category', src.category);
+            line.classList.add('connection-line');
+    
+            if (activeNodeId === src.id) {
+                line.classList.add('active-line');
+            }
+            if (activeFilter !== 'all' && src.category !== activeFilter) {
+                line.classList.add('hidden-line');
+            }
+    
+            svg.appendChild(line);
+        });
+    }
+    
+    /* ==========================================
+       FILTER LOGIC
+       ========================================== */
+    document.getElementById('filterBar').addEventListener('click', e => {
+        const btn = e.target.closest('.filter-btn');
+        if (!btn) return;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.filter;
+        placeNodes();
+    });
+    
+    /* ==========================================
+       INFO PANEL
+       ========================================== */
+    function openInfoPanel(src) {
+        activeNodeId = src.id;
+        placeNodes();
+    
+        const content = document.getElementById('infoPanelContent');
+        content.innerHTML = `
+            <div class="info-panel-icon">${src.icon}</div>
+            <div class="info-panel-title">${src.title}</div>
+            <span class="info-panel-category ${src.category}">${src.category === 'private' ? 'Private & Corporate' : src.category.charAt(0).toUpperCase() + src.category.slice(1)}</span>
+            <p class="info-panel-desc">${src.description}</p>
+    
+            <div class="info-panel-stats">
+                <div class="stat-box">
+                    <div class="stat-value">${src.stats.amount}</div>
+                    <div class="stat-label">${src.stats.label}</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">${src.stats.count}</div>
+                    <div class="stat-label">${src.stats.countLabel}</div>
+                </div>
+            </div>
+    
+            <div class="info-panel-section-title">Real-World Examples</div>
+            <ul class="example-list">
+                ${src.examples.map(ex => `<li><span class="ex-icon">${ex.icon}</span><span>${ex.text}</span></li>`).join('')}
+            </ul>
+    
+            <div class="info-panel-section-title">Pro Tip</div>
+            <div class="info-panel-tip"><strong>Tip:</strong> ${src.tip}</div>
+        `;
+    
+        document.getElementById('infoPanelOverlay').classList.add('visible');
+    
+        // Save explored sources
+        let explored = JSON.parse(localStorage.getItem('mcf-eco-explored') || '[]');
+        if (!explored.includes(src.id)) {
+            explored.push(src.id);
+            localStorage.setItem('mcf-eco-explored', JSON.stringify(explored));
+        }
+    }
+    
+    function closeInfoPanel() {
+        document.getElementById('infoPanelOverlay').classList.remove('visible');
+        activeNodeId = null;
+        placeNodes();
+    }
+    
+    document.getElementById('infoPanelClose').addEventListener('click', closeInfoPanel);
+    document.getElementById('infoPanelOverlay').addEventListener('click', e => {
+        if (e.target === document.getElementById('infoPanelOverlay')) closeInfoPanel();
+    });
+    
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeInfoPanel();
+    });
+    
+    /* ==========================================
+       PDF DOWNLOAD
+       ========================================== */
+    function downloadPDF() {
+        const explored = JSON.parse(localStorage.getItem('mcf-eco-explored') || '[]');
+        const now = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    
+        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Scholarship Ecosystem Cheat Sheet - My College Finance</title>
+        <style>
+            @page { margin: 0.6in; size: letter; }
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; color: #09090b; font-size: 11px; line-height: 1.5; }
+            .pdf-header { text-align: center; border-bottom: 3px solid #012699; padding-bottom: 12px; margin-bottom: 16px; }
+            .pdf-header img { width: 60px; height: 60px; }
+            .pdf-header h1 { font-size: 20px; color: #012699; margin: 6px 0 2px; }
+            .pdf-header .tagline { font-size: 10px; color: #64748b; letter-spacing: 0.1em; }
+            .pdf-header .date { font-size: 9px; color: #94a3b8; margin-top: 4px; }
+            .source-block { margin-bottom: 14px; page-break-inside: avoid; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 12px; }
+            .source-block h2 { font-size: 14px; color: #012699; margin: 0 0 4px; }
+            .source-block .cat { display: inline-block; font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 8px; border-radius: 50px; color: #fff; margin-bottom: 6px; }
+            .cat-government { background: #012699; }
+            .cat-institutional { background: #16a34a; }
+            .cat-private { background: #d97706; }
+            .cat-community { background: #a855f7; }
+            .source-block p { color: #374151; margin: 0 0 6px; font-size: 10.5px; }
+            .source-block .examples { margin: 0; padding: 0; list-style: none; }
+            .source-block .examples li { padding: 3px 0; font-size: 10px; color: #1f2937; border-bottom: 1px solid #f1f5f9; }
+            .source-block .examples li:last-child { border: none; }
+            .source-block .tip { background: #f0f5ff; border: 1px solid #dbeafe; border-radius: 4px; padding: 6px 8px; font-size: 10px; color: #1e3a5f; margin-top: 6px; }
+            .source-block .tip strong { color: #012699; }
+            .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 6px 0 8px; }
+            .stat-mini { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 6px; text-align: center; }
+            .stat-mini .sv { font-size: 14px; font-weight: 800; color: #012699; }
+            .stat-mini .sl { font-size: 8px; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; }
+            .pdf-footer { text-align: center; border-top: 2px solid #e2e8f0; padding-top: 10px; margin-top: 16px; font-size: 9px; color: #94a3b8; }
+            .pdf-footer .amber { color: #d97706; font-weight: 600; letter-spacing: 0.1em; }
+            .explored-badge { display: inline-block; background: #dcfce7; color: #166534; font-size: 8px; font-weight: 700; padding: 1px 6px; border-radius: 50px; margin-left: 6px; }
+        </style></head><body>
+        <div class="pdf-header">
+            <img src="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" alt="MCF Logo">
+            <h1>Scholarship Ecosystem Cheat Sheet</h1>
+            <div class="tagline">EDUCATE * MOTIVATE * ELEVATE</div>
+            <div class="date">Generated ${now} | Explored ${explored.length} of ${scholarshipSources.length} sources</div>
+        </div>`;
+    
+        scholarshipSources.forEach(src => {
+            const wasExplored = explored.includes(src.id);
+            const catLabel = src.category === 'private' ? 'Private & Corporate' : src.category.charAt(0).toUpperCase() + src.category.slice(1);
+    
+            html += `<div class="source-block">
+                <h2>${src.icon} ${src.title}${wasExplored ? '<span class="explored-badge">EXPLORED</span>' : ''}</h2>
+                <span class="cat cat-${src.category}">${catLabel}</span>
+                <p>${src.description}</p>
+                <div class="stats-grid">
+                    <div class="stat-mini"><div class="sv">${src.stats.amount}</div><div class="sl">${src.stats.label}</div></div>
+                    <div class="stat-mini"><div class="sv">${src.stats.count}</div><div class="sl">${src.stats.countLabel}</div></div>
+                </div>
+                <ul class="examples">${src.examples.map(ex => `<li>${ex.icon} ${ex.text}</li>`).join('')}</ul>
+                <div class="tip"><strong>Tip:</strong> ${src.tip}</div>
+            </div>`;
+        });
+    
+        html += `<div class="pdf-footer">
+            <div class="amber">EDUCATE * MOTIVATE * ELEVATE</div>
+            <div>Copyright 2025 My College Finance. All rights reserved. | www.mycollegefinance.com</div>
+        </div>
+    <script src="../../nav-inject.js"></script>
+</body></html>`;
+    
+        const blob = new Blob([html], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const win = window.open(url, '_blank');
+        if (win) {
+            win.onload = () => { setTimeout(() => { win.print(); }, 400); };
+        } else {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Scholarship_Ecosystem_Cheat_Sheet.html';
+            a.click();
+        }
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+    }
+    
+    /* ==========================================
+       BLANK TEMPLATE DOWNLOAD
+       ========================================== */
+    function downloadTemplate() {
+        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Scholarship Ecosystem Worksheet - My College Finance</title>
+        <style>
+            @page { margin: 0.7in; size: letter; }
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; color: #09090b; font-size: 11px; line-height: 1.6; }
+            .header { text-align: center; border-bottom: 3px solid #012699; padding-bottom: 12px; margin-bottom: 20px; }
+            .header img { width: 55px; height: 55px; }
+            .header h1 { font-size: 18px; color: #012699; margin: 6px 0 2px; }
+            .header .tagline { font-size: 9px; color: #64748b; letter-spacing: 0.1em; }
+            .header .sub { font-size: 10px; color: #94a3b8; margin-top: 4px; }
+            .instructions { background: #f0f5ff; border: 1px solid #dbeafe; border-radius: 6px; padding: 10px 14px; margin-bottom: 18px; font-size: 10.5px; color: #1e3a5f; }
+            .instructions strong { color: #012699; }
+            .section { margin-bottom: 18px; page-break-inside: avoid; }
+            .section h2 { font-size: 13px; color: #012699; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px; margin-bottom: 10px; }
+            .write-area { border: 1.5px solid #e2e8f0; border-radius: 6px; padding: 10px; min-height: 80px; margin-bottom: 8px; }
+            .write-area .prompt { font-size: 10px; color: #64748b; margin-bottom: 4px; font-style: italic; }
+            .write-lines { border-bottom: 1px solid #e2e8f0; height: 22px; }
+            .footer { text-align: center; border-top: 2px solid #e2e8f0; padding-top: 10px; margin-top: 20px; }
+            .footer .amber { color: #d97706; font-weight: 600; letter-spacing: 0.1em; font-size: 10px; }
+            .footer .copy { font-size: 8px; color: #94a3b8; }
+        </style></head><body>
+        <div class="header">
+            <img src="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" alt="MCF Logo">
+            <h1>Scholarship Ecosystem Worksheet</h1>
+            <div class="tagline">EDUCATE * MOTIVATE * ELEVATE</div>
+            <div class="sub">The Scholarship Strategy | Lesson 1.1</div>
+        </div>
+    
+        <div class="instructions"><strong>Instructions:</strong> Use this worksheet to map out the scholarship sources available to you. For each funding category, research and write down specific scholarships, deadlines, and amounts that apply to your situation.</div>
+    
+        <div class="section">
+            <h2>Your Information</h2>
+            <div class="write-area">
+                <div class="prompt">Name:</div><div class="write-lines"></div>
+                <div class="prompt" style="margin-top:8px;">School / Grade Level:</div><div class="write-lines"></div>
+                <div class="prompt" style="margin-top:8px;">State:</div><div class="write-lines"></div>
+            </div>
+        </div>`;
+    
+        const categories = [
+            { name: 'Federal Government Sources', prompt: 'What federal grants or aid programs might you qualify for? Have you completed the FAFSA?' },
+            { name: 'State Government Sources', prompt: 'What scholarship programs does your state offer? What are the deadlines?' },
+            { name: 'University & College Sources', prompt: 'What institutional scholarships are available at schools you are considering?' },
+            { name: 'Corporate & Employer Sources', prompt: 'Do your parents\' employers offer dependent scholarships? What corporate programs match your interests?' },
+            { name: 'Foundation & Nonprofit Sources', prompt: 'What foundation scholarships match your background, interests, or career goals?' },
+            { name: 'Community & Local Sources', prompt: 'What local organizations, civic groups, or churches in your area offer scholarships?' }
+        ];
+    
+        categories.forEach(cat => {
+            html += `<div class="section">
+                <h2>${cat.name}</h2>
+                <div class="write-area">
+                    <div class="prompt">${cat.prompt}</div>
+                    <div class="write-lines"></div><div class="write-lines"></div><div class="write-lines"></div><div class="write-lines"></div>
+                </div>
+            </div>`;
+        });
+    
+        html += `<div class="section">
+            <h2>My Top 5 Scholarship Sources to Research</h2>
+            <div class="write-area">
+                <div class="prompt">List the 5 most promising scholarship sources from your research above:</div>
+                <div class="write-lines"></div><div class="write-lines"></div><div class="write-lines"></div><div class="write-lines"></div><div class="write-lines"></div>
+            </div>
+        </div>
+    
+        <div class="footer">
+            <div class="amber">EDUCATE * MOTIVATE * ELEVATE</div>
+            <div class="copy">Copyright 2025 My College Finance. All rights reserved. | www.mycollegefinance.com</div>
+        </div>
+    <script src="../../nav-inject.js"></script>
+</body></html>`;
+    
+        const blob = new Blob([html], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const win = window.open(url, '_blank');
+        if (win) {
+            win.onload = () => { setTimeout(() => { win.print(); }, 400); };
+        } else {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Scholarship_Ecosystem_Worksheet_Template.html';
+            a.click();
+        }
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+    }
+    
+    /* ==========================================
+       INIT
+       ========================================== */
+    function init() {
+        initDarkMode();
+        placeNodes();
+        window.addEventListener('resize', () => { placeNodes(); });
+    }
+    
+    document.addEventListener('DOMContentLoaded', init);
+    </script>
+
+
+    <script src="../../nav-inject.js"></script>
+</body>
+</html>

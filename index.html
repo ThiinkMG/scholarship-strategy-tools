@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Tools - The Scholarship Strategy | My College Finance</title>
+    <meta name="description" content="Free interactive scholarship tools from The Scholarship Strategy course by My College Finance. Find, win, and keep scholarships.">
+    <meta name="theme-color" content="#012699">
+    <link rel="icon" href="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" type="image/png">
+    <style>
+        /* ========================================
+           MCF CSS VARIABLES
+           ======================================== */
+        :root {
+            --mcf-brand-blue: #012699;
+            --mcf-brand-green: #26e011;
+            --mcf-brand-amber: #fdc003;
+            --mcf-brand-black: #000516;
+            --mcf-background: #fafafa;
+            --mcf-foreground: #09090b;
+            --mcf-card: #ffffff;
+            --mcf-card-foreground: #09090b;
+            --mcf-primary: #336bff;
+            --mcf-primary-foreground: #f8fafc;
+            --mcf-secondary: #f1f5f9;
+            --mcf-secondary-foreground: #64748b;
+            --mcf-muted: #f1f5f9;
+            --mcf-muted-foreground: #64748b;
+            --mcf-accent: #f1f5f9;
+            --mcf-accent-foreground: #64748b;
+            --mcf-destructive: #ef4444;
+            --mcf-border: #e2e8f0;
+            --mcf-input: #e2e8f0;
+            --mcf-radius: 0.5rem;
+            --mcf-transition: all 0.3s ease;
+        }
+
+        body.dark-mode {
+            --mcf-background: #09090b;
+            --mcf-foreground: #f8fafc;
+            --mcf-card: #1a1a1f;
+            --mcf-card-foreground: #f8fafc;
+            --mcf-primary: #4c6ef5;
+            --mcf-primary-foreground: #f8fafc;
+            --mcf-secondary: #374151;
+            --mcf-secondary-foreground: #f8fafc;
+            --mcf-muted: #1c1917;
+            --mcf-muted-foreground: #94a3b8;
+            --mcf-accent: #374151;
+            --mcf-accent-foreground: #f8fafc;
+            --mcf-border: #374151;
+            --mcf-input: #1f2937;
+            --mcf-brand-blue: #0139cc;
+            --mcf-brand-green: #3ae826;
+            --mcf-brand-amber: #fdc922;
+            --mcf-brand-black: #f0f1ff;
+        }
+
+        /* ========================================
+           BASE
+           ======================================== */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+            font-size: 16px;
+            line-height: 1.5;
+            background-color: var(--mcf-background);
+            color: var(--mcf-foreground);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ========================================
+           HEADER
+           ======================================== */
+        .mcf-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 2px solid var(--mcf-border);
+            backdrop-filter: blur(14px);
+            background-color: rgba(250, 250, 250, 0.92);
+        }
+        body.dark-mode .mcf-header { background-color: rgba(9, 9, 11, 0.92); }
+
+        .mcf-header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 64px;
+        }
+
+        .mcf-header-brand { display: flex; align-items: center; gap: 0.75rem; }
+
+        .mcf-logo-header { width: 50px; height: 50px; object-fit: contain; }
+
+        .mcf-brand-text { display: flex; flex-direction: column; }
+
+        .mcf-brand-name {
+            font-size: 1rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--mcf-brand-blue);
+            line-height: 1.2;
+        }
+
+        .mcf-tagline {
+            font-size: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--mcf-muted-foreground);
+        }
+
+        .mcf-theme-toggle {
+            width: 40px; height: 40px; padding: 0;
+            border: 2px solid var(--mcf-border);
+            background: var(--mcf-card);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: var(--mcf-transition);
+            color: var(--mcf-foreground);
+        }
+        .mcf-theme-toggle:hover { border-color: var(--mcf-primary); transform: scale(1.1); }
+
+        /* ========================================
+           HERO
+           ======================================== */
+        .hero {
+            text-align: center;
+            padding: 3rem 1rem 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            animation: fadeSlideIn 0.6s ease-out;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: linear-gradient(135deg, var(--mcf-brand-blue), var(--mcf-primary));
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.35rem 1rem;
+            border-radius: 50px;
+            margin-bottom: 1.25rem;
+        }
+
+        .hero h1 {
+            font-size: 2.25rem;
+            font-weight: 900;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.75rem;
+        }
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--mcf-brand-blue), var(--mcf-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-desc {
+            font-size: 1.05rem;
+            color: var(--mcf-muted-foreground);
+            max-width: 600px;
+            margin: 0 auto 1.5rem;
+            line-height: 1.65;
+        }
+
+        /* Stats bar */
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        .hero-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .hero-stat-num {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--mcf-brand-blue);
+        }
+        .hero-stat-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--mcf-muted-foreground);
+        }
+
+        /* ========================================
+           SEARCH & FILTERS
+           ======================================== */
+        .controls {
+            max-width: 1200px;
+            margin: 0 auto 1.5rem;
+            padding: 0 1rem;
+            animation: fadeSlideIn 0.6s ease-out 0.15s both;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--mcf-card);
+            border: 2px solid var(--mcf-border);
+            border-radius: calc(var(--mcf-radius) * 1.5);
+            padding: 0.5rem 1rem;
+            margin-bottom: 1rem;
+            transition: var(--mcf-transition);
+        }
+        .search-bar:focus-within {
+            border-color: var(--mcf-primary);
+            box-shadow: 0 0 0 3px rgba(51, 107, 255, 0.1);
+        }
+        .search-bar svg { color: var(--mcf-muted-foreground); flex-shrink: 0; }
+        .search-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 0.9rem;
+            color: var(--mcf-foreground);
+            outline: none;
+            font-family: inherit;
+        }
+        .search-input::placeholder { color: var(--mcf-muted-foreground); }
+        .search-clear {
+            background: none; border: none; cursor: pointer;
+            color: var(--mcf-muted-foreground);
+            font-size: 1.1rem; padding: 0 0.25rem;
+            display: none;
+            transition: color 0.2s;
+        }
+        .search-clear:hover { color: var(--mcf-foreground); }
+        .search-clear.visible { display: block; }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .filter-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--mcf-muted-foreground);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-right: 0.25rem;
+        }
+        .filter-btn {
+            padding: 0.35rem 0.85rem;
+            border-radius: 50px;
+            border: 2px solid var(--mcf-border);
+            background: var(--mcf-card);
+            color: var(--mcf-foreground);
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--mcf-transition);
+            font-family: inherit;
+            white-space: nowrap;
+        }
+        .filter-btn:hover {
+            border-color: var(--mcf-primary);
+            background: rgba(51, 107, 255, 0.05);
+        }
+        .filter-btn.active {
+            background: var(--mcf-brand-blue);
+            color: #fff;
+            border-color: var(--mcf-brand-blue);
+        }
+        body.dark-mode .filter-btn.active {
+            background: var(--mcf-primary);
+            border-color: var(--mcf-primary);
+        }
+
+        /* Result count */
+        .result-count {
+            font-size: 0.78rem;
+            color: var(--mcf-muted-foreground);
+            max-width: 1200px;
+            margin: 0 auto 0.75rem;
+            padding: 0 1rem;
+        }
+
+        /* ========================================
+           TOOL CARDS GRID
+           ======================================== */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1rem;
+            max-width: 1200px;
+            margin: 0 auto 3rem;
+            padding: 0 1rem;
+            animation: fadeSlideIn 0.6s ease-out 0.3s both;
+        }
+
+        .tool-card {
+            background: var(--mcf-card);
+            border: 2px solid var(--mcf-border);
+            border-radius: calc(var(--mcf-radius) * 1.5);
+            padding: 1.25rem 1.5rem;
+            transition: var(--mcf-transition);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--mcf-brand-blue), var(--mcf-primary));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .tool-card:hover {
+            border-color: var(--mcf-brand-blue);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            transform: translateY(-3px);
+        }
+        .tool-card:hover::before { opacity: 1; }
+
+        .tool-card.hidden { display: none; }
+
+        .tool-card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .tool-badges { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.62rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 0.2rem 0.55rem;
+            border-radius: 50px;
+        }
+        .badge-module {
+            background: var(--mcf-brand-blue);
+            color: #fff;
+        }
+        body.dark-mode .badge-module {
+            background: var(--mcf-primary);
+        }
+        .badge-lesson {
+            background: var(--mcf-secondary);
+            color: var(--mcf-secondary-foreground);
+        }
+        .badge-track-a {
+            background: rgba(38, 224, 17, 0.12);
+            color: #16a34a;
+            border: 1px solid rgba(38, 224, 17, 0.25);
+        }
+        body.dark-mode .badge-track-a {
+            background: rgba(58, 232, 38, 0.12);
+            color: #3ae826;
+            border-color: rgba(58, 232, 38, 0.25);
+        }
+        .badge-track-b {
+            background: rgba(253, 192, 3, 0.12);
+            color: #d97706;
+            border: 1px solid rgba(253, 192, 3, 0.25);
+        }
+        body.dark-mode .badge-track-b {
+            background: rgba(253, 201, 34, 0.12);
+            color: #fdc922;
+            border-color: rgba(253, 201, 34, 0.25);
+        }
+
+        .tool-icon {
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .tool-name {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--mcf-foreground);
+            margin-bottom: 0.35rem;
+            line-height: 1.3;
+        }
+
+        .tool-desc {
+            font-size: 0.82rem;
+            color: var(--mcf-muted-foreground);
+            line-height: 1.55;
+            flex: 1;
+            margin-bottom: 1rem;
+        }
+
+        .tool-launch {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.55rem 1.1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border-radius: var(--mcf-radius);
+            background: var(--mcf-primary);
+            color: var(--mcf-primary-foreground);
+            text-decoration: none;
+            transition: var(--mcf-transition);
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            align-self: flex-start;
+        }
+        .tool-launch:hover {
+            background: var(--mcf-brand-blue);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+        }
+        .tool-launch svg { transition: transform 0.2s ease; }
+        .tool-launch:hover svg { transform: translateX(2px); }
+
+        /* Empty state */
+        .no-results {
+            display: none;
+            text-align: center;
+            padding: 3rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .no-results.visible { display: block; }
+        .no-results-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+        .no-results-text {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--mcf-foreground);
+            margin-bottom: 0.25rem;
+        }
+        .no-results-sub {
+            font-size: 0.85rem;
+            color: var(--mcf-muted-foreground);
+        }
+
+        /* ========================================
+           FOOTER
+           ======================================== */
+        .mcf-footer {
+            background: linear-gradient(to bottom, #111827, #000000);
+            color: white;
+            padding: 2.5rem 1rem;
+            text-align: center;
+        }
+        .mcf-footer-inner {
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        .mcf-footer .mcf-logo-footer { width: 60px; height: 60px; object-fit: contain; }
+        .mcf-footer-title { font-size: 1.1rem; font-weight: 900; letter-spacing: 0.05em; }
+        .mcf-footer-desc {
+            max-width: 450px;
+            color: rgba(255,255,255,0.75);
+            font-size: 0.82rem;
+            line-height: 1.6;
+        }
+        .mcf-footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .mcf-footer-links a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: color 0.3s ease;
+        }
+        .mcf-footer-links a:hover { color: var(--mcf-brand-amber); }
+        .mcf-footer-sep { color: rgba(255,255,255,0.3); font-size: 0.8rem; }
+        .mcf-footer-tagline {
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            color: var(--mcf-brand-amber);
+            font-weight: 600;
+        }
+        .mcf-footer-copy { font-size: 0.7rem; color: rgba(255,255,255,0.45); }
+        body.dark-mode .mcf-footer { background: linear-gradient(to bottom, #000000, #111827); }
+
+        /* ========================================
+           ANIMATIONS
+           ======================================== */
+        @keyframes fadeSlideIn {
+            from { transform: translateY(18px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* ========================================
+           RESPONSIVE
+           ======================================== */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.65rem; }
+            .hero-desc { font-size: 0.92rem; }
+            .mcf-brand-text { display: none; }
+            .tools-grid { grid-template-columns: 1fr; }
+            .hero-stats { gap: 1.25rem; }
+        }
+        @media (max-width: 480px) {
+            .hero { padding: 2rem 1rem 1.25rem; }
+            .hero h1 { font-size: 1.4rem; }
+            .tool-card { padding: 1rem 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== HEADER ===== -->
+    <header class="mcf-header">
+        <div class="mcf-header-inner">
+            <div class="mcf-header-brand">
+                <img src="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" alt="My College Finance Logo" class="mcf-logo-header">
+                <div class="mcf-brand-text">
+                    <div class="mcf-brand-name">My College Finance</div>
+                    <div class="mcf-tagline">EDUCATE &bull; MOTIVATE &bull; ELEVATE</div>
+                </div>
+            </div>
+            <button id="mcf-theme-toggle" class="mcf-theme-toggle" aria-label="Toggle dark mode">
+                <svg class="mcf-sun-icon" width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="4" fill="currentColor"/><path d="M10 0v4M10 16v4M20 10h-4M4 10H0M17.07 2.93l-2.83 2.83M5.76 14.24l-2.83 2.83M17.07 17.07l-2.83-2.83M5.76 5.76L2.93 2.93" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                <svg class="mcf-moon-icon" width="18" height="18" viewBox="0 0 20 20" fill="none" style="display:none;"><path d="M17 10C17 13.866 13.866 17 10 17C6.134 17 3 13.866 3 10C3 6.134 6.134 3 10 3C10.34 3 10.673 3.024 11 3.07C9.275 4.075 8 5.897 8 8C8 11.314 10.686 14 14 14C15.104 14 16.075 13.624 16.93 13C16.976 13.327 17 13.661 17 14Z" fill="currentColor"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero">
+        <div class="hero-badge">The Scholarship Strategy Course</div>
+        <h1>Interactive <span>Scholarship Tools</span></h1>
+        <p class="hero-desc">Free hands-on tools to help you find, win, and keep scholarships. Each tool pairs with a lesson from The Scholarship Strategy course.</p>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <div class="hero-stat-num">6</div>
+                <div class="hero-stat-label">Modules</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-num">15</div>
+                <div class="hero-stat-label">Interactive Tools</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-num">100%</div>
+                <div class="hero-stat-label">Free for Students</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CONTROLS ===== -->
+    <div class="controls">
+        <div class="search-bar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" class="search-input" id="searchInput" placeholder="Search tools by name, module, or topic..." aria-label="Search tools">
+            <button class="search-clear" id="searchClear" aria-label="Clear search">&times;</button>
+        </div>
+        <div class="filter-row">
+            <span class="filter-label">Filter:</span>
+            <button class="filter-btn active" data-filter="all">All Tools</button>
+            <button class="filter-btn" data-filter="1">Module 1</button>
+            <button class="filter-btn" data-filter="2">Module 2</button>
+            <button class="filter-btn" data-filter="3">Module 3</button>
+            <button class="filter-btn" data-filter="4">Module 4</button>
+            <button class="filter-btn" data-filter="5">Module 5</button>
+            <button class="filter-btn" data-filter="6">Module 6</button>
+        </div>
+    </div>
+
+    <!-- ===== RESULT COUNT ===== -->
+    <div class="result-count" id="resultCount"></div>
+
+    <!-- ===== TOOLS GRID ===== -->
+    <div class="tools-grid" id="toolsGrid"></div>
+
+    <!-- ===== NO RESULTS ===== -->
+    <div class="no-results" id="noResults">
+        <div class="no-results-icon">&#128270;</div>
+        <div class="no-results-text">No tools match your search</div>
+        <div class="no-results-sub">Try a different keyword or clear your filters</div>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="mcf-footer">
+        <div class="mcf-footer-inner">
+            <img src="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" alt="My College Finance Logo" class="mcf-logo-footer">
+            <div class="mcf-footer-title">MY COLLEGE FINANCE</div>
+            <div class="mcf-footer-desc">Empowering students with financial education and smart tools for a brighter future.</div>
+            <div class="mcf-footer-links">
+                <a href="https://www.mycollegefinance.com/" target="_blank" rel="noopener">Main Website</a>
+                <span class="mcf-footer-sep">&bull;</span>
+                <a href="https://www.mycollegefinance.com/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a>
+                <span class="mcf-footer-sep">&bull;</span>
+                <a href="https://www.mycollegefinance.com/terms-policy" target="_blank" rel="noopener">Terms of Service</a>
+                <span class="mcf-footer-sep">&bull;</span>
+                <a href="https://linktr.ee/mycollegefinance" target="_blank" rel="noopener">Social Media</a>
+            </div>
+            <div class="mcf-footer-tagline">EDUCATE &bull; MOTIVATE &bull; ELEVATE</div>
+            <div class="mcf-footer-copy">&copy; 2025 My College Finance. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <script>
+    /* ==========================================
+       TOOL DATA
+       ========================================== */
+    const tools = [
+        {
+            module: 1, lesson: '1.1', name: 'Scholarship Ecosystem Map Explorer',
+            desc: 'Interactive visual map showing all six major scholarship funding sources and how they connect to you as a student.',
+            icon: '\u{1F5FA}', path: 'module-1/lesson-1-1/', tags: 'ecosystem map sources funding government institutional private community'
+        },
+        {
+            module: 1, lesson: '1.2', name: 'Myth vs. Fact',
+            desc: 'Test your knowledge by identifying common scholarship myths and discovering the real facts behind college funding.',
+            icon: '\u{1F9E0}', path: 'module-1/lesson-1-2/', tags: 'myth fact quiz beliefs misconceptions truth', placeholder: true
+        },
+        {
+            module: 1, lesson: '1.3', name: 'Scholarship Legitimacy Flow',
+            desc: 'Step-by-step decision flow tool to evaluate whether a scholarship opportunity is legitimate or a potential scam.',
+            icon: '\u{1F6E1}', path: 'module-1/lesson-1-3/', tags: 'scam red flags legitimate safety protection flow decision'
+        },
+        {
+            module: 2, lesson: '2.1', name: 'Scholarship Source Finder',
+            desc: 'Discover where scholarship money actually lives by exploring funding sources organized by category and eligibility.',
+            icon: '\u{1F50D}', path: 'module-2/lesson-2-1/', tags: 'source finder search where money funding discover'
+        },
+        {
+            module: 2, lesson: '2.2', name: 'Scholarship Type Sorter',
+            desc: 'Sort and filter different scholarship types to find the ones that best match your profile, interests, and qualifications.',
+            icon: '\u{1F4CA}', path: 'module-2/lesson-2-2/', tags: 'sort filter type merit need athletic talent match'
+        },
+        {
+            module: 2, lesson: '2.3', name: 'Scam Detector',
+            desc: 'Analyze any scholarship offer for red flags with this interactive tool that scores legitimacy based on known scam patterns.',
+            icon: '\u26A0', path: 'module-2/lesson-2-3/', tags: 'scam detector red flag warning fraud analyze score'
+        },
+        {
+            module: 3, lesson: '3.1', name: 'Scholarship Resume Creator',
+            desc: 'Build a scholarship-optimized resume step by step, highlighting achievements and experiences that committees look for.',
+            icon: '\u{1F4DD}', path: 'module-3/lesson-3-1-creator/', tags: 'resume creator builder achievements experience application'
+        },
+        {
+            module: 3, lesson: '3.1', name: 'Scholarship Search',
+            desc: 'Organize and track scholarship opportunities you\'ve found with deadlines, requirements, and application status.',
+            icon: '\u{1F4CB}', path: 'module-3/lesson-3-1-search/', tags: 'search organize track deadline requirements status tracker'
+        },
+        {
+            module: 3, lesson: '3.2', name: 'Local Scholarship Hunter',
+            desc: 'Find hidden local and community scholarship opportunities that most students overlook, with fewer applicants and better odds.',
+            icon: '\u{1F3D8}', path: 'module-3/lesson-3-2/', tags: 'local community hidden civic church business small town'
+        },
+        {
+            module: 3, lesson: '3.3', name: 'Essay Block Builder',
+            desc: 'Create reusable essay "blocks" that can be mixed and matched across multiple scholarship applications to save time.',
+            icon: '\u{1F9F1}', path: 'module-3/lesson-3-3/', tags: 'essay block builder reusable writing personal statement mix match'
+        },
+        {
+            module: 4, lesson: '4.1A', name: 'Scholarship Timeline Builder',
+            desc: 'Plan your complete scholarship application timeline from freshman year through senior year with key milestones and deadlines.',
+            icon: '\u{1F4C5}', path: 'module-4/lesson-4-1a/', tags: 'timeline planner schedule deadlines milestones high school freshman senior', track: 'A'
+        },
+        {
+            module: 4, lesson: '4.1B', name: 'College Scholarship Finder',
+            desc: 'Discover institutional scholarships available at your current college, including departmental, merit, and need-based awards.',
+            icon: '\u{1F3EB}', path: 'module-4/lesson-4-1b/', tags: 'college university institutional department merit award current school', track: 'B'
+        },
+        {
+            module: 4, lesson: '4.2B', name: 'Aid Risk Detector',
+            desc: 'Identify potential risks to your current financial aid package and learn strategies to protect your funding.',
+            icon: '\u{1F6A8}', path: 'module-4/lesson-4-2b/', tags: 'risk detector protect aid SAP GPA enrollment warning keep', track: 'B'
+        },
+        {
+            module: 5, lesson: '5.2', name: 'COA Adjustment Scenarios',
+            desc: 'Model different cost of attendance adjustment scenarios to understand how life changes can affect your financial aid eligibility.',
+            icon: '\u{1F4B0}', path: 'module-5/lesson-5-2/', tags: 'cost attendance COA adjustment scenario model budget housing'
+        },
+        {
+            module: 6, lesson: '6.1', name: 'Appeal Outline Builder',
+            desc: 'Build a structured, compelling financial aid appeal letter with guided prompts for each required section.',
+            icon: '\u{1F4E8}', path: 'module-6/lesson-6-1/', tags: 'appeal letter outline builder financial aid SAP reinstatement'
+        }
+    ];
+
+    const MODULE_TITLES = {
+        1: 'Scholarships Demystified',
+        2: 'The Scholarship Hunter System',
+        3: 'Build Your Application Kit',
+        4: 'Financial Aid Strategy',
+        5: 'Defense Mode: Protecting Aid',
+        6: 'Appeals & Emergency Aid'
+    };
+
+    /* ==========================================
+       RENDER CARDS
+       ========================================== */
+    const grid = document.getElementById('toolsGrid');
+    const resultCount = document.getElementById('resultCount');
+    const noResults = document.getElementById('noResults');
+
+    function renderCards() {
+        grid.innerHTML = '';
+        tools.forEach((tool, i) => {
+            const card = document.createElement('div');
+            card.className = 'tool-card';
+            card.dataset.module = tool.module;
+            card.dataset.search = `${tool.name} ${tool.desc} ${tool.tags} module ${tool.module} lesson ${tool.lesson} ${MODULE_TITLES[tool.module]}`.toLowerCase();
+            card.style.animationDelay = `${i * 0.04}s`;
+
+            let trackBadge = '';
+            if (tool.track === 'A') trackBadge = '<span class="badge badge-track-a">HS Track</span>';
+            if (tool.track === 'B') trackBadge = '<span class="badge badge-track-b">College Track</span>';
+
+            card.innerHTML = `
+                <div class="tool-card-top">
+                    <div class="tool-badges">
+                        <span class="badge badge-module">Module ${tool.module}</span>
+                        <span class="badge badge-lesson">Lesson ${tool.lesson}</span>
+                        ${trackBadge}
+                    </div>
+                    <span class="tool-icon">${tool.icon}</span>
+                </div>
+                <div class="tool-name">${tool.name}</div>
+                <div class="tool-desc">${tool.desc}</div>
+                <a href="${tool.path}" class="tool-launch" ${tool.placeholder ? 'style="opacity:0.4;pointer-events:none;" title="Coming soon"' : ''}>
+                    ${tool.placeholder ? 'Coming Soon' : 'Launch Tool'}
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </a>
+            `;
+            grid.appendChild(card);
+        });
+        updateCount();
+    }
+
+    /* ==========================================
+       SEARCH & FILTER
+       ========================================== */
+    let activeFilter = 'all';
+    const searchInput = document.getElementById('searchInput');
+    const searchClear = document.getElementById('searchClear');
+
+    function applyFilters() {
+        const query = searchInput.value.toLowerCase().trim();
+        const cards = grid.querySelectorAll('.tool-card');
+        let visible = 0;
+
+        cards.forEach(card => {
+            const matchesFilter = activeFilter === 'all' || card.dataset.module === activeFilter;
+            const matchesSearch = !query || card.dataset.search.includes(query);
+            const show = matchesFilter && matchesSearch;
+            card.classList.toggle('hidden', !show);
+            if (show) visible++;
+        });
+
+        searchClear.classList.toggle('visible', query.length > 0);
+        noResults.classList.toggle('visible', visible === 0);
+        updateCount(visible);
+    }
+
+    function updateCount(count) {
+        const total = tools.length;
+        const visible = count !== undefined ? count : total;
+        if (visible === total) {
+            resultCount.textContent = `Showing all ${total} tools`;
+        } else {
+            resultCount.textContent = `Showing ${visible} of ${total} tools`;
+        }
+    }
+
+    // Filter buttons
+    document.querySelector('.filter-row').addEventListener('click', e => {
+        const btn = e.target.closest('.filter-btn');
+        if (!btn) return;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.filter;
+        applyFilters();
+    });
+
+    // Search input
+    searchInput.addEventListener('input', applyFilters);
+    searchClear.addEventListener('click', () => {
+        searchInput.value = '';
+        applyFilters();
+        searchInput.focus();
+    });
+
+    /* ==========================================
+       DARK MODE
+       ========================================== */
+    function initDarkMode() {
+        const saved = localStorage.getItem('mcf-theme') || 'light';
+        if (saved === 'dark') {
+            document.body.classList.add('dark-mode');
+            updateIcons(true);
+        }
+        document.getElementById('mcf-theme-toggle').addEventListener('click', () => {
+            const isDark = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('mcf-theme', isDark ? 'dark' : 'light');
+            updateIcons(isDark);
+        });
+    }
+
+    function updateIcons(isDark) {
+        document.querySelectorAll('.mcf-sun-icon').forEach(i => i.style.display = isDark ? 'none' : 'block');
+        document.querySelectorAll('.mcf-moon-icon').forEach(i => i.style.display = isDark ? 'block' : 'none');
+    }
+
+    /* ==========================================
+       INIT
+       ========================================== */
+    document.addEventListener('DOMContentLoaded', () => {
+        initDarkMode();
+        renderCards();
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,576 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appeal Outline Builder - My College Finance</title>
+    <style>
+        :root {
+            --mcf-brand-blue:#012699;--mcf-brand-green:#26e011;--mcf-brand-amber:#fdc003;--mcf-brand-black:#000516;
+            --mcf-background:#fafafa;--mcf-foreground:#09090b;--mcf-card:#ffffff;--mcf-card-foreground:#09090b;
+            --mcf-primary:#336bff;--mcf-primary-foreground:#f8fafc;--mcf-secondary:#f1f5f9;--mcf-secondary-foreground:#64748b;
+            --mcf-muted:#f1f5f9;--mcf-muted-foreground:#64748b;--mcf-destructive:#ef4444;--mcf-border:#e2e8f0;
+            --mcf-input:#e2e8f0;--mcf-radius:0.5rem;--mcf-transition:all 0.3s ease;
+        }
+        body.dark-mode {
+            --mcf-background:#09090b;--mcf-foreground:#f8fafc;--mcf-card:#1a1a1f;--mcf-card-foreground:#f8fafc;
+            --mcf-primary:#4c6ef5;--mcf-primary-foreground:#f8fafc;--mcf-secondary:#374151;--mcf-secondary-foreground:#f8fafc;
+            --mcf-muted:#1c1917;--mcf-muted-foreground:#94a3b8;--mcf-border:#374151;--mcf-input:#1f2937;
+            --mcf-brand-blue:#0139cc;--mcf-brand-green:#3ae826;--mcf-brand-amber:#fdc922;--mcf-brand-black:#f0f1ff;
+        }
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,'Noto Sans',sans-serif;font-size:16px;line-height:1.5;background:var(--mcf-background);color:var(--mcf-foreground);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+
+        .mcf-header{position:sticky;top:0;z-index:100;border-bottom:2px solid var(--mcf-border);backdrop-filter:blur(12px);background:rgba(250,250,250,0.92);}
+        body.dark-mode .mcf-header{background:rgba(9,9,11,0.92);}
+        .mcf-header-inner{max-width:1280px;margin:0 auto;padding:0 1rem;display:flex;justify-content:space-between;align-items:center;height:64px;}
+        .mcf-header-brand{display:flex;align-items:center;gap:0.75rem;}
+        .mcf-logo-header{width:50px;height:50px;object-fit:contain;}
+        .mcf-brand-text{display:flex;flex-direction:column;}
+        .mcf-brand-name{font-size:1rem;font-weight:900;text-transform:uppercase;letter-spacing:0.05em;color:var(--mcf-brand-blue);line-height:1.2;}
+        .mcf-tagline{font-size:0.6rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--mcf-muted-foreground);}
+        .mcf-theme-toggle{width:40px;height:40px;padding:0;border:2px solid var(--mcf-border);background:var(--mcf-card);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--mcf-transition);color:var(--mcf-foreground);}
+        .mcf-theme-toggle:hover{border-color:var(--mcf-primary);transform:scale(1.1);}
+        .content-wrap{max-width:1060px;margin:0 auto;padding:0 1rem;}
+
+        .hero{text-align:center;padding:2.5rem 0 1.5rem;animation:fadeSlideIn 0.6s ease-out;}
+        .hero-badge{display:inline-flex;align-items:center;gap:0.4rem;background:linear-gradient(135deg,var(--mcf-brand-blue),var(--mcf-primary));color:#fff;font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.35rem 1rem;border-radius:50px;margin-bottom:1rem;}
+        .hero-title{font-size:2rem;font-weight:900;line-height:1.15;letter-spacing:-0.02em;margin-bottom:0.75rem;}
+        .hero-title span{background:linear-gradient(135deg,var(--mcf-brand-blue),var(--mcf-primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .hero-desc{font-size:1rem;color:var(--mcf-muted-foreground);max-width:660px;margin:0 auto;line-height:1.6;}
+
+        /* LAYOUT */
+        .builder-layout{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;align-items:start;animation:fadeSlideIn 0.6s ease-out 0.15s both;}
+        @media(max-width:900px){.builder-layout{grid-template-columns:1fr;}}
+
+        /* PROGRESS */
+        .progress-wrap{margin-bottom:1rem;}
+        .progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.3rem;}
+        .progress-label{font-size:0.72rem;font-weight:600;color:var(--mcf-foreground);}
+        .progress-pct{font-size:0.72rem;font-weight:700;color:var(--mcf-brand-blue);}
+        .progress-track{width:100%;height:8px;background:var(--mcf-secondary);border-radius:50px;overflow:hidden;border:1px solid var(--mcf-border);}
+        .progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--mcf-brand-blue),var(--mcf-primary));border-radius:50px;transition:width 0.5s ease;}
+
+        /* STEP NAV */
+        .step-nav{display:flex;gap:0.3rem;margin-bottom:1rem;flex-wrap:wrap;}
+        .step-pill{padding:0.35rem 0.75rem;border-radius:50px;border:2px solid var(--mcf-border);background:var(--mcf-card);font-size:0.68rem;font-weight:700;color:var(--mcf-muted-foreground);cursor:pointer;transition:var(--mcf-transition);font-family:inherit;display:flex;align-items:center;gap:0.25rem;}
+        .step-pill:hover{border-color:var(--mcf-primary);}
+        .step-pill.active{border-color:var(--mcf-brand-blue);color:var(--mcf-foreground);}
+        .step-pill.completed{border-color:var(--mcf-brand-green);color:var(--mcf-brand-green);}
+        .step-pill .sp-num{width:18px;height:18px;border-radius:50%;background:var(--mcf-border);display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:800;color:var(--mcf-muted-foreground);transition:var(--mcf-transition);}
+        .step-pill.active .sp-num{background:var(--mcf-brand-blue);color:#fff;}
+        .step-pill.completed .sp-num{background:var(--mcf-brand-green);color:#fff;}
+
+        /* EDITOR CARDS */
+        .editor-card{background:var(--mcf-card);border:2px solid var(--mcf-border);border-radius:calc(var(--mcf-radius)*2);padding:1.5rem;transition:var(--mcf-transition);animation:fadeSlideIn 0.4s ease-out;}
+        .editor-card.hidden{display:none;}
+        .ec-icon{font-size:1.4rem;margin-bottom:0.25rem;}
+        .ec-title{font-size:1.05rem;font-weight:800;margin-bottom:0.1rem;color:var(--mcf-foreground);}
+        .ec-desc{font-size:0.78rem;color:var(--mcf-muted-foreground);margin-bottom:1rem;line-height:1.55;}
+
+        /* FORM */
+        .form-group{margin-bottom:0.85rem;}
+        .form-label{display:block;font-size:0.75rem;font-weight:600;color:var(--mcf-foreground);margin-bottom:0.3rem;}
+        .form-label .req{color:var(--mcf-destructive);}
+        .form-helper{font-size:0.65rem;color:var(--mcf-muted-foreground);margin-top:0.15rem;line-height:1.4;}
+        .mcf-input{width:100%;padding:0.6rem 0.75rem;font-size:0.85rem;background:var(--mcf-background);color:var(--mcf-foreground);border:2px solid var(--mcf-input);border-radius:var(--mcf-radius);transition:var(--mcf-transition);font-family:inherit;}
+        .mcf-input:focus{outline:none;border-color:var(--mcf-primary);box-shadow:0 0 0 3px rgba(51,107,255,0.1);}
+        .mcf-input.filled{border-color:var(--mcf-brand-green);}
+        .mcf-textarea{width:100%;padding:0.6rem 0.75rem;font-size:0.85rem;background:var(--mcf-background);color:var(--mcf-foreground);border:2px solid var(--mcf-input);border-radius:var(--mcf-radius);transition:var(--mcf-transition);font-family:inherit;resize:vertical;min-height:80px;}
+        .mcf-textarea:focus{outline:none;border-color:var(--mcf-primary);box-shadow:0 0 0 3px rgba(51,107,255,0.1);}
+        .mcf-textarea.filled{border-color:var(--mcf-brand-green);}
+        .mcf-select{width:100%;padding:0.6rem 2rem 0.6rem 0.75rem;font-size:0.85rem;background:var(--mcf-background);color:var(--mcf-foreground);border:2px solid var(--mcf-input);border-radius:var(--mcf-radius);appearance:none;cursor:pointer;font-family:inherit;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 9L1 4h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 0.75rem center;transition:var(--mcf-transition);}
+        .mcf-select:focus{outline:none;border-color:var(--mcf-primary);box-shadow:0 0 0 3px rgba(51,107,255,0.1);}
+        .form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;}
+        @media(max-width:500px){.form-row{grid-template-columns:1fr;}}
+
+        /* CHECKLIST */
+        .doc-checklist{margin-top:0.5rem;}
+        .doc-item{display:flex;align-items:center;gap:0.5rem;padding:0.45rem 0.65rem;background:var(--mcf-card);border:2px solid var(--mcf-border);border-radius:var(--mcf-radius);margin-bottom:0.35rem;cursor:pointer;transition:var(--mcf-transition);font-size:0.82rem;font-weight:600;color:var(--mcf-foreground);}
+        .doc-item:hover{border-color:var(--mcf-primary);}
+        .doc-item.checked{border-color:var(--mcf-brand-green);background:linear-gradient(135deg,rgba(38,224,17,0.04),transparent);}
+        .di-box{width:20px;height:20px;border:2px solid var(--mcf-input);border-radius:calc(var(--mcf-radius)*0.5);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:transparent;transition:var(--mcf-transition);}
+        .doc-item.checked .di-box{background:var(--mcf-brand-green);border-color:var(--mcf-brand-green);color:#fff;}
+
+        /* TONE TIPS */
+        .tone-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.5rem;}
+        @media(max-width:500px){.tone-grid{grid-template-columns:1fr;}}
+        .tone-card{padding:0.65rem;border-radius:var(--mcf-radius);font-size:0.78rem;line-height:1.5;}
+        .tone-do{background:rgba(38,224,17,0.06);border:1.5px solid rgba(38,224,17,0.25);color:var(--mcf-card-foreground);}
+        .tone-dont{background:rgba(239,68,68,0.06);border:1.5px solid rgba(239,68,68,0.25);color:var(--mcf-card-foreground);}
+        .tone-card .tc-label{font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.2rem;}
+        .tone-do .tc-label{color:#16a34a;}
+        .tone-dont .tc-label{color:var(--mcf-destructive);}
+
+        /* NAV BUTTONS */
+        .nav-row{display:flex;justify-content:space-between;margin-top:1rem;gap:0.5rem;flex-wrap:wrap;}
+
+        /* PREVIEW */
+        .preview-panel{position:sticky;top:80px;}
+        .preview-label{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--mcf-muted-foreground);margin-bottom:0.5rem;display:flex;align-items:center;gap:0.35rem;}
+        .letter-preview{background:#fff;color:#1a1a1a;border:2px solid var(--mcf-border);border-radius:calc(var(--mcf-radius)*1.5);padding:2rem 1.75rem;min-height:450px;font-size:11px;line-height:1.6;box-shadow:0 4px 20px rgba(0,0,0,0.06);font-family:Georgia,'Times New Roman',serif;}
+        body.dark-mode .letter-preview{background:#fff;color:#1a1a1a;border-color:#374151;}
+        .lp-date{font-size:10px;color:#64748b;margin-bottom:12px;}
+        .lp-address{font-size:10px;color:#374151;margin-bottom:12px;line-height:1.5;}
+        .lp-greeting{font-size:11px;font-weight:600;margin-bottom:10px;}
+        .lp-section{margin-bottom:10px;}
+        .lp-section-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#012699;margin-bottom:3px;}
+        .lp-text{font-size:11px;color:#1f2937;line-height:1.7;}
+        .lp-placeholder{color:#94a3b8;font-style:italic;}
+        .lp-closing{margin-top:16px;font-size:11px;}
+        .lp-sig{font-size:12px;font-weight:700;margin-top:20px;}
+        .lp-empty{text-align:center;padding:3rem 1rem;color:#94a3b8;font-style:italic;font-size:12px;font-family:-apple-system,sans-serif;}
+        .lp-docs{margin-top:10px;padding-top:8px;border-top:1px solid #e2e8f0;}
+        .lp-docs-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#012699;margin-bottom:3px;}
+        .lp-docs-list{font-size:10px;color:#374151;padding-left:14px;}
+
+        /* TIP */
+        .tip-box{background:linear-gradient(135deg,rgba(1,38,153,0.05),rgba(51,107,255,0.05));border:1.5px solid rgba(51,107,255,0.15);border-radius:calc(var(--mcf-radius)*1.5);padding:0.75rem 0.85rem;font-size:0.78rem;line-height:1.55;color:var(--mcf-card-foreground);margin-top:0.75rem;}
+        body.dark-mode .tip-box{background:linear-gradient(135deg,rgba(1,57,204,0.1),rgba(76,110,245,0.06));border-color:rgba(76,110,245,0.25);}
+        .tip-box strong{color:var(--mcf-brand-blue);}
+
+        /* BUTTONS */
+        .mcf-btn{display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;padding:0.6rem 1.25rem;font-size:0.82rem;font-weight:600;border-radius:var(--mcf-radius);transition:var(--mcf-transition);cursor:pointer;border:none;font-family:inherit;text-decoration:none;}
+        .mcf-btn-primary{background:var(--mcf-primary);color:var(--mcf-primary-foreground);}
+        .mcf-btn-primary:hover{background:var(--mcf-brand-blue);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.12);}
+        .mcf-btn-outline{background:transparent;border:2px solid var(--mcf-border);color:var(--mcf-foreground);}
+        .mcf-btn-outline:hover{border-color:var(--mcf-primary);background:rgba(51,107,255,0.05);}
+        .mcf-btn-success{background:var(--mcf-brand-green);color:#000516;border:none;}
+        .mcf-btn-success:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(38,224,17,0.2);}
+        .mcf-btn-sm{padding:0.4rem 0.85rem;font-size:0.75rem;}
+        .action-bar{display:flex;flex-wrap:wrap;justify-content:center;gap:0.75rem;margin:1.5rem 0 2rem;}
+
+        /* OUTCOMES */
+        .outcomes-section{margin-top:1rem;padding-top:1rem;border-top:1.5px solid var(--mcf-border);}
+        .outcome-card{display:flex;align-items:flex-start;gap:0.5rem;padding:0.55rem 0.65rem;background:var(--mcf-secondary);border-radius:var(--mcf-radius);margin-bottom:0.35rem;font-size:0.78rem;color:var(--mcf-card-foreground);line-height:1.45;}
+        .outcome-card .oc-icon{font-size:1rem;flex-shrink:0;margin-top:0.05rem;}
+        .outcome-card strong{color:var(--mcf-foreground);}
+
+        .mcf-footer{background:linear-gradient(to bottom,#111827,#000000);color:white;padding:2.5rem 1rem;margin-top:2rem;text-align:center;}
+        .mcf-footer-inner{max-width:700px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:1rem;}
+        .mcf-footer .mcf-logo-footer{width:60px;height:60px;object-fit:contain;}
+        .mcf-footer-title{font-size:1.1rem;font-weight:900;letter-spacing:0.05em;}
+        .mcf-footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:0.5rem;align-items:center;}
+        .mcf-footer-links a{color:rgba(255,255,255,0.7);text-decoration:none;font-size:0.8rem;transition:color 0.3s ease;}
+        .mcf-footer-links a:hover{color:var(--mcf-brand-amber);}
+        .mcf-footer-sep{color:rgba(255,255,255,0.3);font-size:0.8rem;}
+        .mcf-footer-tagline{font-size:0.8rem;letter-spacing:0.1em;color:var(--mcf-brand-amber);font-weight:600;}
+        .mcf-footer-copy{font-size:0.7rem;color:rgba(255,255,255,0.45);}
+
+        @keyframes fadeSlideIn{from{transform:translateY(18px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+        @media(max-width:640px){.hero-title{font-size:1.5rem;}.mcf-brand-text{display:none;}.letter-preview{padding:1.25rem 1rem;font-size:10px;}}
+        @media print{.mcf-header,.mcf-footer,.mcf-theme-toggle,.action-bar,.editor-panel,.hero,.step-nav,.progress-wrap{display:none!important;}body{background:#fff!important;color:#000!important;}.builder-layout{grid-template-columns:1fr!important;}.preview-panel{position:static!important;}.preview-label{display:none!important;}}
+    </style>
+</head>
+<body>
+    <header class="mcf-header"><div class="mcf-header-inner"><div class="mcf-header-brand"><img src="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" alt="My College Finance Logo" class="mcf-logo-header"><div class="mcf-brand-text"><div class="mcf-brand-name">My College Finance</div><div class="mcf-tagline">EDUCATE &bull; MOTIVATE &bull; ELEVATE</div></div></div><button id="mcf-theme-toggle" class="mcf-theme-toggle" aria-label="Toggle dark mode"><svg class="mcf-sun-icon" width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="4" fill="currentColor"/><path d="M10 0v4M10 16v4M20 10h-4M4 10H0M17.07 2.93l-2.83 2.83M5.76 14.24l-2.83 2.83M17.07 17.07l-2.83-2.83M5.76 5.76L2.93 2.93" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><svg class="mcf-moon-icon" width="18" height="18" viewBox="0 0 20 20" fill="none" style="display:none;"><path d="M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C10.3395 3 10.6734 3.02389 11 3.07039C9.27477 4.07544 8 5.8965 8 8C8 11.3137 10.6863 14 14 14C15.1035 14 16.0754 13.6238 16.9296 12.9998C16.9762 13.3266 17 13.6605 17 14Z" fill="currentColor"/></svg></button></div></header>
+
+    <div class="content-wrap">
+        <section class="hero">
+            <div class="hero-badge">Lesson 6.1 &mdash; Financial Aid Appeals</div>
+            <h1 class="hero-title">Appeal Outline<br><span>Builder</span></h1>
+            <p class="hero-desc">Build a structured financial aid appeal letter step by step. Answer guided prompts on the left and watch your appeal letter come together in real time on the right.</p>
+        </section>
+
+        <div class="builder-layout">
+            <!-- EDITOR -->
+            <div class="editor-panel">
+                <div class="progress-wrap"><div class="progress-header"><span class="progress-label">Appeal Completeness</span><span class="progress-pct" id="globalPct">0%</span></div><div class="progress-track"><div class="progress-fill" id="globalFill"></div></div></div>
+
+                <div class="step-nav" id="stepNav"></div>
+
+                <!-- STEP 1: YOUR INFO -->
+                <div class="editor-card" id="sec-info">
+                    <div class="ec-icon">&#128100;</div>
+                    <div class="ec-title">Your Information</div>
+                    <div class="ec-desc">Basic details for the letter header. This tells the financial aid office who you are.</div>
+                    <div class="form-row">
+                        <div class="form-group"><label class="form-label">Full Name <span class="req">*</span></label><input type="text" class="mcf-input" id="fName" placeholder="e.g. Maria Johnson" oninput="mf(this);renderPreview()"></div>
+                        <div class="form-group"><label class="form-label">Student ID</label><input type="text" class="mcf-input" id="fStudentId" placeholder="e.g. 900123456" oninput="mf(this);renderPreview()"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label class="form-label">School Name <span class="req">*</span></label><input type="text" class="mcf-input" id="fSchool" placeholder="e.g. Georgia State University" oninput="mf(this);renderPreview()"></div>
+                        <div class="form-group"><label class="form-label">Academic Year</label><input type="text" class="mcf-input" id="fYear" placeholder="e.g. 2025-2026" oninput="mf(this);renderPreview()"></div>
+                    </div>
+                    <div class="form-group"><label class="form-label">Email</label><input type="email" class="mcf-input" id="fEmail" placeholder="maria@email.com" oninput="mf(this);renderPreview()"></div>
+                    <div class="nav-row"><div></div><button class="mcf-btn mcf-btn-primary mcf-btn-sm" onclick="goStep(1)">Next: Situation &#8594;</button></div>
+                </div>
+
+                <!-- STEP 2: SITUATION -->
+                <div class="editor-card hidden" id="sec-situation">
+                    <div class="ec-icon">&#128680;</div>
+                    <div class="ec-title">What Happened?</div>
+                    <div class="ec-desc">Describe the financial change or hardship clearly and specifically. Be factual and honest.</div>
+                    <div class="form-group"><label class="form-label">Type of Hardship <span class="req">*</span></label>
+                        <select class="mcf-select" id="fType" onchange="mf(this);updateTypeHelper();renderPreview()">
+                            <option value="">Select the type of change...</option>
+                            <option value="job_loss">Job loss or layoff (self or parent/guardian)</option>
+                            <option value="income_reduction">Significant income reduction</option>
+                            <option value="medical">Unexpected medical expenses</option>
+                            <option value="family_change">Family change (divorce, separation, death)</option>
+                            <option value="disaster">Natural disaster or emergency</option>
+                            <option value="housing">Housing emergency or displacement</option>
+                            <option value="other">Other financial hardship</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">When did this change occur? <span class="req">*</span></label><input type="text" class="mcf-input" id="fWhen" placeholder="e.g. March 2025, or During the fall semester" oninput="mf(this);renderPreview()"><div class="form-helper">Be specific about the timing. This helps the aid office understand why your FAFSA may not reflect your current situation.</div></div>
+                    <div class="form-group"><label class="form-label">Describe what happened <span class="req">*</span></label><textarea class="mcf-textarea" id="fWhat" rows="4" placeholder="Describe the situation in 2-4 sentences. Focus on facts: what changed, who is affected, and whether it is ongoing or resolved." oninput="mf(this);renderPreview()"></textarea><div class="form-helper" id="typeHelper"></div></div>
+                    <div class="tip-box"><strong>Writing Tip:</strong> Be specific and factual. Instead of "We are having money problems," say "My father was laid off from his position as an electrician at Smith Electric on March 15, 2025, after the company downsized. He has been unable to find comparable employment."</div>
+                    <div class="nav-row"><button class="mcf-btn mcf-btn-outline mcf-btn-sm" onclick="goStep(0)">&#8592; Back</button><button class="mcf-btn mcf-btn-primary mcf-btn-sm" onclick="goStep(2)">Next: Impact &#8594;</button></div>
+                </div>
+
+                <!-- STEP 3: IMPACT -->
+                <div class="editor-card hidden" id="sec-impact">
+                    <div class="ec-icon">&#128176;</div>
+                    <div class="ec-title">How Does This Affect You?</div>
+                    <div class="ec-desc">Explain how this situation impacts your ability to pay for college. Connect the hardship to your educational costs.</div>
+                    <div class="form-group"><label class="form-label">Financial impact on your ability to pay <span class="req">*</span></label><textarea class="mcf-textarea" id="fImpact" rows="4" placeholder="Explain how this change affects your ability to cover tuition, housing, books, or other educational expenses. Include specific numbers if possible (e.g., income reduced by $30,000/year)." oninput="mf(this);renderPreview()"></textarea><div class="form-helper">Be honest about the gap between what you can now afford and what college costs. Numbers strengthen your case.</div></div>
+                    <div class="form-group"><label class="form-label">What are you requesting? <span class="req">*</span></label><textarea class="mcf-textarea" id="fRequest" rows="3" placeholder="e.g. I am requesting a review of my financial aid package based on our changed circumstances. I am asking that my family's current income be considered rather than the income reported on the FAFSA." oninput="mf(this);renderPreview()"></textarea><div class="form-helper">Be clear about what you are asking for. You can request a Special Circumstances review, additional grant aid, or a reconsideration of your aid package.</div></div>
+                    <div class="form-group"><label class="form-label">What steps have you taken? (optional)</label><textarea class="mcf-textarea" id="fSteps" rows="2" placeholder="e.g. I have applied for unemployment benefits, I am working part-time, I have reduced personal expenses..." oninput="mf(this);renderPreview()"></textarea><div class="form-helper">Showing that you are actively addressing the situation demonstrates responsibility and strengthens your appeal.</div></div>
+                    <div class="nav-row"><button class="mcf-btn mcf-btn-outline mcf-btn-sm" onclick="goStep(1)">&#8592; Back</button><button class="mcf-btn mcf-btn-primary mcf-btn-sm" onclick="goStep(3)">Next: Documents &#8594;</button></div>
+                </div>
+
+                <!-- STEP 4: DOCUMENTATION -->
+                <div class="editor-card hidden" id="sec-docs">
+                    <div class="ec-icon">&#128203;</div>
+                    <div class="ec-title">Supporting Documentation</div>
+                    <div class="ec-desc">Check off documents you plan to include. Strong documentation significantly increases your chances of a successful appeal.</div>
+                    <div class="doc-checklist" id="docChecklist"></div>
+                    <div class="form-group" style="margin-top:0.75rem;"><label class="form-label">Additional documents you will provide</label><input type="text" class="mcf-input" id="fExtraDocs" placeholder="e.g. Court documents, insurance denial letter..." oninput="mf(this);renderPreview()"></div>
+                    <div class="tip-box"><strong>Documentation Tip:</strong> Financial aid offices need to verify your claims. The more documentation you provide, the faster and more favorably your appeal can be processed. If you do not have a document yet, note that it is "forthcoming" in your letter.</div>
+                    <div class="nav-row"><button class="mcf-btn mcf-btn-outline mcf-btn-sm" onclick="goStep(2)">&#8592; Back</button><button class="mcf-btn mcf-btn-primary mcf-btn-sm" onclick="goStep(4)">Next: Tone Check &#8594;</button></div>
+                </div>
+
+                <!-- STEP 5: TONE & REVIEW -->
+                <div class="editor-card hidden" id="sec-tone">
+                    <div class="ec-icon">&#9989;</div>
+                    <div class="ec-title">Tone & Final Review</div>
+                    <div class="ec-desc">Review your letter preview on the right. Make sure your appeal is professional, respectful, and complete.</div>
+                    <div class="tone-grid">
+                        <div class="tone-card tone-do"><div class="tc-label">Do This</div>Be factual and specific<br>Stay respectful and grateful<br>Include clear numbers/dates<br>Explain what changed and when<br>State your request clearly<br>Express commitment to education</div>
+                        <div class="tone-card tone-dont"><div class="tc-label">Avoid This</div>Exaggerating or being dramatic<br>Blaming the school or system<br>Being vague about circumstances<br>Demanding specific dollar amounts<br>Comparing to other students<br>Submitting without documentation</div>
+                    </div>
+
+                    <div class="outcomes-section">
+                        <div style="font-size:0.78rem;font-weight:700;color:var(--mcf-foreground);margin-bottom:0.4rem;">Possible Outcomes of Your Appeal</div>
+                        <div class="outcome-card"><span class="oc-icon">&#9989;</span><span><strong>Aid Adjustment:</strong> Your financial aid eligibility is recalculated based on updated financial information, potentially increasing grants or reducing expected family contribution.</span></div>
+                        <div class="outcome-card"><span class="oc-icon">&#128176;</span><span><strong>Additional Aid:</strong> The school may offer additional institutional grants, emergency funds, or work-study opportunities.</span></div>
+                        <div class="outcome-card"><span class="oc-icon">&#128196;</span><span><strong>Updated Package:</strong> Your entire financial aid package may be reprocessed using Professional Judgment to reflect your current circumstances.</span></div>
+                        <div class="outcome-card"><span class="oc-icon">&#128172;</span><span><strong>No Change:</strong> The office may determine the original package is appropriate. Even so, you may learn about other resources or options available to you.</span></div>
+                    </div>
+
+                    <div class="tip-box"><strong>Before Submitting:</strong> 1) Proofread carefully. 2) Have someone else review it. 3) Make copies of everything you submit. 4) Note the date you submit and who you give it to. 5) Follow up in 1-2 weeks if you have not heard back.</div>
+                    <div class="nav-row"><button class="mcf-btn mcf-btn-outline mcf-btn-sm" onclick="goStep(3)">&#8592; Back</button></div>
+                </div>
+            </div>
+
+            <!-- PREVIEW -->
+            <div class="preview-panel">
+                <div class="preview-label">&#128196; Live Appeal Letter Preview</div>
+                <div class="letter-preview" id="letterPreview"><div class="lp-empty">Start filling in your information on the left to see your appeal letter build in real time.</div></div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <button class="mcf-btn mcf-btn-primary" onclick="downloadPDF()"><span>&#128196;</span> Save &amp; Download PDF</button>
+            <button class="mcf-btn mcf-btn-outline" onclick="downloadTemplate()"><span>&#128203;</span> Download Blank Template</button>
+            <button class="mcf-btn mcf-btn-outline" onclick="resetAll()"><span>&#128260;</span> Reset All</button>
+        </div>
+    </div>
+
+    <footer class="mcf-footer"><div class="mcf-footer-inner"><img src="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" alt="MCF Logo" class="mcf-logo-footer"><div class="mcf-footer-title">MY COLLEGE FINANCE</div><div class="mcf-footer-links"><a href="https://www.mycollegefinance.com/" target="_blank" rel="noopener">Main Website</a><span class="mcf-footer-sep">&bull;</span><a href="https://www.mycollegefinance.com/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a><span class="mcf-footer-sep">&bull;</span><a href="https://www.mycollegefinance.com/terms-policy" target="_blank" rel="noopener">Terms of Service</a><span class="mcf-footer-sep">&bull;</span><a href="https://linktr.ee/mycollegefinance" target="_blank" rel="noopener">Social Media</a></div><div class="mcf-footer-tagline">EDUCATE &bull; MOTIVATE &bull; ELEVATE</div><div class="mcf-footer-copy">&copy; 2025 My College Finance. All rights reserved.</div></div></footer>
+
+<script>
+const steps=[{id:'info',label:'Your Info'},{id:'situation',label:'Situation'},{id:'impact',label:'Impact'},{id:'docs',label:'Documents'},{id:'tone',label:'Review'}];
+let activeStep=0;
+let checkedDocs={};
+
+const docsByType={
+    job_loss:['Termination or layoff notice','Last pay stub showing end date','Unemployment benefit letter','Letter from employer confirming separation','Updated tax return or income statement'],
+    income_reduction:['Recent pay stubs showing reduced income','Employer letter confirming reduced hours/pay','Prior year W-2 for comparison','Updated tax return or income estimate','Benefit reduction notices'],
+    medical:['Medical bills (itemized)','Insurance Explanation of Benefits (EOB)','Letter from physician','Prescription cost documentation','Health insurance premium statements'],
+    family_change:['Legal separation or divorce documents','Death certificate (if applicable)','Change in household documentation','Updated tax filing status documents','Court orders affecting finances'],
+    disaster:['FEMA declaration or correspondence','Insurance claim documentation','Photos or damage assessments','Temporary housing receipts','News articles about the event'],
+    housing:['Lease termination notice','Eviction documentation','Temporary housing costs','Moving expense receipts','New housing cost documentation'],
+    other:['Documentation of the financial change','Letters explaining circumstances','Financial statements','Any official correspondence','Third-party verification letters']
+};
+
+function initDarkMode(){const s=localStorage.getItem('mcf-theme')||'light';if(s==='dark'){document.body.classList.add('dark-mode');updI(true);}document.getElementById('mcf-theme-toggle').addEventListener('click',()=>{const d=document.body.classList.toggle('dark-mode');localStorage.setItem('mcf-theme',d?'dark':'light');updI(d);});}
+function updI(d){document.querySelectorAll('.mcf-sun-icon').forEach(i=>i.style.display=d?'none':'block');document.querySelectorAll('.mcf-moon-icon').forEach(i=>i.style.display=d?'block':'none');}
+function mf(el){if(el.value.trim())el.classList.add('filled');else el.classList.remove('filled');saveState();}
+
+function buildStepNav(){
+    document.getElementById('stepNav').innerHTML=steps.map((s,i)=>{
+        const hasContent=checkStepContent(i);
+        return `<button class="step-pill ${i===activeStep?'active':''} ${hasContent&&i!==activeStep?'completed':''}" onclick="goStep(${i})"><span class="sp-num">${i+1}</span>${s.label}</button>`;
+    }).join('');
+}
+
+function checkStepContent(idx){
+    if(idx===0)return !!(document.getElementById('fName').value&&document.getElementById('fSchool').value);
+    if(idx===1)return !!(document.getElementById('fType').value&&document.getElementById('fWhen').value&&document.getElementById('fWhat').value);
+    if(idx===2)return !!(document.getElementById('fImpact').value&&document.getElementById('fRequest').value);
+    if(idx===3)return Object.values(checkedDocs).some(v=>v);
+    if(idx===4)return true;
+    return false;
+}
+
+function goStep(idx){
+    activeStep=idx;
+    document.querySelectorAll('.editor-card').forEach(c=>c.classList.add('hidden'));
+    document.getElementById('sec-'+steps[idx].id).classList.remove('hidden');
+    buildStepNav();
+    updateProgress();
+    if(idx===3)buildDocChecklist();
+    saveState();
+}
+
+function buildDocChecklist(){
+    const type=document.getElementById('fType').value||'other';
+    const docs=docsByType[type]||docsByType.other;
+    const container=document.getElementById('docChecklist');
+    container.innerHTML=docs.map((d,i)=>{
+        const key=type+'_'+i;
+        const checked=checkedDocs[key]===true;
+        return `<div class="doc-item ${checked?'checked':''}" data-key="${key}" onclick="toggleDoc('${key}')"><div class="di-box">${checked?'\u2713':''}</div><span>${d}</span></div>`;
+    }).join('');
+}
+
+function toggleDoc(key){
+    checkedDocs[key]=!checkedDocs[key];
+    const item=document.querySelector(`.doc-item[data-key="${key}"]`);
+    if(item){item.classList.toggle('checked',checkedDocs[key]);item.querySelector('.di-box').innerHTML=checkedDocs[key]?'\u2713':'';}
+    renderPreview();saveState();
+}
+
+function updateTypeHelper(){
+    const type=document.getElementById('fType').value;
+    const helpers={
+        job_loss:'Describe who lost employment, their position, the employer, and the date. Note if it was a layoff, termination, or company closure.',
+        income_reduction:'Explain what caused the reduction (reduced hours, pay cut, business decline). Include approximate dollar amounts if possible.',
+        medical:'Describe the medical situation, approximate costs, and what insurance did or did not cover. You do not need to share private diagnosis details.',
+        family_change:'Explain the change (divorce, separation, death) and how it has affected the household\'s financial resources.',
+        disaster:'Describe the event, damage or loss experienced, and any ongoing financial impact.',
+        housing:'Explain the housing situation and how it has affected your educational costs.',
+        other:'Describe the financial change clearly and specifically, including when it occurred and who is affected.'
+    };
+    document.getElementById('typeHelper').textContent=helpers[type]||'';
+    buildDocChecklist();
+}
+
+function updateProgress(){
+    const fields=['fName','fSchool','fType','fWhen','fWhat','fImpact','fRequest'];
+    const optional=['fStudentId','fYear','fEmail','fSteps','fExtraDocs'];
+    let filled=0;
+    fields.forEach(id=>{if(document.getElementById(id).value.trim())filled++;});
+    optional.forEach(id=>{if(document.getElementById(id).value.trim())filled++;});
+    if(Object.values(checkedDocs).some(v=>v))filled++;
+    const total=fields.length+optional.length+1;
+    const pct=Math.round((filled/total)*100);
+    document.getElementById('globalPct').textContent=pct+'%';
+    document.getElementById('globalFill').style.width=pct+'%';
+}
+
+function renderPreview(){
+    const name=document.getElementById('fName').value.trim();
+    const sid=document.getElementById('fStudentId').value.trim();
+    const school=document.getElementById('fSchool').value.trim();
+    const year=document.getElementById('fYear').value.trim();
+    const email=document.getElementById('fEmail').value.trim();
+    const type=document.getElementById('fType').value;
+    const when=document.getElementById('fWhen').value.trim();
+    const what=document.getElementById('fWhat').value.trim();
+    const impact=document.getElementById('fImpact').value.trim();
+    const request=document.getElementById('fRequest').value.trim();
+    const stepsTaken=document.getElementById('fSteps').value.trim();
+    const extraDocs=document.getElementById('fExtraDocs').value.trim();
+
+    const preview=document.getElementById('letterPreview');
+    if(!name&&!school&&!what){
+        preview.innerHTML='<div class="lp-empty">Start filling in your information on the left to see your appeal letter build in real time.</div>';
+        updateProgress();return;
+    }
+
+    const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+    const typeLabels={job_loss:'loss of employment',income_reduction:'significant income reduction',medical:'unexpected medical expenses',family_change:'change in family circumstances',disaster:'natural disaster / emergency',housing:'housing emergency',other:'change in financial circumstances'};
+
+    let html=`<div class="lp-date">${today}</div>`;
+    html+=`<div class="lp-address">Financial Aid Office<br>${school||'<span class="lp-placeholder">[School Name]</span>'}<br>${year?'RE: Financial Aid Appeal - '+year:'<span class="lp-placeholder">[Academic Year]</span>'}</div>`;
+    html+=`<div class="lp-greeting">Dear Financial Aid Office,</div>`;
+
+    // Intro
+    html+=`<div class="lp-section"><div class="lp-text">My name is ${name||'<span class="lp-placeholder">[Your Name]</span>'}${sid?' (Student ID: '+sid+')':''}. I am writing to respectfully request a review of my financial aid package${year?' for the '+year+' academic year':''} due to ${type?typeLabels[type]:'<span class="lp-placeholder">[type of hardship]</span>'} that has significantly affected my family\'s financial situation.</div></div>`;
+
+    // Situation
+    if(what||when){
+        html+=`<div class="lp-section"><div class="lp-section-title">Explanation of Circumstances</div><div class="lp-text">${when?'In '+when+', ':''}${what||'<span class="lp-placeholder">[Describe what happened...]</span>'}</div></div>`;
+    }
+
+    // Impact
+    if(impact||request){
+        html+=`<div class="lp-section"><div class="lp-section-title">Financial Impact & Request</div><div class="lp-text">${impact||'<span class="lp-placeholder">[Explain how this affects your ability to pay...]</span>'}</div>`;
+        if(request)html+=`<div class="lp-text" style="margin-top:6px;">${request}</div>`;
+        html+=`</div>`;
+    }
+
+    // Steps taken
+    if(stepsTaken){
+        html+=`<div class="lp-section"><div class="lp-section-title">Steps I Have Taken</div><div class="lp-text">${stepsTaken}</div></div>`;
+    }
+
+    // Documents
+    const checkedDocNames=[];
+    const docType=type||'other';
+    const docList=docsByType[docType]||docsByType.other;
+    docList.forEach((d,i)=>{if(checkedDocs[docType+'_'+i])checkedDocNames.push(d);});
+    if(extraDocs)checkedDocNames.push(extraDocs);
+
+    if(checkedDocNames.length>0){
+        html+=`<div class="lp-docs"><div class="lp-docs-title">Enclosed Documentation</div><ol class="lp-docs-list">${checkedDocNames.map(d=>`<li>${d}</li>`).join('')}</ol></div>`;
+    }
+
+    // Closing
+    html+=`<div class="lp-closing">I appreciate your time in reviewing my situation. I am committed to completing my education at ${school||'[School Name]'} and would be grateful for any assistance your office can provide. Please do not hesitate to contact me if you need any additional information.</div>`;
+    html+=`<div class="lp-closing" style="margin-top:10px;">Respectfully,</div>`;
+    html+=`<div class="lp-sig">${name||'[Your Name]'}</div>`;
+    if(email)html+=`<div style="font-size:10px;color:#64748b;margin-top:2px;">${email}</div>`;
+
+    preview.innerHTML=html;
+    updateProgress();
+}
+
+function saveState(){
+    const d={};
+    ['fName','fStudentId','fSchool','fYear','fEmail','fType','fWhen','fWhat','fImpact','fRequest','fSteps','fExtraDocs'].forEach(id=>{d[id]=document.getElementById(id).value;});
+    d.checkedDocs=checkedDocs;d.activeStep=activeStep;
+    localStorage.setItem('mcf-appeal-builder',JSON.stringify(d));
+}
+
+function loadState(){
+    const raw=localStorage.getItem('mcf-appeal-builder');if(!raw)return;
+    try{
+        const d=JSON.parse(raw);
+        ['fName','fStudentId','fSchool','fYear','fEmail','fType','fWhen','fWhat','fImpact','fRequest','fSteps','fExtraDocs'].forEach(id=>{if(d[id]){document.getElementById(id).value=d[id];mf(document.getElementById(id));}});
+        if(d.checkedDocs)checkedDocs=d.checkedDocs;
+        if(d.activeStep)activeStep=d.activeStep;
+        if(d.fType)updateTypeHelper();
+        goStep(activeStep);renderPreview();
+    }catch(e){}
+}
+
+function resetAll(){
+    if(!confirm('Reset your entire appeal? This cannot be undone.'))return;
+    ['fName','fStudentId','fSchool','fYear','fEmail','fType','fWhen','fWhat','fImpact','fRequest','fSteps','fExtraDocs'].forEach(id=>{const el=document.getElementById(id);el.value='';el.classList.remove('filled');});
+    checkedDocs={};activeStep=0;
+    localStorage.removeItem('mcf-appeal-builder');
+    goStep(0);renderPreview();buildStepNav();
+}
+
+function downloadPDF(){
+    const name=document.getElementById('fName').value.trim()||'Student';
+    const preview=document.getElementById('letterPreview').innerHTML;
+    let html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Financial Aid Appeal Letter - ${name}</title>
+    <style>
+        @page{margin:1in;size:letter;}
+        body{font-family:Georgia,'Times New Roman',serif;color:#1a1a1a;font-size:12px;line-height:1.7;}
+        .lp-date{font-size:11px;color:#555;margin-bottom:16px;font-family:-apple-system,sans-serif;}
+        .lp-address{font-size:11px;color:#333;margin-bottom:16px;line-height:1.6;font-family:-apple-system,sans-serif;}
+        .lp-greeting{font-size:12px;font-weight:600;margin-bottom:14px;}
+        .lp-section{margin-bottom:14px;}
+        .lp-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#012699;margin-bottom:4px;font-family:-apple-system,sans-serif;}
+        .lp-text{font-size:12px;color:#1f2937;line-height:1.7;}
+        .lp-placeholder{color:#94a3b8;font-style:italic;}
+        .lp-closing{margin-top:18px;font-size:12px;}
+        .lp-sig{font-size:13px;font-weight:700;margin-top:24px;}
+        .lp-docs{margin-top:14px;padding-top:10px;border-top:1px solid #ddd;}
+        .lp-docs-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#012699;margin-bottom:4px;font-family:-apple-system,sans-serif;}
+        .lp-docs-list{font-size:11px;color:#333;padding-left:18px;line-height:1.6;}
+        .watermark{text-align:center;margin-top:30px;padding-top:12px;border-top:1px solid #e2e8f0;font-size:8px;color:#94a3b8;font-family:-apple-system,sans-serif;}
+        .watermark .amber{color:#d97706;font-weight:600;letter-spacing:0.1em;}
+    </style></head><body>${preview}<div class="watermark"><div class="amber">EDUCATE * MOTIVATE * ELEVATE</div>Draft prepared with My College Finance Appeal Outline Builder | www.mycollegefinance.com</div>
+    <script src="../../nav-inject.js"></script>
+</body></html>`;
+    openPrint(html,`${name.replace(/\s+/g,'_')}_Financial_Aid_Appeal.html`);
+    saveState();
+}
+
+function downloadTemplate(){
+    let html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Financial Aid Appeal Worksheet - My College Finance</title>
+    <style>
+        @page{margin:0.65in;size:letter;}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#09090b;font-size:10.5px;line-height:1.5;}
+        .header{text-align:center;border-bottom:3px solid #012699;padding-bottom:10px;margin-bottom:14px;}
+        .header img{width:50px;height:50px;}.header h1{font-size:18px;color:#012699;margin:6px 0 2px;}
+        .header .tagline{font-size:9px;color:#64748b;letter-spacing:0.1em;}.header .sub{font-size:9px;color:#94a3b8;margin-top:4px;}
+        .instructions{background:#f0f5ff;border:1px solid #dbeafe;border-radius:6px;padding:8px 12px;margin-bottom:14px;font-size:10px;color:#1e3a5f;}
+        .instructions strong{color:#012699;}
+        .section-title{font-size:12px;font-weight:800;color:#012699;border-bottom:2px solid #e2e8f0;padding-bottom:3px;margin:14px 0 8px;}
+        .write-lines{border-bottom:1px solid #e2e8f0;height:24px;}
+        .write-box{border:1.5px solid #d1d5db;border-radius:6px;min-height:80px;padding:8px;margin-bottom:8px;}
+        .prompt{font-size:9.5px;color:#374151;font-weight:600;margin-bottom:4px;}
+        .hint{font-size:8.5px;color:#64748b;font-style:italic;margin-bottom:6px;}
+        .field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px;}
+        .field .label{font-size:8px;color:#64748b;font-weight:600;}
+        .doc-table{width:100%;border-collapse:collapse;margin:8px 0;}
+        .doc-table th,.doc-table td{padding:5px 8px;border:1px solid #d1d5db;font-size:10px;}
+        .doc-table th{background:#f0f5ff;color:#012699;font-weight:700;text-align:left;font-size:9px;text-transform:uppercase;}
+        .cb-empty{width:14px;height:14px;border:2px solid #d1d5db;border-radius:3px;display:inline-block;vertical-align:middle;margin-right:4px;}
+        .tone-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0;}
+        .tone-box{border:1px solid #e2e8f0;border-radius:4px;padding:6px 8px;font-size:9px;}
+        .tone-box h4{font-size:8px;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:2px;}
+        .tone-do h4{color:#16a34a;}.tone-dont h4{color:#ef4444;}
+        .footer{text-align:center;border-top:2px solid #e2e8f0;padding-top:10px;margin-top:14px;}
+        .footer .amber{color:#d97706;font-weight:600;letter-spacing:0.1em;font-size:10px;}.footer .copy{font-size:8px;color:#94a3b8;}
+    </style></head><body>
+    <div class="header"><img src="https://static.wixstatic.com/media/c24a60_2b6231b666214539ae22ebd2dffe7a09~mv2.png" alt="MCF Logo"><h1>Financial Aid Appeal Worksheet</h1><div class="tagline">EDUCATE * MOTIVATE * ELEVATE</div><div class="sub">The Scholarship Strategy | Lesson 6.1</div></div>
+    <div class="instructions"><strong>Instructions:</strong> Use this worksheet to organize your financial aid appeal before writing the final letter. Answer each prompt thoughtfully and gather your supporting documentation.</div>
+
+    <div class="section-title">Step 1: Your Information</div>
+    <div class="field-row"><div class="field"><div class="label">Full Name:</div><div class="write-lines"></div></div><div class="field"><div class="label">Student ID:</div><div class="write-lines"></div></div></div>
+    <div class="field-row"><div class="field"><div class="label">School:</div><div class="write-lines"></div></div><div class="field"><div class="label">Academic Year:</div><div class="write-lines"></div></div></div>
+
+    <div class="section-title">Step 2: What Happened?</div>
+    <div class="prompt">What financial change or hardship occurred?</div>
+    <div class="hint">Be specific: job loss, medical emergency, family change, disaster, etc.</div>
+    <div class="write-box"></div>
+    <div class="prompt">When did this change happen?</div>
+    <div class="write-lines"></div>
+
+    <div class="section-title">Step 3: How Does This Affect You?</div>
+    <div class="prompt">How does this situation affect your ability to pay for college?</div>
+    <div class="hint">Include specific numbers if possible (income reduction amount, new expenses, etc.)</div>
+    <div class="write-box"></div>
+    <div class="prompt">What are you specifically requesting from the financial aid office?</div>
+    <div class="write-box" style="min-height:50px;"></div>
+    <div class="prompt">What steps have you taken to address the situation?</div>
+    <div class="write-box" style="min-height:50px;"></div>
+
+    <div class="section-title">Step 4: Supporting Documentation Checklist</div>
+    <table class="doc-table"><tr><th>Document</th><th>Have It?</th><th>Notes</th></tr>
+    <tr><td>Termination/layoff notice or employer letter</td><td style="text-align:center;"><span class="cb-empty"></span></td><td></td></tr>
+    <tr><td>Pay stubs or income documentation</td><td style="text-align:center;"><span class="cb-empty"></span></td><td></td></tr>
+    <tr><td>Medical bills or insurance statements</td><td style="text-align:center;"><span class="cb-empty"></span></td><td></td></tr>
+    <tr><td>Legal/court documents (if applicable)</td><td style="text-align:center;"><span class="cb-empty"></span></td><td></td></tr>
+    <tr><td>Written personal statement</td><td style="text-align:center;"><span class="cb-empty"></span></td><td></td></tr>
+    <tr><td>Other: _______________</td><td style="text-align:center;"><span class="cb-empty"></span></td><td></td></tr>
+    <tr><td>Other: _______________</td><td style="text-align:center;"><span class="cb-empty"></span></td><td></td></tr></table>
+
+    <div class="section-title">Step 5: Tone Check</div>
+    <div class="tone-grid">
+        <div class="tone-box tone-do"><h4>Do</h4>Be factual and specific / Stay respectful / Include numbers and dates / Explain what changed / State your request clearly</div>
+        <div class="tone-box tone-dont"><h4>Don't</h4>Exaggerate or be dramatic / Blame the school / Be vague / Demand specific amounts / Submit without documentation</div>
+    </div>
+
+    <div class="footer"><div class="amber">EDUCATE * MOTIVATE * ELEVATE</div><div class="copy">Copyright 2025 My College Finance. All rights reserved. | www.mycollegefinance.com</div></div>
+    <script src="../../nav-inject.js"></script>
+</body></html>`;
+    openPrint(html,'Financial_Aid_Appeal_Worksheet.html');
+}
+
+function openPrint(html,name){const blob=new Blob([html],{type:'text/html'});const url=URL.createObjectURL(blob);const win=window.open(url,'_blank');if(win){win.onload=()=>{setTimeout(()=>{win.print();},400);};}else{const a=document.createElement('a');a.href=url;a.download=name;a.click();}setTimeout(()=>URL.revokeObjectURL(url),10000);}
+
+document.addEventListener('DOMContentLoaded',()=>{initDarkMode();buildStepNav();loadState();renderPreview();});
+</script>
+
+    <script src="../../nav-inject.js"></script>
+</body>
+</html>
