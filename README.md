@@ -200,4 +200,4 @@ These tools are designed to complement, not replace, official financial aid guid
 
 For questions or support, please contact:
 
-- [My College Finance Technical Feedback Form](https://www.mycollegefinance.com/contact)
+- [My College Finance Technical Feedback Form](https://docs.google.com/forms/d/e/1FAIpQLScYaEGpSP3GsvLPWMx4yAk-uckDCG32HqoXYgtzh4npLDPjNw/viewform?usp=header)
