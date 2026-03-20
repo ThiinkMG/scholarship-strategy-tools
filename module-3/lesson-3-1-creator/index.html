@@ -672,7 +672,6 @@ function downloadPDF(){
     if(interests) html+=`<div class="section-title">Interests</div><div class="entry-desc">${interests}</div>`;
 
     html+=`<div class="mcf-watermark"><div class="amber">EDUCATE * MOTIVATE * ELEVATE</div>Created with My College Finance Scholarship Resume Builder | www.mycollegefinance.com</div>
-    <script src="../../nav-inject.js"></script>
 </body></html>`;
     openPrint(html,`${name.replace(/\s+/g,'_')}_Scholarship_Resume.html`);
     saveState();
@@ -744,7 +743,6 @@ function downloadTemplate(){
 
     <div class="tip"><strong>Resume Tips:</strong> Keep to one page. Use action verbs. Quantify achievements when possible (e.g. "Organized fundraiser raising $2,000"). Tailor for each scholarship application. Proofread carefully!</div>
     <div class="footer"><div class="amber">EDUCATE * MOTIVATE * ELEVATE</div><div class="copy">Copyright 2025 My College Finance. All rights reserved. | www.mycollegefinance.com</div></div>
-    <script src="../../nav-inject.js"></script>
 </body></html>`;
     openPrint(html,'Scholarship_Resume_Template.html');
 }

@@ -13,6 +13,9 @@
 (function () {
     'use strict';
 
+    // Prevent double injection
+    if (document.getElementById('mcf-tools-nav-bar')) return;
+
     // Determine the base path to the hub (root of the GitHub Pages site)
     const scriptTags = document.querySelectorAll('script[src*="nav-inject"]');
     let basePath = './';
